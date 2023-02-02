@@ -1,5 +1,9 @@
 package org.newcih.service;
 
+import com.sun.nio.file.ExtendedWatchEventModifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
@@ -12,22 +16,33 @@ import java.util.function.Consumer;
  */
 public class FileWatchService {
 
+    public static final Logger LOGGER = LoggerFactory.getLogger(FileWatchService.class);
+
     /**
      * 监听服务对象
      */
-    private WatchService watchService;
+    private final WatchService watchService;
 
     /**
      * 监听变化后的动作
      */
-    private Consumer<WatchEvent<?>> consumer;
+    private Consumer<List<WatchEvent<?>>> consumer;
 
     public FileWatchService(String[] paths) throws IOException {
         watchService = FileSystems.getDefault().newWatchService();
         for (String path : paths) {
             Path tempPath = Paths.get(path);
-            tempPath.register(watchService, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.OVERFLOW);
+            // TODO 是否有必要使用FILE_TREE注册，如果使用FILE_TREE注册，则仅需监听MODIFY事件
+            tempPath.register(watchService, new WatchEvent.Kind[]{StandardWatchEventKinds.ENTRY_MODIFY}, ExtendedWatchEventModifier.FILE_TREE);
         }
+    }
+
+    /**
+     * 启动方法
+     */
+    public void action() {
+        addShutdownHook();
+        registerWatchService();
     }
 
     /**
@@ -43,6 +58,10 @@ public class FileWatchService {
         });
 
         Runtime.getRuntime().addShutdownHook(shutdownHook);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("FileWatchService注册了ShutdownHook");
+        }
     }
 
     /**
@@ -54,12 +73,9 @@ public class FileWatchService {
                 try {
                     WatchKey watchKey = watchService.take();
                     List<WatchEvent<?>> watchEvents = watchKey.pollEvents();
-                    for (WatchEvent<?> watchEvent : watchEvents) {
-                        if (StandardWatchEventKinds.ENTRY_CREATE.equals(watchEvent.kind())) {
-                            consumer.accept(watchEvent);
-                        }
-                    }
+                    consumer.accept(watchEvents);
 
+                    watchKey.reset();
                 } catch (InterruptedException e) {
                     throw new RuntimeException("创建watchKey发生异常", e);
                 }
@@ -68,5 +84,20 @@ public class FileWatchService {
 
         watchDaemon.setDaemon(true);
         watchDaemon.start();
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("FileWatchService线程已启动");
+        }
+    }
+
+    /**
+     * getter and setter
+     */
+    public Consumer<List<WatchEvent<?>>> getConsumer() {
+        return consumer;
+    }
+
+    public void setConsumer(Consumer<List<WatchEvent<?>>> consumer) {
+        this.consumer = consumer;
     }
 }
