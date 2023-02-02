@@ -32,8 +32,9 @@ public class FileWatchService {
         watchService = FileSystems.getDefault().newWatchService();
         for (String path : paths) {
             Path tempPath = Paths.get(path);
-            // TODO 是否有必要使用FILE_TREE注册，如果使用FILE_TREE注册，则仅需监听MODIFY事件
-            tempPath.register(watchService, new WatchEvent.Kind[]{StandardWatchEventKinds.ENTRY_MODIFY}, ExtendedWatchEventModifier.FILE_TREE);
+            // macOS平台JDK不支持Modifer参数
+            // tempPath.register(watchService, new WatchEvent.Kind[]{StandardWatchEventKinds.ENTRY_MODIFY}, ExtendedWatchEventModifier.FILE_TREE);
+            tempPath.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
         }
     }
 
