@@ -1,6 +1,7 @@
 package org.newcih.service;
 
 import com.sun.nio.file.ExtendedWatchEventModifier;
+import org.newcih.util.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,6 +9,8 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
 import java.util.function.Consumer;
+
+import static java.nio.file.StandardWatchEventKinds.*;
 
 /**
  * 文件变动监听服务
@@ -32,9 +35,13 @@ public class FileWatchService {
         watchService = FileSystems.getDefault().newWatchService();
         for (String path : paths) {
             Path tempPath = Paths.get(path);
+
             // macOS平台JDK不支持Modifer参数
-            // tempPath.register(watchService, new WatchEvent.Kind[]{StandardWatchEventKinds.ENTRY_MODIFY}, ExtendedWatchEventModifier.FILE_TREE);
-            tempPath.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
+            if (SystemUtils.isWindowOS()) {
+                tempPath.register(watchService, new WatchEvent.Kind[]{StandardWatchEventKinds.ENTRY_MODIFY}, ExtendedWatchEventModifier.FILE_TREE);
+            } else {
+                tempPath.register(watchService, ENTRY_MODIFY, ENTRY_CREATE, ENTRY_DELETE, OVERFLOW);
+            }
         }
     }
 
