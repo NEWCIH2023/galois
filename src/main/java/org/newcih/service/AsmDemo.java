@@ -1,14 +1,8 @@
 package org.newcih.service;
 
-import com.sun.tools.javac.code.Attribute;
 import org.objectweb.asm.*;
-import org.objectweb.asm.util.ASMifier;
-import org.objectweb.asm.util.Printer;
-import org.objectweb.asm.util.TraceClassVisitor;
 
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.lang.reflect.Method;
 
 public class AsmDemo extends ClassLoader implements Opcodes {

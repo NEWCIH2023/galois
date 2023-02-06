@@ -29,7 +29,9 @@ public class FileWatchService {
     /**
      * 监听变化后的动作
      */
-    private Consumer<List<WatchEvent<?>>> consumer;
+    private Consumer<List<WatchEvent<?>>> consumers;
+
+    private Consumer<WatchEvent> consumer;
 
     public FileWatchService(String[] paths) throws IOException {
         watchService = FileSystems.getDefault().newWatchService();
@@ -81,7 +83,11 @@ public class FileWatchService {
                 try {
                     WatchKey watchKey = watchService.take();
                     List<WatchEvent<?>> watchEvents = watchKey.pollEvents();
-                    consumer.accept(watchEvents);
+                    if (consumer != null) {
+                        watchEvents.forEach(watchEvent -> consumer.accept(watchEvent));
+                    } else if (consumers != null) {
+                        consumers.accept(watchEvents);
+                    }
 
                     watchKey.reset();
                 } catch (InterruptedException e) {
@@ -98,14 +104,19 @@ public class FileWatchService {
         }
     }
 
-    /**
-     * getter and setter
-     */
-    public Consumer<List<WatchEvent<?>>> getConsumer() {
+    public Consumer<List<WatchEvent<?>>> getConsumers() {
+        return consumers;
+    }
+
+    public void setConsumers(Consumer<List<WatchEvent<?>>> consumers) {
+        this.consumers = consumers;
+    }
+
+    public Consumer<WatchEvent> getConsumer() {
         return consumer;
     }
 
-    public void setConsumer(Consumer<List<WatchEvent<?>>> consumer) {
+    public void setConsumer(Consumer<WatchEvent> consumer) {
         this.consumer = consumer;
     }
 }
