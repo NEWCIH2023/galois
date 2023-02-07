@@ -8,13 +8,12 @@ public class PremainDemo {
 
     public static void main(String[] args) throws InterruptedException {
         while (true) {
-            Thread.sleep(10_000);
-            LOGGER.info(new PremainDemo().getName());
+            Thread.sleep(5000);
+            System.out.println(new PremainDemo().getName());
         }
     }
 
     public String getName() {
-        System.out.println(1);
-        return "first version getName method !";
+        return " first versbon getName method !";
     }
 }

@@ -69,6 +69,11 @@
             <artifactId>guava</artifactId>
             <version>29.0-jre</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>springloaded</artifactId>
+            <version>1.2.8.RELEASE</version>
+        </dependency>
     </dependencies>
     <build>
         <pluginManagement>
@@ -82,7 +87,8 @@
                                 <Boot-Class-Path>
                                     C:/Users/liuguangsheng.SZSYY/.m2/repository/org/javassist/javassist/3.21.0-GA/javassist-3.21.0-GA.jar
                                 </Boot-Class-Path>
-<!--                                <Agent-Class>org.newcih.service.PremainService</Agent-Class>-->
+                                <Can-Redefine-Clsses>true</Can-Redefine-Clsses>
+                                <!--                                <Agent-Class>org.newcih.service.PremainService</Agent-Class>-->
                             </manifestEntries>
                         </archive>
                     </configuration>
@@ -94,6 +100,17 @@
                         <source>1.8</source>
                         <target>1.8</target>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.springframework</groupId>
+                            <artifactId>springloaded</artifactId>
+                            <version>1.2.8.RELEASE</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>

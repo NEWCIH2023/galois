@@ -24,11 +24,11 @@ public class FileWatchServiceDemo {
             fileWatchService = new FileWatchService(new String[]{"/Users/cihnew"});
         }
 
-        fileWatchService.setConsumer(watchEvent -> {
-            if (StandardWatchEventKinds.ENTRY_MODIFY.equals(watchEvent.kind())) {
-                LOGGER.info("检测到修改了 <" + watchEvent.context() + ">");
-            }
-        });
+//        fileWatchService.setConsumer(watchEvent -> {
+//            if (StandardWatchEventKinds.ENTRY_MODIFY.equals(watchEvent.kind())) {
+//                LOGGER.info("检测到修改了 <" + watchEvent.context() + ">");
+//            }
+//        });
         fileWatchService.action();
 
         Thread.currentThread().join();

@@ -5,9 +5,12 @@ import org.newcih.util.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileDescriptor;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static java.nio.file.StandardWatchEventKinds.*;
@@ -26,12 +29,7 @@ public class FileWatchService {
      */
     private final WatchService watchService;
 
-    /**
-     * 监听变化后的动作
-     */
-    private Consumer<List<WatchEvent<?>>> consumers;
-
-    private Consumer<WatchEvent> consumer;
+    private BiConsumer<WatchEvent<?>, File> biConsumer;
 
     public FileWatchService(String[] paths) throws IOException {
         watchService = FileSystems.getDefault().newWatchService();
@@ -82,12 +80,10 @@ public class FileWatchService {
             while (true) {
                 try {
                     WatchKey watchKey = watchService.take();
-                    List<WatchEvent<?>> watchEvents = watchKey.pollEvents();
-                    if (consumer != null) {
-                        watchEvents.forEach(watchEvent -> consumer.accept(watchEvent));
-                    } else if (consumers != null) {
-                        consumers.accept(watchEvents);
-                    }
+                    List<WatchEvent<?>> events = watchKey.pollEvents();
+                    events.forEach(event -> {
+                        System.out.println(event.context());
+                    });
 
                     watchKey.reset();
                 } catch (InterruptedException e) {
@@ -104,19 +100,4 @@ public class FileWatchService {
         }
     }
 
-    public Consumer<List<WatchEvent<?>>> getConsumers() {
-        return consumers;
-    }
-
-    public void setConsumers(Consumer<List<WatchEvent<?>>> consumers) {
-        this.consumers = consumers;
-    }
-
-    public Consumer<WatchEvent> getConsumer() {
-        return consumer;
-    }
-
-    public void setConsumer(Consumer<WatchEvent> consumer) {
-        this.consumer = consumer;
-    }
 }
