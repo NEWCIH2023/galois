@@ -1,17 +1,12 @@
 package org.newcih.service;
 
-import com.sun.nio.file.ExtendedWatchEventModifier;
 import com.sun.nio.file.SensitivityWatchEventModifier;
-import org.newcih.util.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileDescriptor;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static java.nio.file.StandardWatchEventKinds.*;
@@ -21,9 +16,9 @@ import static java.nio.file.StandardWatchEventKinds.*;
  *
  * @author liuguangsheng
  */
-public class FileWatchService {
+public class JdkFileWatchService implements FileWatchService {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(FileWatchService.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(JdkFileWatchService.class);
 
     /**
      * 监听服务对象
@@ -36,7 +31,7 @@ public class FileWatchService {
 
     private Consumer<WatchEvent<Path>> deleteHandler;
 
-    public FileWatchService(String[] paths) throws IOException {
+    public JdkFileWatchService(String[] paths) throws IOException {
         watchService = FileSystems.getDefault().newWatchService();
         for (String path : paths) {
             Path tempPath = Paths.get(path);
@@ -49,23 +44,36 @@ public class FileWatchService {
     /**
      * 启动方法
      */
-    public void action() {
-        addShutdownHook();
-        registerWatchService();
+    @Override
+    public boolean start() {
+        try {
+            addShutdownHook();
+            registerWatchService();
+        } catch (Exception e) {
+            LOGGER.error("启动jdkWatchService服务发生异常", e);
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean stop() {
+        try {
+            watchService.close();
+        } catch (IOException e) {
+            LOGGER.error("关闭jdkWatchService服务发生异常", e);
+            return false;
+        }
+
+        return true;
     }
 
     /**
      * 注册watchService关闭hook
      */
     private void addShutdownHook() {
-        Thread shutdownHook = new Thread(() -> {
-            try {
-                watchService.close();
-            } catch (IOException e) {
-                throw new RuntimeException("关闭watchService服务发生异常", e);
-            }
-        });
-
+        Thread shutdownHook = new Thread(this::stop);
         Runtime.getRuntime().addShutdownHook(shutdownHook);
 
         if (LOGGER.isDebugEnabled()) {

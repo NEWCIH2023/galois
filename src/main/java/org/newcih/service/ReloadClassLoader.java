@@ -1,9 +1,13 @@
 package org.newcih.service;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -12,26 +16,22 @@ import java.util.Objects;
 
 public class ReloadClassLoader extends ClassLoader {
 
-    public String classpath;
+    private final List<String> classpaths = Lists.newArrayListWithCapacity(10);
 
     public static final Logger LOGGER = LoggerFactory.getLogger(ReloadClassLoader.class);
 
-    public static final String[] JVM_PACKAGES = new String[]{"java", "javax", "org.omg", "org.ietf", "org.w3c", "org.xml", "jdk"};
+    public static final String[] IGNORE_PACKAGE = new String[]{"java", "javax", "org.omg", "org.ietf", "org.w3c", "org.xml", "jdk", "org.objectweb"};
 
-    public ReloadClassLoader(String classpath) {
-        this.classpath = classpath;
+    public ReloadClassLoader(List<String> classpaths) {
+        this.classpaths.addAll(classpaths);
     }
 
     @Override
-    protected Class<?> findClass(String name) throws ClassNotFoundException {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("will use findClass method in ReloadClassLoader to find class {}", name);
-        }
-
+    protected Class<?> findClass(String name) {
         String path = name.replaceAll("\\.", "\\\\");
 
         try {
-            byte[] classBytes = getClassBytes(classpath + "\\" + path + ".class");
+            byte[] classBytes = getClassBytes(path + ".class");
             return defineClass(name, classBytes, 0, Objects.requireNonNull(classBytes).length);
         } catch (Exception e) {
             LOGGER.error("寻找类{}发生异常", name, e);
@@ -43,7 +43,7 @@ public class ReloadClassLoader extends ClassLoader {
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
 
-        for (String jvmPackage : JVM_PACKAGES) {
+        for (String jvmPackage : IGNORE_PACKAGE) {
             if (name.startsWith(jvmPackage)) {
                 return super.loadClass(name, resolve);
             }
@@ -68,8 +68,16 @@ public class ReloadClassLoader extends ClassLoader {
         }
     }
 
-    private static byte[] getClassBytes(String path) {
-        try (InputStream is = Files.newInputStream(Paths.get(path)); ByteArrayOutputStream baos = new ByteArrayOutputStream();) {
+    private byte[] getClassBytes(String path) {
+        String fullPath = "";
+
+        for (String classpath : classpaths) {
+            if (!Strings.isNullOrEmpty(fullPath = Paths.get(classpath + "\\" + path).toString())) {
+                break;
+            }
+        }
+
+        try (InputStream is = Files.newInputStream(Paths.get(fullPath)); ByteArrayOutputStream baos = new ByteArrayOutputStream();) {
             byte[] buffer = new byte[1024];
             int len = 0;
 
@@ -83,5 +91,13 @@ public class ReloadClassLoader extends ClassLoader {
         }
 
         return null;
+    }
+
+    public void addClassPath(List<String> classPaths) {
+        this.classpaths.addAll(classPaths);
+    }
+
+    public void removeClassPath(List<String> classpaths) {
+        this.classpaths.removeAll(classpaths);
     }
 }

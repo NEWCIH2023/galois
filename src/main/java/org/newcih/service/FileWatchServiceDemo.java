@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.file.StandardWatchEventKinds;
 
 public class FileWatchServiceDemo {
 
@@ -13,15 +12,13 @@ public class FileWatchServiceDemo {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        FileWatchService fileWatchService;
+        JdkFileWatchService fileWatchService;
         if (SystemUtils.isWindowOS()) {
-            fileWatchService = new FileWatchService(new String[]{
-                    "C:\\Users\\liuguangsheng.SZSYY\\IdeaProjects\\galois\\out",
-                    "C:\\Users\\liuguangsheng.SZSYY\\IdeaProjects\\galois\\target",
-                    "C:\\Users\\liuguangsheng.SZSYY\\IdeaProjects\\learn-java-asm\\target"
+            fileWatchService = new JdkFileWatchService(new String[]{
+                    "C:\\Users\\liuguangsheng.SZSYY\\IdeaProjects\\galois\\target"
             });
         } else {
-            fileWatchService = new FileWatchService(new String[]{"/Users/cihnew"});
+            fileWatchService = new JdkFileWatchService(new String[]{"/Users/cihnew"});
         }
 
 //        fileWatchService.setConsumer(watchEvent -> {
@@ -29,7 +26,7 @@ public class FileWatchServiceDemo {
 //                LOGGER.info("检测到修改了 <" + watchEvent.context() + ">");
 //            }
 //        });
-        fileWatchService.action();
+        fileWatchService.start();
 
         Thread.currentThread().join();
     }

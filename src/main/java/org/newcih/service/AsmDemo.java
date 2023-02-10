@@ -21,14 +21,14 @@ public class AsmDemo extends ClassLoader implements Opcodes {
         new ClassReader(className).accept(traceClassVisitor, parsingOptions);
     }
 
-    public byte[] createClassWithoutTestMethod() throws IOException {
+    public byte[] createClassWithoutTestMethod(String className) throws IOException {
         ClassWriter classWriter = new ClassWriter(0);
         FieldVisitor fieldVisitor;
         RecordComponentVisitor recordComponentVisitor;
         MethodVisitor methodVisitor;
         AnnotationVisitor annotationVisitor;
 
-        classWriter.visit(V1_8, ACC_PUBLIC | ACC_SUPER, "CopyClassExample", null, "java/lang/Object", null);
+        classWriter.visit(V1_8, ACC_PUBLIC | ACC_SUPER, className, null, "java/lang/Object", null);
         methodVisitor = classWriter.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
         methodVisitor.visitCode();
         methodVisitor.visitVarInsn(ALOAD, 0);
@@ -49,25 +49,25 @@ public class AsmDemo extends ClassLoader implements Opcodes {
         classWriter.visitEnd();
 
         byte[] bytes = classWriter.toByteArray();
-        writeClassFile(bytes);
+        writeClassFile(bytes, className);
 
         return bytes;
     }
 
-    public static void writeClassFile(byte[] bytes) throws IOException {
-        FileOutputStream fos = new FileOutputStream("target\\classes\\CopyClassExample.class");
+    public static void writeClassFile(byte[] bytes, String className) throws IOException {
+        FileOutputStream fos = new FileOutputStream(String.format("target\\classes\\%s.class", className));
         fos.write(bytes);
         fos.close();
     }
 
-    public byte[] createClassWithTestMethod() throws IOException {
+    public byte[] createClassWithTestMethod(String output, String className) throws IOException {
         ClassWriter classWriter = new ClassWriter(0);
         FieldVisitor fieldVisitor;
         RecordComponentVisitor recordComponentVisitor;
         MethodVisitor methodVisitor;
         AnnotationVisitor annotationVisitor;
 
-        classWriter.visit(V1_8, ACC_PUBLIC | ACC_SUPER, "CopyClassExample", null, "java/lang/Object", null);
+        classWriter.visit(V1_8, ACC_PUBLIC | ACC_SUPER, className, null, "java/lang/Object", null);
         methodVisitor = classWriter.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
         methodVisitor.visitCode();
         methodVisitor.visitVarInsn(ALOAD, 0);
@@ -88,7 +88,7 @@ public class AsmDemo extends ClassLoader implements Opcodes {
         methodVisitor = classWriter.visitMethod(ACC_PUBLIC, "test", "()Ljava/lang/String;", null, null);
         methodVisitor.visitCode();
         methodVisitor.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
-        methodVisitor.visitLdcInsn("test method");
+        methodVisitor.visitLdcInsn(output);
         methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
         methodVisitor.visitLdcInsn("test");
         methodVisitor.visitInsn(ARETURN);
@@ -98,17 +98,21 @@ public class AsmDemo extends ClassLoader implements Opcodes {
         classWriter.visitEnd();
 
         byte[] bytes = classWriter.toByteArray();
-        writeClassFile(bytes);
+        writeClassFile(bytes, className);
 
         return bytes;
     }
 
     public static void main(String[] args) throws Exception {
         AsmDemo asmDemo = new AsmDemo();
-        asmDemo.printCreateClassFileCode();
-        byte[] bytes = asmDemo.createClassWithTestMethod();
-        Class<?> clazz = asmDemo.defineClass("CopyClassExample", bytes, 0, bytes.length);
-        Method[] methods = clazz.getMethods();
-        methods[0].invoke(null, new Object[]{null});
+//        asmDemo.printCreateClassFileCode();
+//        asmDemo.createClassWithTestMethod("newcih", "CopyClassExample1");
+        asmDemo.createClassWithTestMethod("neh2", "CopyClassExample");
+        asmDemo.createClassWithTestMethod("nwih2", "CopyClassExample4");
+        asmDemo.createClassWithTestMethod("ecih2", "CopyClassExample5");
+        asmDemo.createClassWithTestMethod("ewcih2", "CopyClassExample3");
+//        Class<?> clazz = asmDemo.defineClass("CopyClassExample", bytes, 0, bytes.length);
+//        Method[] methods = clazz.getMethods();
+//        methods[0].invoke(null, new Object[]{null});
     }
 }

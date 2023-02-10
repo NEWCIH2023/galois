@@ -7,10 +7,7 @@ public class PremainDemo {
     public static final Logger LOGGER = LoggerFactory.getLogger(PremainDemo.class);
 
     public static void main(String[] args) throws InterruptedException {
-        while (true) {
-            Thread.sleep(5000);
-            System.out.println(new PremainDemo().getName());
-        }
+        Thread.currentThread().join();
     }
 
     public String getName() {
