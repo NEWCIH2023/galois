@@ -2,6 +2,7 @@ package org.newcih.service;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import org.newcih.util.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +29,7 @@ public class ReloadClassLoader extends ClassLoader {
 
     @Override
     protected Class<?> findClass(String name) {
-        String path = name.replaceAll("\\.", "\\\\");
+        String path = name.replaceAll("\\.", SystemUtils.isWindowOS() ? "\\\\" : "/");
 
         try {
             byte[] classBytes = getClassBytes(path + ".class");
@@ -77,7 +78,7 @@ public class ReloadClassLoader extends ClassLoader {
         String fullPath = "";
 
         for (String classpath : classpaths) {
-            if (!Strings.isNullOrEmpty(fullPath = Paths.get(classpath + "\\" + path).toString())) {
+            if (!Strings.isNullOrEmpty(fullPath = Paths.get(classpath + path).toString())) {
                 break;
             }
         }

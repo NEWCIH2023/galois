@@ -3,12 +3,16 @@ package org.newcih.service;
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class ApacheFileWatchService extends FileAlterationListenerAdaptor implements FileWatchService {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(ApacheFileWatchService.class);
 
     private Consumer<File> createHandler;
 
@@ -43,7 +47,12 @@ public class ApacheFileWatchService extends FileAlterationListenerAdaptor implem
             monitor.addObserver(observer);
             observer.addListener(this);
             monitor.start();
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("FileWatchService文件监听服务已启动！");
+            }
         } catch (Exception e) {
+            LOGGER.error("启动文件监听服务FileWatchService失败", e);
             return false;
         }
 
@@ -55,6 +64,7 @@ public class ApacheFileWatchService extends FileAlterationListenerAdaptor implem
         try {
             monitor.stop();
         } catch (Exception e) {
+            LOGGER.error("关闭文件监听服务FileWatchService失败", e);
             return false;
         }
 
@@ -68,7 +78,6 @@ public class ApacheFileWatchService extends FileAlterationListenerAdaptor implem
 
     @Override
     public void onFileCreate(File file) {
-        super.onFileCreate(file);
         if (createHandler != null && isValidFile(file)) {
             createHandler.accept(file);
         }
@@ -76,7 +85,6 @@ public class ApacheFileWatchService extends FileAlterationListenerAdaptor implem
 
     @Override
     public void onFileChange(File file) {
-        super.onFileChange(file);
         if (modiferHandler != null && isValidFile(file)) {
             modiferHandler.accept(file);
         }
@@ -84,7 +92,6 @@ public class ApacheFileWatchService extends FileAlterationListenerAdaptor implem
 
     @Override
     public void onFileDelete(File file) {
-        super.onFileDelete(file);
         if (deleteHandler != null && isValidFile(file)) {
             deleteHandler.accept(file);
         }

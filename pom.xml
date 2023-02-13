@@ -89,10 +89,12 @@
                         <archive>
                             <manifestEntries>
                                 <Premain-Class>org.newcih.service.PremainService</Premain-Class>
+                                <!--                                <Boot-Class-Path>-->
+                                <!--                                    C:/Users/liuguangsheng.SZSYY/.m2/repository/commons-io/commons-io/2.11.0/commons-io-2.11.0.jar;-->
+                                <!--                                    C:/Users/liuguangsheng.SZSYY/.m2/repository/com/google/guava/guava/29.0-jre/guava-29.0-jre.jar;-->
+                                <!--                                </Boot-Class-Path>-->
                                 <Boot-Class-Path>
-                                    C:/Users/liuguangsheng.SZSYY/.m2/repository/org/javassist/javassist/3.21.0-GA/javassist-3.21.0-GA.jar;
-                                    C:/Users/liuguangsheng.SZSYY/.m2/repository/commons-io/commons-io/2.11.0/commons-io-2.11.0.jar;
-                                    C:/Users/liuguangsheng.SZSYY/.m2/repository/com/google/guava/guava/29.0-jre/guava-29.0-jre.jar
+                                    /Users/cihnew/.m2/repository/commons-io/commons-io/2.11.0/commons-io-2.11.0.jar:/Users/cihnew/.m2/repository/com/google/guava/guava/29.0-jre/guava-29.0-jre.jar
                                 </Boot-Class-Path>
                                 <Can-Redefine-Clsses>true</Can-Redefine-Clsses>
                                 <!--                                <Agent-Class>org.newcih.service.PremainService</Agent-Class>-->
