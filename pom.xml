@@ -15,18 +15,44 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <asm.version>9.0</asm.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.ow2.asm</groupId>
-            <artifactId>asm-all</artifactId>
-            <version>5.1</version>
-        </dependency>
-        <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
             <version>3.21.0-GA</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>${asm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-commons</artifactId>
+            <version>${asm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-util</artifactId>
+            <version>${asm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-tree</artifactId>
+            <version>${asm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-analysis</artifactId>
+            <version>${asm.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -43,6 +69,16 @@
             <artifactId>logback-classic</artifactId>
             <version>1.1.7</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>29.0-jre</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>springloaded</artifactId>
+            <version>1.2.8.RELEASE</version>
+        </dependency>
     </dependencies>
     <build>
         <pluginManagement>
@@ -52,11 +88,14 @@
                     <configuration>
                         <archive>
                             <manifestEntries>
-                                <Premain-Class>org.newcih.service.AgentService</Premain-Class>
+                                <Premain-Class>org.newcih.service.PremainService</Premain-Class>
                                 <Boot-Class-Path>
-                                    C:/Users/liuguangsheng.SZSYY/.m2/repository/org/javassist/javassist/3.21.0-GA/javassist-3.21.0-GA.jar
+                                    C:/Users/liuguangsheng.SZSYY/.m2/repository/org/javassist/javassist/3.21.0-GA/javassist-3.21.0-GA.jar;
+                                    C:/Users/liuguangsheng.SZSYY/.m2/repository/commons-io/commons-io/2.11.0/commons-io-2.11.0.jar;
+                                    C:/Users/liuguangsheng.SZSYY/.m2/repository/com/google/guava/guava/29.0-jre/guava-29.0-jre.jar
                                 </Boot-Class-Path>
-                                <!--                                <Agent-Class>org.newcih.service.AgentMain</Agent-Class>-->
+                                <Can-Redefine-Clsses>true</Can-Redefine-Clsses>
+                                <!--                                <Agent-Class>org.newcih.service.PremainService</Agent-Class>-->
                             </manifestEntries>
                         </archive>
                     </configuration>
@@ -68,6 +107,17 @@
                         <source>1.8</source>
                         <target>1.8</target>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.springframework</groupId>
+                            <artifactId>springloaded</artifactId>
+                            <version>1.2.8.RELEASE</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>
