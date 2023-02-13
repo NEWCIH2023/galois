@@ -5,6 +5,7 @@ import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 
 import java.io.File;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class ApacheFileWatchService extends FileAlterationListenerAdaptor implements FileWatchService {
@@ -14,6 +15,10 @@ public class ApacheFileWatchService extends FileAlterationListenerAdaptor implem
     private Consumer<File> modiferHandler;
 
     private Consumer<File> deleteHandler;
+
+    private List<String> includeFileTypes;
+
+    private List<String> excludeFileTypes;
 
     private final FileAlterationMonitor monitor;
 
@@ -62,33 +67,9 @@ public class ApacheFileWatchService extends FileAlterationListenerAdaptor implem
     }
 
     @Override
-    public void onDirectoryCreate(File directory) {
-        super.onDirectoryCreate(directory);
-        if (createHandler != null) {
-            createHandler.accept(directory);
-        }
-    }
-
-    @Override
-    public void onDirectoryChange(File directory) {
-        super.onDirectoryChange(directory);
-        if (modiferHandler != null) {
-            modiferHandler.accept(directory);
-        }
-    }
-
-    @Override
-    public void onDirectoryDelete(File directory) {
-        super.onDirectoryDelete(directory);
-        if (deleteHandler != null) {
-            deleteHandler.accept(directory);
-        }
-    }
-
-    @Override
     public void onFileCreate(File file) {
         super.onFileCreate(file);
-        if (createHandler != null) {
+        if (createHandler != null && isValidFile(file)) {
             createHandler.accept(file);
         }
     }
@@ -96,7 +77,7 @@ public class ApacheFileWatchService extends FileAlterationListenerAdaptor implem
     @Override
     public void onFileChange(File file) {
         super.onFileChange(file);
-        if (modiferHandler != null) {
+        if (modiferHandler != null && isValidFile(file)) {
             modiferHandler.accept(file);
         }
     }
@@ -104,9 +85,26 @@ public class ApacheFileWatchService extends FileAlterationListenerAdaptor implem
     @Override
     public void onFileDelete(File file) {
         super.onFileDelete(file);
-        if (deleteHandler != null) {
+        if (deleteHandler != null && isValidFile(file)) {
             deleteHandler.accept(file);
         }
+    }
+
+    /**
+     * 是否符合待监听文件类型
+     *
+     * @param file
+     * @return
+     */
+    private boolean isValidFile(File file) {
+        String fileName = file.getName();
+
+        if (includeFileTypes != null && includeFileTypes.size() > 0) {
+            return includeFileTypes.contains(fileName.substring(fileName.indexOf(".") + 1));
+        } else if (excludeFileTypes != null && excludeFileTypes.size() > 0) {
+            return !excludeFileTypes.contains(fileName.substring(fileName.indexOf(".") + 1));
+        } else return false;
+
     }
 
     @Override
@@ -138,4 +136,19 @@ public class ApacheFileWatchService extends FileAlterationListenerAdaptor implem
         this.deleteHandler = deleteHandler;
     }
 
+    public List<String> getIncludeFileTypes() {
+        return includeFileTypes;
+    }
+
+    public void setIncludeFileTypes(List<String> includeFileTypes) {
+        this.includeFileTypes = includeFileTypes;
+    }
+
+    public List<String> getExcludeFileTypes() {
+        return excludeFileTypes;
+    }
+
+    public void setExcludeFileTypes(List<String> excludeFileTypes) {
+        this.excludeFileTypes = excludeFileTypes;
+    }
 }

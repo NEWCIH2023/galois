@@ -68,6 +68,11 @@ public class ReloadClassLoader extends ClassLoader {
         }
     }
 
+    @Override
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
+        return loadClass(name, true);
+    }
+
     private byte[] getClassBytes(String path) {
         String fullPath = "";
 
