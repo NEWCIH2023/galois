@@ -1,10 +1,9 @@
-package org.newcih.service;
+package org.newcih.service.watch;
 
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.newcih.util.GaloisLog;
 
 import java.io.File;
 import java.util.List;
@@ -12,7 +11,7 @@ import java.util.function.Consumer;
 
 public class ApacheFileWatchService extends FileAlterationListenerAdaptor implements FileWatchService {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ApacheFileWatchService.class);
+    private final static GaloisLog LOGGER = GaloisLog.getLogger(ApacheFileWatchService.class);
 
     private Consumer<File> createHandler;
 
@@ -48,9 +47,7 @@ public class ApacheFileWatchService extends FileAlterationListenerAdaptor implem
             observer.addListener(this);
             monitor.start();
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("FileWatchService文件监听服务已启动！");
-            }
+            LOGGER.debug("FileWatchService文件监听服务已启动！");
         } catch (Exception e) {
             LOGGER.error("启动文件监听服务FileWatchService失败", e);
             return false;

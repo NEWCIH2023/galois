@@ -1,8 +1,7 @@
-package org.newcih.service;
+package org.newcih.service.watch;
 
 import com.sun.nio.file.SensitivityWatchEventModifier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.newcih.util.GaloisLog;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -18,7 +17,7 @@ import static java.nio.file.StandardWatchEventKinds.*;
  */
 public class JdkFileWatchService implements FileWatchService {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(JdkFileWatchService.class);
+    public static final GaloisLog LOGGER = GaloisLog.getLogger(JdkFileWatchService.class);
 
     /**
      * 监听服务对象
@@ -76,9 +75,7 @@ public class JdkFileWatchService implements FileWatchService {
         Thread shutdownHook = new Thread(this::stop);
         Runtime.getRuntime().addShutdownHook(shutdownHook);
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("FileWatchService注册了ShutdownHook");
-        }
+        LOGGER.debug("FileWatchService注册了ShutdownHook");
     }
 
     /**
@@ -117,9 +114,7 @@ public class JdkFileWatchService implements FileWatchService {
         watchDaemon.setDaemon(true);
         watchDaemon.start();
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("FileWatchService线程已启动");
-        }
+        LOGGER.debug("FileWatchService线程已启动");
     }
 
     public Consumer<WatchEvent<Path>> getModifyHandler() {

@@ -1,4 +1,4 @@
-package org.newcih.service;
+package org.newcih.service.watch;
 
 /**
  * 文件监听服务

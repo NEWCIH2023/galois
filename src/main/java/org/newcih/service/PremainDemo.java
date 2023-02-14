@@ -1,10 +1,9 @@
 package org.newcih.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.newcih.util.GaloisLog;
 
 public class PremainDemo {
-    public static final Logger LOGGER = LoggerFactory.getLogger(PremainDemo.class);
 
     public static void main(String[] args) throws InterruptedException {
         Thread.currentThread().join();

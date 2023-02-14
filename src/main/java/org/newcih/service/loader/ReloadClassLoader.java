@@ -1,25 +1,22 @@
-package org.newcih.service;
+package org.newcih.service.loader;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
+import org.newcih.util.GaloisLog;
 import org.newcih.util.SystemUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class ReloadClassLoader extends ClassLoader {
 
-    private final List<String> classpaths = Lists.newArrayListWithCapacity(10);
+    private final List<String> classpaths = new ArrayList<>(20);
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(ReloadClassLoader.class);
+    public static final GaloisLog LOGGER = GaloisLog.getLogger(ReloadClassLoader.class);
 
     public static final String[] IGNORE_PACKAGE = new String[]{"java", "javax", "org.omg", "org.ietf", "org.w3c", "org.xml", "jdk", "org.objectweb"};
 
@@ -35,7 +32,7 @@ public class ReloadClassLoader extends ClassLoader {
             byte[] classBytes = getClassBytes(path + ".class");
             return defineClass(name, classBytes, 0, Objects.requireNonNull(classBytes).length);
         } catch (Exception e) {
-            LOGGER.error("寻找类{}发生异常", name, e);
+            LOGGER.error("寻找类" + name + "发生异常", e);
         }
 
         return null;
@@ -78,7 +75,8 @@ public class ReloadClassLoader extends ClassLoader {
         String fullPath = "";
 
         for (String classpath : classpaths) {
-            if (!Strings.isNullOrEmpty(fullPath = Paths.get(classpath + path).toString())) {
+            fullPath = Paths.get(classpath + path).toString();
+            if (fullPath.length() > 0) {
                 break;
             }
         }

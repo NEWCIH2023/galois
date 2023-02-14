@@ -1,14 +1,12 @@
 package org.newcih.service;
 
+import org.newcih.service.watch.JdkFileWatchService;
 import org.newcih.util.SystemUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 public class FileWatchServiceDemo {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(FileWatchServiceDemo.class);
 
     public static void main(String[] args) throws IOException, InterruptedException {
 

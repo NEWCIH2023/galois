@@ -1,8 +1,9 @@
-package org.newcih.service;
+package org.newcih.service.agent;
 
+import org.newcih.service.loader.ReloadClassLoader;
+import org.newcih.service.watch.ApacheFileWatchService;
+import org.newcih.util.GaloisLog;
 import org.newcih.util.SystemUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.instrument.Instrumentation;
@@ -12,13 +13,13 @@ import java.util.function.Consumer;
 
 public class PremainService {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(PremainService.class);
+    public static final GaloisLog LOGGER = GaloisLog.getLogger(PremainService.class);
 
     public static final String GRADLE_OUTPUT = "build";
 
     public static final String MAVEN_OUTPUT = "target";
 
-    public static final boolean useMaven = false;
+    public static final boolean useMaven = true;
 
     public static void premain(String agentArgs, Instrumentation inst) {
         LOGGER.info("premain was called");
@@ -30,10 +31,12 @@ public class PremainService {
 
         if (useMaven) {
             classPath = classPath.substring(1).replace("/", "\\");
-            outputPath = String.format("%s%s\\classes\\", classPath, GRADLE_OUTPUT);
+            outputPath = classPath;
         } else {
             outputPath = classPath;
         }
+
+        LOGGER.info("output path is %s", outputPath);
 
         ApacheFileWatchService targetWatch = new ApacheFileWatchService(outputPath);
         targetWatch.setIncludeFileTypes(Collections.singletonList("class"));
@@ -44,8 +47,8 @@ public class PremainService {
 
             try {
                 ReloadClassLoader reloadClassLoader = new ReloadClassLoader(Collections.singletonList(outputPath));
-                reloadClassLoader.loadClass(className);
-                LOGGER.info("使用 {} 加载 {}", reloadClassLoader, className);
+                Class<?> bean = reloadClassLoader.loadClass(className);
+                LOGGER.info("使用 %s 加载 %s", reloadClassLoader, className);
             } catch (Throwable e) {
                 LOGGER.error("reload class file throw exception", e);
             }
