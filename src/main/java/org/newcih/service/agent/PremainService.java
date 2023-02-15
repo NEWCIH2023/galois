@@ -1,6 +1,7 @@
 package org.newcih.service.agent;
 
 import org.newcih.service.loader.ReloadClassLoader;
+import org.newcih.service.reloader.spring.SpringBeanReloader;
 import org.newcih.service.watch.ApacheFileWatchService;
 import org.newcih.util.GaloisLog;
 import org.newcih.util.SystemUtils;
@@ -24,6 +25,8 @@ public class PremainService {
     public static void premain(String agentArgs, Instrumentation inst) {
         LOGGER.info("premain was called");
 
+        inst.addTransformer(new SpringTransformer(), true);
+
         int loadedClassLength = inst.getAllLoadedClasses().length;
         Class<?> clazz = inst.getAllLoadedClasses()[loadedClassLength - 1];
         String classPath = Objects.requireNonNull(clazz.getResource("")).getPath();
@@ -31,15 +34,13 @@ public class PremainService {
 
         if (useMaven) {
             classPath = classPath.substring(1).replace("/", "\\");
-            outputPath = classPath;
-        } else {
-            outputPath = classPath;
         }
 
-        LOGGER.info("output path is %s", outputPath);
+        outputPath = classPath;
 
         ApacheFileWatchService targetWatch = new ApacheFileWatchService(outputPath);
         targetWatch.setIncludeFileTypes(Collections.singletonList("class"));
+        SpringBeanReloader springBeanReloader = new SpringBeanReloader();
 
         Consumer<File> handler = file -> {
             String path = file.getAbsolutePath();
@@ -49,6 +50,8 @@ public class PremainService {
                 ReloadClassLoader reloadClassLoader = new ReloadClassLoader(Collections.singletonList(outputPath));
                 Class<?> bean = reloadClassLoader.loadClass(className);
                 LOGGER.info("使用 %s 加载 %s", reloadClassLoader, className);
+
+                springBeanReloader.addBean(bean, bean.newInstance());
             } catch (Throwable e) {
                 LOGGER.error("reload class file throw exception", e);
             }
