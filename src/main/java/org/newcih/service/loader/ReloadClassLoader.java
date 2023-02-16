@@ -18,7 +18,7 @@ public class ReloadClassLoader extends ClassLoader {
 
     public static final GaloisLog LOGGER = GaloisLog.getLogger(ReloadClassLoader.class);
 
-    public static final String[] IGNORE_PACKAGE = new String[]{"java", "javax", "org.omg", "org.ietf", "org.w3c", "org.xml", "jdk", "org.objectweb"};
+    public static final String[] IGNORE_PACKAGE = new String[]{"java", "javax", "org.omg", "org.ietf", "org.w3c", "org.xml", "jdk", "org.objectweb", "org.springframework"};
 
     public ReloadClassLoader(List<String> classpaths) {
         this.classpaths.addAll(classpaths);

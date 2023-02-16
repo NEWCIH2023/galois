@@ -1,9 +1,13 @@
 package org.newcih.service.reloader.spring;
 
+import org.newcih.service.loader.ReloadClassLoader;
 import org.newcih.service.reloader.BeanReloader;
 import org.newcih.util.GaloisLog;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 
 import java.util.Iterator;
@@ -14,7 +18,7 @@ public class SpringBeanReloader implements BeanReloader {
 
     private static ClassPathBeanDefinitionScanner SCANNER;
 
-    private static AnnotationConfigApplicationContext APPLICATION_CONTEXT;
+    private static ApplicationContext APPLICATION_CONTEXT;
 
     private static final GaloisLog LOGGER = GaloisLog.getLogger(SpringBeanReloader.class);
 
@@ -27,31 +31,39 @@ public class SpringBeanReloader implements BeanReloader {
         SCANNER = scanner;
     }
 
-    public static void registerApplicationContext(AnnotationConfigApplicationContext applicationContext) {
+    public static void registerApplicationContext(ApplicationContext applicationContext) {
         APPLICATION_CONTEXT = applicationContext;
+        LOGGER.info("now i got applicationContext %s", APPLICATION_CONTEXT);
     }
 
     @Override
     public void addBean(Class<?> clazz, Object bean) {
         LOGGER.info("即将使用%s添加类型为%s的对象bean<%s>", SCANNER, clazz, bean);
+
         String packageName = clazz.getPackage().getName();
         Set<BeanDefinition> beanDefinitionSet = SCANNER.findCandidateComponents(packageName);
-        LOGGER.info("这个包%s有%d个装载类", packageName, beanDefinitionSet.size());
 
         Iterator<BeanDefinition> definitionIterator = beanDefinitionSet.iterator();
         BeanDefinition temp;
+
         while (definitionIterator.hasNext()) {
             temp = definitionIterator.next();
+
             if (Objects.equals(temp.getBeanClassName(), clazz.getName())) {
-                SCANNER.getRegistry().removeBeanDefinition("demoController");
-                SCANNER.clearCache();
-                LOGGER.info("已清除旧实例定义，当前包下有%d个实例", SCANNER.findCandidateComponents(packageName).size());
+                DefaultListableBeanFactory beanFactory = (DefaultListableBeanFactory) APPLICATION_CONTEXT.getAutowireCapableBeanFactory();
+//                beanFactory.removeBeanDefinition("demoController");
+                beanFactory.destroySingleton("demoController");
+
+//                AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(clazz).getBeanDefinition();
+//                beanFactory.registerBeanDefinition("demoController", beanDefinition);
+
+                beanFactory.registerSingleton("demoController", bean);
                 break;
             }
+
         }
 
-        SCANNER.scan(packageName);
-        LOGGER.info("已重新扫描，当前包下有%d个实例", SCANNER.findCandidateComponents(packageName).size());
+//        SCANNER.scan(packageName);
     }
 
 }

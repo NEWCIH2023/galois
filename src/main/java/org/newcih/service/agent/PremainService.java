@@ -46,12 +46,17 @@ public class PremainService {
             String path = file.getAbsolutePath();
             String className = path.replace(outputPath, "").replaceAll(SystemUtils.isWindowOS() ? "\\\\" : "/", ".").replace(".class", "");
 
+            LOGGER.info("检测到文件变动，当前需要加载%s", className);
+
             try {
+
                 ReloadClassLoader reloadClassLoader = new ReloadClassLoader(Collections.singletonList(outputPath));
                 Class<?> bean = reloadClassLoader.loadClass(className);
+
                 LOGGER.info("使用 %s 加载 %s", reloadClassLoader, className);
 
                 springBeanReloader.addBean(bean, bean.newInstance());
+
             } catch (Throwable e) {
                 LOGGER.error("reload class file throw exception", e);
             }
