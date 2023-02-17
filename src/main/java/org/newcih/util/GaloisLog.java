@@ -14,19 +14,19 @@ public class GaloisLog {
     }
 
     public void info(String msg, Object... args) {
-        System.out.printf(LocalDateTime.now().format(DATE_TIME_FORMAT) + " " + MARKER + " " + msg + "\n", args);
+        System.out.printf(LocalDateTime.now().format(DATE_TIME_FORMAT) + " " + MARKER + " [INFO] " + msg + "\n", args);
     }
 
     public void debug(String msg, Object... args) {
-        System.out.printf(LocalDateTime.now().format(DATE_TIME_FORMAT) + " " + MARKER + " " + msg + "\n", args);
+        System.out.printf(LocalDateTime.now().format(DATE_TIME_FORMAT) + " " + MARKER + " [DEBUG] " + msg + "\n", args);
     }
 
     public void error(String msg, Object... args) {
-        System.out.printf(LocalDateTime.now().format(DATE_TIME_FORMAT) + " " + MARKER + " " + msg + "\n", args);
+        System.out.printf(LocalDateTime.now().format(DATE_TIME_FORMAT) + " " + MARKER + " [ERROR] " + msg + "\n", args);
     }
 
     public void error(String msg, Throwable throwable) {
-        System.err.println(LocalDateTime.now().format(DATE_TIME_FORMAT) + " " + MARKER + " " + msg + "\n" + throwable.getMessage());
+        System.err.println(LocalDateTime.now().format(DATE_TIME_FORMAT) + " " + MARKER + " [ERROR] " + msg + "\n" + throwable.getMessage());
     }
 
 }
