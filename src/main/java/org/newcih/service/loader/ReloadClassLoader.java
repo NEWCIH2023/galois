@@ -14,11 +14,9 @@ import java.util.Objects;
 
 public class ReloadClassLoader extends ClassLoader {
 
-    private final List<String> classpaths = new ArrayList<>(20);
-
     public static final GaloisLog LOGGER = GaloisLog.getLogger(ReloadClassLoader.class);
-
     public static final String[] IGNORE_PACKAGE = new String[]{"java", "javax", "org.omg", "org.ietf", "org.w3c", "org.xml", "jdk", "org.objectweb", "org.springframework", "org.slf4j"};
+    private final List<String> classpaths = new ArrayList<>(20);
 
     public ReloadClassLoader(List<String> classpaths) {
         this.classpaths.addAll(classpaths);
@@ -81,7 +79,7 @@ public class ReloadClassLoader extends ClassLoader {
             }
         }
 
-        try (InputStream is = Files.newInputStream(Paths.get(fullPath)); ByteArrayOutputStream baos = new ByteArrayOutputStream();) {
+        try (InputStream is = Files.newInputStream(Paths.get(fullPath)); ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             byte[] buffer = new byte[1024];
             int len = 0;
 

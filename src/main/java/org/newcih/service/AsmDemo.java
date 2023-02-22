@@ -11,6 +11,25 @@ import java.io.PrintWriter;
 
 public class AsmDemo extends ClassLoader implements Opcodes {
 
+    public static void writeClassFile(byte[] bytes, String className) throws IOException {
+        FileOutputStream fos = new FileOutputStream(String.format("target\\classes\\%s.class", className));
+        fos.write(bytes);
+        fos.close();
+    }
+
+    public static void main(String[] args) throws Exception {
+        AsmDemo asmDemo = new AsmDemo();
+//        asmDemo.printCreateClassFileCode();
+//        asmDemo.createClassWithTestMethod("newcih", "CopyClassExample1");
+        asmDemo.createClassWithTestMethod("neh2", "CopyClassExample");
+        asmDemo.createClassWithTestMethod("nwih2", "CopyClassExample4");
+        asmDemo.createClassWithTestMethod("ecih2", "CopyClassExample5");
+        asmDemo.createClassWithTestMethod("ewcih2", "CopyClassExample3");
+//        Class<?> clazz = asmDemo.defineClass("CopyClassExample", bytes, 0, bytes.length);
+//        Method[] methods = clazz.getMethods();
+//        methods[0].invoke(null, new Object[]{null});
+    }
+
     public void printCreateClassFileCode() throws IOException {
         String className = "org.newcih.service.ClassExample";
         int parsingOptions = ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG;
@@ -51,12 +70,6 @@ public class AsmDemo extends ClassLoader implements Opcodes {
         writeClassFile(bytes, className);
 
         return bytes;
-    }
-
-    public static void writeClassFile(byte[] bytes, String className) throws IOException {
-        FileOutputStream fos = new FileOutputStream(String.format("target\\classes\\%s.class", className));
-        fos.write(bytes);
-        fos.close();
     }
 
     public byte[] createClassWithTestMethod(String output, String className) throws IOException {
@@ -100,18 +113,5 @@ public class AsmDemo extends ClassLoader implements Opcodes {
         writeClassFile(bytes, className);
 
         return bytes;
-    }
-
-    public static void main(String[] args) throws Exception {
-        AsmDemo asmDemo = new AsmDemo();
-//        asmDemo.printCreateClassFileCode();
-//        asmDemo.createClassWithTestMethod("newcih", "CopyClassExample1");
-        asmDemo.createClassWithTestMethod("neh2", "CopyClassExample");
-        asmDemo.createClassWithTestMethod("nwih2", "CopyClassExample4");
-        asmDemo.createClassWithTestMethod("ecih2", "CopyClassExample5");
-        asmDemo.createClassWithTestMethod("ewcih2", "CopyClassExample3");
-//        Class<?> clazz = asmDemo.defineClass("CopyClassExample", bytes, 0, bytes.length);
-//        Method[] methods = clazz.getMethods();
-//        methods[0].invoke(null, new Object[]{null});
     }
 }

@@ -12,20 +12,13 @@ import java.util.function.Consumer;
 public class ApacheFileWatchService extends FileAlterationListenerAdaptor implements FileWatchService {
 
     private final static GaloisLog LOGGER = GaloisLog.getLogger(ApacheFileWatchService.class);
-
-    private Consumer<File> createHandler;
-
-    private Consumer<File> modiferHandler;
-
-    private Consumer<File> deleteHandler;
-
-    private List<String> includeFileTypes;
-
-    private List<String> excludeFileTypes;
-
     private final FileAlterationMonitor monitor;
-
     private final FileAlterationObserver observer;
+    private Consumer<File> createHandler;
+    private Consumer<File> modiferHandler;
+    private Consumer<File> deleteHandler;
+    private List<String> includeFileTypes;
+    private List<String> excludeFileTypes;
 
     public ApacheFileWatchService(String path) {
         this(path, 500);
@@ -75,6 +68,8 @@ public class ApacheFileWatchService extends FileAlterationListenerAdaptor implem
 
     @Override
     public void onFileCreate(File file) {
+        LOGGER.debug("文件创建监听: %s", file.getName());
+
         if (createHandler != null && isValidFile(file)) {
             createHandler.accept(file);
         }
@@ -82,6 +77,8 @@ public class ApacheFileWatchService extends FileAlterationListenerAdaptor implem
 
     @Override
     public void onFileChange(File file) {
+        LOGGER.debug("文件更新监听: %s", file.getName());
+
         if (modiferHandler != null && isValidFile(file)) {
             modiferHandler.accept(file);
         }
@@ -89,6 +86,8 @@ public class ApacheFileWatchService extends FileAlterationListenerAdaptor implem
 
     @Override
     public void onFileDelete(File file) {
+        LOGGER.debug("文件删除监听: %s", file.getName());
+
         if (deleteHandler != null && isValidFile(file)) {
             deleteHandler.accept(file);
         }
@@ -107,8 +106,8 @@ public class ApacheFileWatchService extends FileAlterationListenerAdaptor implem
             return includeFileTypes.contains(fileName.substring(fileName.indexOf(".") + 1));
         } else if (excludeFileTypes != null && excludeFileTypes.size() > 0) {
             return !excludeFileTypes.contains(fileName.substring(fileName.indexOf(".") + 1));
-        } else return false;
-
+        } else
+            return true;
     }
 
     @Override

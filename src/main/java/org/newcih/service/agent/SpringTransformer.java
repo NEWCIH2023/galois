@@ -22,37 +22,16 @@ public class SpringTransformer implements ClassFileTransformer {
     public static final String SPRING_APPLICATION_CONTEXT_CLASS = SPRING_APPLICATION_CONTEXT_PATH.replace("/", ".");
     public static final GaloisLog LOGGER = GaloisLog.getLogger(SpringTransformer.class);
 
-    @Override
-    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) {
-        if (className == null || className.trim().length() == 0) {
-            return new byte[0];
-        }
-
-        switch (className) {
-            case SPRING_APPLICATION_CONTEXT_PATH:
-                LOGGER.info("find hacked class %s", className);
-                return handleSpringApplicationContext(loader, className, classBeingRedefined, protectionDomain, classfileBuffer);
-            case SPRING_BEAN_SCANNER_PATH:
-                LOGGER.info("find hacked class %s", className);
-                return handleSpringBeanScanner(loader, className, classBeingRedefined, protectionDomain, classfileBuffer);
-            default:
-        }
-
-        return new byte[0];
-    }
-
     private static byte[] handleSpringApplicationContext(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) {
         try {
             ClassPool classPool = ClassPool.getDefault();
             CtClass applicationContext = classPool.get(SPRING_APPLICATION_CONTEXT_CLASS);
             CtConstructor constructor = applicationContext.getDeclaredConstructor(new CtClass[0]);
 
-            LOGGER.info("find hacked constructor %s", constructor);
-
             constructor.insertAfter(String.format("{ if (this instanceof %s) { org.newcih.service.reloader.spring.SpringBeanReloader.registerApplicationContext((%s)this); } }", SPRING_APPLICATION_CONTEXT_CLASS, SPRING_APPLICATION_CONTEXT_CLASS));
             return applicationContext.toBytecode();
         } catch (NotFoundException | CannotCompileException | IOException e) {
-            LOGGER.error("hack method throw Exception", e);
+            LOGGER.error("侵入代码注册Spring上下文发生异常", e);
             throw new RuntimeException(e);
         }
 
@@ -64,16 +43,29 @@ public class SpringTransformer implements ClassFileTransformer {
             ClassPool classPool = ClassPool.getDefault();
             CtClass scanner = classPool.get(SPRING_BEAN_SCANNER_CLASS);
             CtMethod method = scanner.getDeclaredMethod("doScan");
-
-            LOGGER.info("find hacked method %s", method);
-
             method.insertBefore(String.format("{ if (this instanceof %s) { org.newcih.service.reloader.spring.SpringBeanReloader.registerBeanReloader((%s)this); } }", SPRING_BEAN_SCANNER_CLASS, SPRING_BEAN_SCANNER_CLASS));
-
             return scanner.toBytecode();
         } catch (NotFoundException | CannotCompileException | IOException e) {
-            LOGGER.error("hacked method faild", e);
+            LOGGER.error("侵入代码注册SpringBean管理器发生异常", e);
             throw new RuntimeException(e);
         }
 
+    }
+
+    @Override
+    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) {
+        if (className == null || className.trim().length() == 0) {
+            return new byte[0];
+        }
+
+        switch (className) {
+            case SPRING_APPLICATION_CONTEXT_PATH:
+                return handleSpringApplicationContext(loader, className, classBeingRedefined, protectionDomain, classfileBuffer);
+            case SPRING_BEAN_SCANNER_PATH:
+                return handleSpringBeanScanner(loader, className, classBeingRedefined, protectionDomain, classfileBuffer);
+            default:
+        }
+
+        return new byte[0];
     }
 }
