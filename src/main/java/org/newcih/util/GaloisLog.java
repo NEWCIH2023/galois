@@ -12,14 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GaloisLog {
 
     public static final String LOG_LEVEL = "log.level";
-    public static final String LOG_LEVEL_INFO = "info";
-    public static final int LOG_LEVEL_INFO_RANK = 0;
-    public static final String LOG_LEVEL_DEBUG = "debug";
-    public static final int LOG_LEVEL_DEBUG_RANK = -1;
-    public static final String LOG_LEVEL_WARN = "warn";
-    public static final int LOG_LEVEL_WARN_RANK = 5;
-    public static final String LOG_LEVEL_ERROR = "error";
-    public static final int LOG_LEVEL_ERROR_RANK = 10;
+    public static final String LOG_LEVEL_INFO = "info", LOG_LEVEL_DEBUG = "debug", LOG_LEVEL_WARN = "warn", LOG_LEVEL_ERROR = "error";
+    public static final int LOG_LEVEL_INFO_RANK = 0, LOG_LEVEL_DEBUG_RANK = -1, LOG_LEVEL_WARN_RANK = 5, LOG_LEVEL_ERROR_RANK = 10;
     public static final Map<String, Integer> LOG_LEVEL_RANK_MAP = new HashMap<>();
     public static final String MARKER = "## Galois ##";
     public static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -63,10 +57,18 @@ public class GaloisLog {
         }
     }
 
+    public boolean isInfoEnabled() {
+        return currentLogRank() <= LOG_LEVEL_INFO_RANK;
+    }
+
     public void debug(String msg, Object... args) {
         if (currentLogRank() <= LOG_LEVEL_DEBUG_RANK) {
             System.out.printf(LocalDateTime.now().format(DATE_TIME_FORMAT) + " " + MARKER + " [DEBUG] " + msg + "\n", args);
         }
+    }
+
+    public boolean isDebugEnabled() {
+        return currentLogRank() <= LOG_LEVEL_DEBUG_RANK;
     }
 
     public void error(String msg, Object... args) {
@@ -80,6 +82,10 @@ public class GaloisLog {
             System.err.println(LocalDateTime.now().format(DATE_TIME_FORMAT) + " " + MARKER + " [ERROR] " + msg + "\n");
             throwable.printStackTrace();
         }
+    }
+
+    public boolean isErrorEnabled() {
+        return currentLogRank() <= LOG_LEVEL_ERROR_RANK;
     }
 
 }

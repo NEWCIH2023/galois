@@ -1,7 +1,5 @@
 package org.newcih.service.watch.frame;
 
-import org.newcih.service.agent.AgentService;
-
 import java.io.File;
 import java.lang.instrument.Instrumentation;
 
@@ -10,9 +8,6 @@ import java.lang.instrument.Instrumentation;
  */
 public interface FileChangedListener {
 
-    default void registerListener(FileChangedListener listener) {
-        AgentService.fileChangedListeners.add(listener);
-    }
 
     /**
      * 验证该文件是否适合该监听器处理

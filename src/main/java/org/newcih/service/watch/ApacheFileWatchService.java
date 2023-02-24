@@ -1,24 +1,20 @@
 package org.newcih.service.watch;
 
-import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
+import org.apache.commons.io.monitor.FileAlterationListener;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.newcih.util.GaloisLog;
 
 import java.io.File;
-import java.util.List;
-import java.util.function.Consumer;
 
-public class ApacheFileWatchService extends FileAlterationListenerAdaptor implements FileWatchService {
+/**
+ * 基于Apache Common IO的文件变更监听工具
+ */
+public class ApacheFileWatchService extends FileWatchService implements FileAlterationListener {
 
     private final static GaloisLog LOGGER = GaloisLog.getLogger(ApacheFileWatchService.class);
     private final FileAlterationMonitor monitor;
     private final FileAlterationObserver observer;
-    private Consumer<File> createHandler;
-    private Consumer<File> modiferHandler;
-    private Consumer<File> deleteHandler;
-    private List<String> includeFileTypes;
-    private List<String> excludeFileTypes;
 
     public ApacheFileWatchService(String path) {
         this(path, 500);
@@ -63,14 +59,29 @@ public class ApacheFileWatchService extends FileAlterationListenerAdaptor implem
 
     @Override
     public void onStart(FileAlterationObserver observer) {
-        super.onStart(observer);
+
+    }
+
+    @Override
+    public void onDirectoryCreate(File directory) {
+
+    }
+
+    @Override
+    public void onDirectoryChange(File directory) {
+
+    }
+
+    @Override
+    public void onDirectoryDelete(File directory) {
+
     }
 
     @Override
     public void onFileCreate(File file) {
         LOGGER.debug("文件创建监听: %s", file.getName());
 
-        if (createHandler != null && isValidFile(file)) {
+        if (createHandler != null) {
             createHandler.accept(file);
         }
     }
@@ -79,7 +90,7 @@ public class ApacheFileWatchService extends FileAlterationListenerAdaptor implem
     public void onFileChange(File file) {
         LOGGER.debug("文件更新监听: %s", file.getName());
 
-        if (modiferHandler != null && isValidFile(file)) {
+        if (modiferHandler != null) {
             modiferHandler.accept(file);
         }
     }
@@ -88,70 +99,13 @@ public class ApacheFileWatchService extends FileAlterationListenerAdaptor implem
     public void onFileDelete(File file) {
         LOGGER.debug("文件删除监听: %s", file.getName());
 
-        if (deleteHandler != null && isValidFile(file)) {
+        if (deleteHandler != null) {
             deleteHandler.accept(file);
         }
     }
 
-    /**
-     * 是否符合待监听文件类型
-     *
-     * @param file
-     * @return
-     */
-    private boolean isValidFile(File file) {
-        String fileName = file.getName();
-
-        if (includeFileTypes != null && includeFileTypes.size() > 0) {
-            return includeFileTypes.contains(fileName.substring(fileName.indexOf(".") + 1));
-        } else if (excludeFileTypes != null && excludeFileTypes.size() > 0) {
-            return !excludeFileTypes.contains(fileName.substring(fileName.indexOf(".") + 1));
-        } else
-            return true;
-    }
-
     @Override
     public void onStop(FileAlterationObserver observer) {
-        super.onStop(observer);
-    }
 
-    public Consumer<File> getCreateHandler() {
-        return createHandler;
-    }
-
-    public void setCreateHandler(Consumer<File> createHandler) {
-        this.createHandler = createHandler;
-    }
-
-    public Consumer<File> getModiferHandler() {
-        return modiferHandler;
-    }
-
-    public void setModiferHandler(Consumer<File> modiferHandler) {
-        this.modiferHandler = modiferHandler;
-    }
-
-    public Consumer<File> getDeleteHandler() {
-        return deleteHandler;
-    }
-
-    public void setDeleteHandler(Consumer<File> deleteHandler) {
-        this.deleteHandler = deleteHandler;
-    }
-
-    public List<String> getIncludeFileTypes() {
-        return includeFileTypes;
-    }
-
-    public void setIncludeFileTypes(List<String> includeFileTypes) {
-        this.includeFileTypes = includeFileTypes;
-    }
-
-    public List<String> getExcludeFileTypes() {
-        return excludeFileTypes;
-    }
-
-    public void setExcludeFileTypes(List<String> excludeFileTypes) {
-        this.excludeFileTypes = excludeFileTypes;
     }
 }
