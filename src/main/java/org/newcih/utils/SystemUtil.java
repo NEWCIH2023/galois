@@ -10,6 +10,8 @@ public class SystemUtil {
     public static final String OS_NAME = "os.name";
     public static final String WIN = "Windows";
 
+    private static final String CLASSES_PATH = "classes";
+
     /**
      * 是否是Windows操作系统
      *
@@ -39,12 +41,10 @@ public class SystemUtil {
             clazz = String.class;
         }
 
-        String originClassPath = Objects.requireNonNull(clazz.getResource("/")).getPath();
-        if (isWindowOS()) {
-            return originClassPath.substring(1).replace("/", File.separator);
-        }
+        String path = Objects.requireNonNull(clazz.getResource("/")).getPath();
+        path = path.substring(1, path.indexOf(CLASSES_PATH));
 
-        return originClassPath;
+        return path;
     }
 
     /**
