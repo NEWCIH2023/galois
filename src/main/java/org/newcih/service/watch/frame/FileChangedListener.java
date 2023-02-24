@@ -1,7 +1,6 @@
 package org.newcih.service.watch.frame;
 
 import java.io.File;
-import java.lang.instrument.Instrumentation;
 
 /**
  * 文件变动监听
@@ -22,20 +21,20 @@ public interface FileChangedListener {
      *
      * @param file
      */
-    void fileCreatedHandle(File file, Instrumentation inst);
+    void fileCreatedHandle(File file);
 
     /**
      * 文件修改时处理
      *
      * @param file
      */
-    void fileModifiedHandle(File file, Instrumentation inst);
+    void fileModifiedHandle(File file);
 
     /**
      * 文件删除时处理
      *
      * @param file
      */
-    void fileDeletedHandle(File file, Instrumentation inst);
+    void fileDeletedHandle(File file);
 
 }

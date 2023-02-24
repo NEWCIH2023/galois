@@ -1,11 +1,11 @@
-package org.newcih.util;
+package org.newcih.utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Objects;
 
-public class SystemUtils {
+public class SystemUtil {
 
     public static final String OS_NAME = "os.name";
     public static final String WIN = "Windows";
@@ -83,6 +83,6 @@ public class SystemUtils {
      * @return
      */
     public static String getClassName(String prefixPath, File classFile) {
-        return classFile.getAbsolutePath().replace(prefixPath, "").replaceAll(SystemUtils.isWindowOS() ? "\\\\" : "/", ".").replace(".class", "");
+        return classFile.getAbsolutePath().replace(prefixPath, "").replaceAll(SystemUtil.isWindowOS() ? "\\\\" : "/", ".").replace(".class", "");
     }
 }

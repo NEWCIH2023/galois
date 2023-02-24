@@ -1,4 +1,4 @@
-package org.newcih.util;
+package org.newcih.utils;
 
 import java.io.IOException;
 import java.io.InputStream;

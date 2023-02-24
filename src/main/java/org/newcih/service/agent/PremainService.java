@@ -6,16 +6,13 @@ import org.newcih.service.watch.ApacheFileWatchService;
 import org.newcih.service.watch.frame.FileChangedListener;
 import org.newcih.service.watch.frame.mybatis.MyBatisXmlListener;
 import org.newcih.service.watch.frame.spring.SpringBeanListener;
-import org.newcih.util.GaloisLog;
-import org.newcih.util.SystemUtils;
+import org.newcih.utils.GaloisLog;
+import org.newcih.utils.SystemUtil;
 
-import java.io.File;
 import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * PreMain服务类
@@ -33,21 +30,19 @@ public class PremainService {
     public static void premain(String agentArgs, Instrumentation inst) {
         LOGGER.info("PremainService服务启动");
 
+        // 添加类转换器
         inst.addTransformer(new SpringTransformer());
         inst.addTransformer(new MyBatisTransformer());
 
-        List<FileChangedListener> fileChangedListeners = Arrays.asList(new SpringBeanListener(), new MyBatisXmlListener());
-        String outputPath = SystemUtils.getOutputPath();
-        ApacheFileWatchService watchService = new ApacheFileWatchService(outputPath);
+        // 启用文件变更监听服务
+        List<FileChangedListener> fileChangedListeners = Arrays.asList(
+                new SpringBeanListener(inst),
+                new MyBatisXmlListener()
+        );
+        String outputPath = SystemUtil.getOutputPath();
+        LOGGER.info("Galois开始监听%s目录下文件变动", outputPath);
 
-        BiConsumer<File, Consumer<FileChangedListener>> commonHandler = (file, handler) -> fileChangedListeners.stream()
-                .filter(listener -> listener.validFile(file))
-                .forEach(handler);
-
-        watchService.setCreateHandler(file -> commonHandler.accept(file, listener -> listener.fileCreatedHandle(file, inst)));
-        watchService.setModiferHandler(file -> commonHandler.accept(file, listener -> listener.fileModifiedHandle(file, inst)));
-        watchService.setDeleteHandler(file -> commonHandler.accept(file, listener -> listener.fileDeletedHandle(file, inst)));
-
+        ApacheFileWatchService watchService = new ApacheFileWatchService(outputPath, fileChangedListeners);
         watchService.start();
     }
 

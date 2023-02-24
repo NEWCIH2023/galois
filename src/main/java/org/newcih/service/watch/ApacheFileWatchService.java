@@ -3,33 +3,36 @@ package org.newcih.service.watch;
 import org.apache.commons.io.monitor.FileAlterationListener;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
-import org.newcih.util.GaloisLog;
+import org.newcih.service.watch.frame.FileChangedListener;
+import org.newcih.utils.GaloisLog;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * 基于Apache Common IO的文件变更监听工具
  */
-public class ApacheFileWatchService extends FileWatchService implements FileAlterationListener {
+public class ApacheFileWatchService implements FileAlterationListener {
 
     private final static GaloisLog LOGGER = GaloisLog.getLogger(ApacheFileWatchService.class);
     private final FileAlterationMonitor monitor;
     private final FileAlterationObserver observer;
 
+    private List<FileChangedListener> listeners;
+
     public ApacheFileWatchService(String path) {
-        this(path, 500);
+        observer = new FileAlterationObserver(new File(path));
+        monitor = new FileAlterationMonitor(500);
     }
 
     /**
-     * @param path     监听路径
-     * @param interval 监听时延
+     * @param path 监听路径
      */
-    public ApacheFileWatchService(String path, long interval) {
-        observer = new FileAlterationObserver(new File(path));
-        monitor = new FileAlterationMonitor(interval);
+    public ApacheFileWatchService(String path, List<FileChangedListener> listeners) {
+        this(path);
+        this.listeners = listeners;
     }
 
-    @Override
     public boolean start() {
         try {
             monitor.addObserver(observer);
@@ -45,7 +48,6 @@ public class ApacheFileWatchService extends FileWatchService implements FileAlte
         return true;
     }
 
-    @Override
     public boolean stop() {
         try {
             monitor.stop();
@@ -81,31 +83,45 @@ public class ApacheFileWatchService extends FileWatchService implements FileAlte
     public void onFileCreate(File file) {
         LOGGER.debug("文件创建监听: %s", file.getName());
 
-        if (createHandler != null) {
-            createHandler.accept(file);
+        if (listeners == null || listeners.isEmpty()) {
+            return;
         }
+
+        listeners.stream().filter(listener -> listener.validFile(file)).forEach(listener -> listener.fileCreatedHandle(file));
     }
 
     @Override
     public void onFileChange(File file) {
         LOGGER.debug("文件更新监听: %s", file.getName());
 
-        if (modiferHandler != null) {
-            modiferHandler.accept(file);
+        if (listeners == null || listeners.isEmpty()) {
+            return;
         }
+
+        listeners.stream().filter(listener -> listener.validFile(file)).forEach(listener -> listener.fileCreatedHandle(file));
     }
 
     @Override
     public void onFileDelete(File file) {
         LOGGER.debug("文件删除监听: %s", file.getName());
 
-        if (deleteHandler != null) {
-            deleteHandler.accept(file);
+        if (listeners == null || listeners.isEmpty()) {
+            return;
         }
+
+        listeners.stream().filter(listener -> listener.validFile(file)).forEach(listener -> listener.fileCreatedHandle(file));
     }
 
     @Override
     public void onStop(FileAlterationObserver observer) {
 
+    }
+
+    public List<FileChangedListener> getListeners() {
+        return listeners;
+    }
+
+    public void setListeners(List<FileChangedListener> listeners) {
+        this.listeners = listeners;
     }
 }

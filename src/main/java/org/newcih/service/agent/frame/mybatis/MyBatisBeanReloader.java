@@ -9,7 +9,7 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.parsing.XPathParser;
 import org.apache.ibatis.session.Configuration;
-import org.newcih.util.GaloisLog;
+import org.newcih.utils.GaloisLog;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -74,6 +74,7 @@ public class MyBatisBeanReloader {
         builder.parse();
     }
 
+    @SuppressWarnings("unchecked")
     private void clearMapperRegistry(String namespace) throws NoSuchFieldException, IllegalAccessException {
         Field field = MapperRegistry.class.getDeclaredField("knownMappers");
         field.setAccessible(true);

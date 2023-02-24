@@ -4,7 +4,7 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtMethod;
-import org.newcih.util.GaloisLog;
+import org.newcih.utils.GaloisLog;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.security.ProtectionDomain;

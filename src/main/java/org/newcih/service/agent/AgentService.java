@@ -8,16 +8,13 @@ import org.newcih.service.watch.ApacheFileWatchService;
 import org.newcih.service.watch.frame.FileChangedListener;
 import org.newcih.service.watch.frame.mybatis.MyBatisXmlListener;
 import org.newcih.service.watch.frame.spring.SpringBeanListener;
-import org.newcih.util.GaloisLog;
-import org.newcih.util.SystemUtils;
+import org.newcih.utils.GaloisLog;
+import org.newcih.utils.SystemUtil;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
@@ -45,19 +42,11 @@ public class AgentService {
         LOGGER.info("AgentService服务启动");
 
         // 创建文件类型监听器
-        fileChangedListeners.add(new SpringBeanListener());
+        fileChangedListeners.add(new SpringBeanListener(inst));
         fileChangedListeners.add(new MyBatisXmlListener());
 
-        String outputPath = SystemUtils.getOutputPath(null);
-        ApacheFileWatchService watchService = new ApacheFileWatchService(outputPath);
-
-        BiConsumer<File, Consumer<FileChangedListener>> commonHandler = (file, handler) -> fileChangedListeners.stream()
-                .filter(listener -> listener.validFile(file))
-                .forEach(handler);
-        watchService.setCreateHandler(file -> commonHandler.accept(file, listener -> listener.fileCreatedHandle(file, inst)));
-        watchService.setModiferHandler(file -> commonHandler.accept(file, listener -> listener.fileModifiedHandle(file, inst)));
-        watchService.setDeleteHandler(file -> commonHandler.accept(file, listener -> listener.fileDeletedHandle(file, inst)));
-
+        String outputPath = SystemUtil.getOutputPath(null);
+        ApacheFileWatchService watchService = new ApacheFileWatchService(outputPath, fileChangedListeners);
         watchService.start();
         LOGGER.info("已启动AgentService的文件监控服务");
     }

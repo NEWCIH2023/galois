@@ -1,6 +1,6 @@
 package org.newcih.service.agent.frame.spring;
 
-import org.newcih.util.GaloisLog;
+import org.newcih.utils.GaloisLog;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
