@@ -5,9 +5,13 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class GaloisLog {
 
@@ -72,8 +76,24 @@ public class GaloisLog {
     }
 
     public void error(String msg, Object... args) {
+        AtomicReference<Throwable> throwable = new AtomicReference<>(null);
+        Object temp;
+
+        List<Object> argList = Stream.of(args).filter(arg -> {
+            if (arg instanceof Throwable) {
+                throwable.set((Throwable) arg);
+                return false;
+            }
+            return true;
+        }).collect(Collectors.toList());
+
         if (currentLogRank() <= LOG_LEVEL_ERROR_RANK) {
-            System.out.printf(LocalDateTime.now().format(DATE_TIME_FORMAT) + " " + MARKER + " [ERROR] " + msg + "\n", args);
+            System.out.printf(LocalDateTime.now().format(DATE_TIME_FORMAT) + " " + MARKER + " [ERROR] " + msg + "\n",
+                    argList.toArray());
+        }
+
+        if (throwable.get() != null) {
+            throwable.get().printStackTrace();
         }
     }
 

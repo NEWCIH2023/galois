@@ -64,7 +64,7 @@ public class MyBatisBeanReloader {
             // 重新加载
             reloadXML(newXMLFile);
         } catch (Exception e) {
-            LOGGER.error("重新加载MyBatis的XML文件发生异常", e);
+            LOGGER.error("reload mybatis xml throw exception", e);
         }
     }
 

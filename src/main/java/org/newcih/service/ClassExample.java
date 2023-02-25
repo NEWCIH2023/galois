@@ -1,5 +1,10 @@
 package org.newcih.service;
 
+import java.util.Iterator;
+import java.util.PrimitiveIterator;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 public class ClassExample {
 
     public ClassExample() {
@@ -7,11 +12,26 @@ public class ClassExample {
     }
 
     public static void main(String[] args) {
-        System.out.println("hello world");
+        test1();
     }
 
     public String test() {
         System.out.println("test method");
         return "test";
+    }
+
+    public static void test1() {
+        Stream<Integer> is = Stream.of(12, 33, 89);
+        Iterator iterator = is.iterator();
+        while (iterator.hasNext()) {
+            if (33 == (int) iterator.next()) {
+                iterator.remove();
+            }
+        }
+
+        System.out.println(is.count());
+    }
+
+    public static void test2(){
     }
 }

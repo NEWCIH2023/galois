@@ -39,19 +39,19 @@ public class MyBatisTransformer implements ClassFileTransformer {
                     MyBatisBeanReloader.class.getName());
 
             if (LOGGER.isDebugEnabled()) {
-                insertCode += String.format("System.out.println(\"MyBatis的%s类的构造方法侵入成功\");", className);
+                insertCode += String.format("System.out.println(\"injected constructor of %s class in mybatis success\");", className);
             }
 
             constructor.insertAfter(insertCode);
 
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("%s 正在处理 %s 类的 %s 方法", getClass().getSimpleName(), className, constructor.getName());
+                LOGGER.debug("%s is handling %s method in %s class", getClass().getSimpleName(), constructor.getName(), className);
             }
 
             return factory.toBytecode();
 
         } catch (Exception e) {
-            LOGGER.error("侵入MyBatis的DefaultSqlSessionFactory的构造方法发生异常", e);
+            LOGGER.error("inject constructor method of %s class failed", className);
         }
 
         return null;
@@ -68,7 +68,7 @@ public class MyBatisTransformer implements ClassFileTransformer {
         if (LOGGER.isDebugEnabled()) {
             if (Arrays.asList(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT,
                     CLASS_PATH_BEAN_DEFINITION_SCANNER, SQL_SESSION_FACTORY_BEAN).contains(newClassName)) {
-                LOGGER.debug("%s 正在扫描 %s", getClass().getSimpleName(), newClassName);
+                LOGGER.debug("%s is scanning %s", getClass().getSimpleName(), newClassName);
             }
         }
 

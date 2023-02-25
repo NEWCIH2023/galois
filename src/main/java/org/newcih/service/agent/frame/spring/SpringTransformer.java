@@ -35,21 +35,22 @@ public class SpringTransformer implements ClassFileTransformer {
             String insertCode = String.format("%s.getInstance().registerApplicationContext(this);", SpringBeanReloader.class.getName());
 
             if (LOGGER.isDebugEnabled()) {
-                insertCode += String.format("System.out.println(\"Spring的%s类的构造方法侵入成功\");", className);
+                insertCode += String.format("System.out.println(\"injected constructor method of %s class in spring success\");", className);
             }
 
             constructor.insertAfter(insertCode);
 
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("%s 正在处理 %s 类的 %s 方法", getClass().getSimpleName(), className, constructor.getName());
+                LOGGER.debug("%s is handling %s method in %s class", getClass().getSimpleName(), constructor.getName(), className);
             }
 
             return applicationContext.toBytecode();
 
         } catch (Exception e) {
-            LOGGER.error("侵入代码注册Spring上下文发生异常", e);
-            throw new RuntimeException(e);
+            LOGGER.error("inject constructor method of %s class in spring fail", className, e);
         }
+
+        return null;
     }
 
     private byte[] handleSpringBeanScanner(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) {
@@ -73,9 +74,9 @@ public class SpringTransformer implements ClassFileTransformer {
             return scanner.toBytecode();
         } catch (Exception e) {
             LOGGER.error("侵入代码注册SpringBean管理器发生异常", e);
-            throw new RuntimeException(e);
         }
 
+        return null;
     }
 
     @Override
@@ -89,7 +90,7 @@ public class SpringTransformer implements ClassFileTransformer {
         if (LOGGER.isDebugEnabled()) {
             if (Arrays.asList(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT,
                     CLASS_PATH_BEAN_DEFINITION_SCANNER, SQL_SESSION_FACTORY_BEAN).contains(newClassName)) {
-                LOGGER.debug("%s 正在扫描 %s", getClass().getSimpleName(), newClassName);
+                LOGGER.debug("%s is scanning %s", getClass().getSimpleName(), newClassName);
             }
         }
 

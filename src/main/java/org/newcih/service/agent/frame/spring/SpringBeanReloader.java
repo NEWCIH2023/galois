@@ -55,8 +55,6 @@ public final class SpringBeanReloader {
     }
 
     public void addBean(Class<?> clazz, Object bean) {
-        LOGGER.debug("即将使用%s添加类型为%s的对象bean<%s>", scanner, clazz, bean);
-
         String packageName = clazz.getPackage().getName();
         Set<BeanDefinition> beanDefinitionSet = scanner.findCandidateComponents(packageName);
         Iterator<BeanDefinition> definitionIterator = beanDefinitionSet.iterator();
@@ -66,12 +64,12 @@ public final class SpringBeanReloader {
             temp = definitionIterator.next();
 
             if (Objects.equals(temp.getBeanClassName(), clazz.getName())) {
-                DefaultListableBeanFactory beanFactory =
-                        (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
+                DefaultListableBeanFactory beanFactory = (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
                 String beanName = beanFactory.getBeanNamesForType(clazz)[0];
                 beanFactory.destroySingleton(beanName);
                 beanFactory.registerSingleton(beanName, bean);
-                LOGGER.debug("重新注册了%s", bean);
+
+                LOGGER.debug("register %s bean again", bean);
                 break;
             }
 
