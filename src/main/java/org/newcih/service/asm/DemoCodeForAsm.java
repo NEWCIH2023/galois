@@ -1,6 +1,10 @@
 package org.newcih.service.asm;
 
-import java.util.Objects;
+import jdk.internal.org.objectweb.asm.*;
+
+import java.io.IOException;
+
+import static org.objectweb.asm.Opcodes.ASM9;
 
 public class DemoCodeForAsm {
 
@@ -8,17 +12,33 @@ public class DemoCodeForAsm {
         return new DemoCodeForAsm();
     }
 
-    public int getInt() {
-        DemoCodeForAsm a = new DemoCodeForAsm();
-        DemoCodeForAsm tmp = DemoCodeForAsm.getInstance();
-        if (Objects.equals(a, tmp)) {
-            System.out.println("two object is equals");
-            return 35;
-        } else {
-            int c = 235;
-            int d = 22;
-            System.out.println(c + d);
-            return c * d;
-        }
+    public void testB() {
+        long var1 = System.currentTimeMillis();
+        System.err.println("========>I am B");
+        long var3 = System.currentTimeMillis();
+        System.out.println((new StringBuilder()).append("cost:").append(var3 - var1).toString());
+    }
+
+    public static void testInspectCode() throws IOException {
+        ClassReader cr = new ClassReader("org.newcih.service.asm.DemoCodeForAsm");
+        ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
+        cr.accept(new ClassVisitor(ASM9, cw) {
+            @Override
+            public MethodVisitor visitMethod(int access, final String name, String descriptor, String signature,
+                                             String[] exceptions) {
+                MethodVisitor mv = cv.visitMethod(access, name, descriptor, signature, exceptions);
+                return new MethodVisitor() {
+                    @Override
+                    public void visitLineNumber(int i, Label label) {
+                        System.out.println("经过这个测试行数：" + i);
+                        super.visitLineNumber(i, label);
+                    }
+
+                    public void visitParameter(String name, int access){
+
+                    }
+                }
+            }
+        });
     }
 }
