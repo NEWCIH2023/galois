@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    implementation files("C:/Users/liuguangsheng.SZSYY/.m2/repository/com/dm/dm.jdbc.driver/8.0.0/dm.jdbc.driver-8.0.0.jar")
+//    implementation files("C:/Users/liuguangsheng.SZSYY/.m2/repository/com/dm/dm.jdbc.driver/8.0.0/dm.jdbc.driver-8.0.0.jar")
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.0'
 }
