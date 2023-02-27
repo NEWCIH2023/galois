@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class ApacheFileWatchService implements FileAlterationListener {
 
-    private final static GaloisLog LOGGER = GaloisLog.getLogger(ApacheFileWatchService.class);
+    private final static GaloisLog logger = GaloisLog.getLogger(ApacheFileWatchService.class);
     private final FileAlterationMonitor monitor;
     private final FileAlterationObserver observer;
 
@@ -39,9 +39,9 @@ public class ApacheFileWatchService implements FileAlterationListener {
             observer.addListener(this);
             monitor.start();
 
-            LOGGER.debug("FileWatchService文件监听服务已启动！");
+            logger.debug("FileWatchService文件监听服务已启动！");
         } catch (Exception e) {
-            LOGGER.error("启动文件监听服务FileWatchService失败", e);
+            logger.error("启动文件监听服务FileWatchService失败", e);
             return false;
         }
 
@@ -52,7 +52,7 @@ public class ApacheFileWatchService implements FileAlterationListener {
         try {
             monitor.stop();
         } catch (Exception e) {
-            LOGGER.error("关闭文件监听服务FileWatchService失败", e);
+            logger.error("关闭文件监听服务FileWatchService失败", e);
             return false;
         }
 
@@ -81,7 +81,7 @@ public class ApacheFileWatchService implements FileAlterationListener {
 
     @Override
     public void onFileCreate(File file) {
-        LOGGER.debug("文件创建监听: %s", file.getName());
+        logger.debug("文件创建监听: %s", file.getName());
 
         if (listeners == null || listeners.isEmpty()) {
             return;
@@ -92,7 +92,7 @@ public class ApacheFileWatchService implements FileAlterationListener {
 
     @Override
     public void onFileChange(File file) {
-        LOGGER.debug("文件更新监听: %s", file.getName());
+        logger.debug("文件更新监听: %s", file.getName());
 
         if (listeners == null || listeners.isEmpty()) {
             return;
@@ -103,7 +103,7 @@ public class ApacheFileWatchService implements FileAlterationListener {
 
     @Override
     public void onFileDelete(File file) {
-        LOGGER.debug("文件删除监听: %s", file.getName());
+        logger.debug("文件删除监听: %s", file.getName());
 
         if (listeners == null || listeners.isEmpty()) {
             return;

@@ -25,7 +25,7 @@ import java.util.stream.Stream;
  * 用于动态调试使用
  */
 public class AgentService {
-    public static final GaloisLog LOGGER = GaloisLog.getLogger(AgentService.class);
+    public static final GaloisLog logger = GaloisLog.getLogger(AgentService.class);
 
     public static final String SUN_JVM_ARGS = "sun.jvm.args";
     public static final String AGENT_JAR_NAME = "galois-jar-with-dependencies.jar";
@@ -38,7 +38,7 @@ public class AgentService {
      * @param inst
      */
     public static void agentmain(String agentArgs, Instrumentation inst) {
-        LOGGER.info("AgentService服务启动");
+        logger.info("AgentService服务启动");
 
         // 添加类转换器
         inst.addTransformer(new SpringTransformer());
@@ -50,13 +50,13 @@ public class AgentService {
                 new MyBatisXmlListener()
         );
         String outputPath = SystemUtil.getOutputPath();
-        LOGGER.info("Galois开始监听%s目录下文件变动", outputPath);
+        logger.info("Galois开始监听%s目录下文件变动", outputPath);
 
         ApacheFileWatchService watchService = new ApacheFileWatchService(outputPath, fileChangedListeners);
         watchService.start();
 
         try {
-            LOGGER.debug("动态转换类开始");
+            logger.debug("动态转换类开始");
             // 动态转换类
             inst.retransformClasses(
                     Class.forName(SpringTransformer.CLASS_PATH_BEAN_DEFINITION_SCANNER),
@@ -64,7 +64,7 @@ public class AgentService {
                     Class.forName(MyBatisTransformer.SQL_SESSION_FACTORY_BEAN)
             );
         } catch (Exception e) {
-            LOGGER.error("动态转换类发生异常", e);
+            logger.error("动态转换类发生异常", e);
         }
     }
 
@@ -83,7 +83,7 @@ public class AgentService {
      */
     public static void attachProcess(String pid, String agentPath) throws IOException, AttachNotSupportedException,
             AgentLoadException, AgentInitializationException {
-        LOGGER.info("AgentService将绑定到pid为[%s]的java进程中", pid);
+        logger.info("AgentService将绑定到pid为[%s]的java进程中", pid);
 
         VirtualMachine vm = VirtualMachine.attach(pid);
         if (agentPath == null || agentPath.trim().isEmpty()) {

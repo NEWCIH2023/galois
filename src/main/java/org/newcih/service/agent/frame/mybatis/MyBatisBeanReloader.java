@@ -23,20 +23,11 @@ import java.util.*;
  */
 public class MyBatisBeanReloader {
 
-    private static final GaloisLog LOGGER = GaloisLog.getLogger(MyBatisBeanReloader.class);
-    private static final MyBatisBeanReloader MYBATIS_BEAN_RELOADER = new MyBatisBeanReloader();
-    private Configuration configuration;
+    private static final GaloisLog logger = GaloisLog.getLogger(MyBatisBeanReloader.class);
+    public static final MyBatisBeanReloader mybatisBeanReloder = new MyBatisBeanReloader();
+    protected Configuration configuration;
 
     private MyBatisBeanReloader() {
-    }
-
-    /**
-     * 通过Transform方式注入对象
-     *
-     * @param configuration
-     */
-    public void registerConfiguration(Configuration configuration) {
-        getInstance().configuration = configuration;
     }
 
     /**
@@ -45,12 +36,13 @@ public class MyBatisBeanReloader {
      * @return
      */
     public static MyBatisBeanReloader getInstance() {
-        return MYBATIS_BEAN_RELOADER;
+        return mybatisBeanReloder;
     }
 
     public void addBean(File newXMLFile) {
         try (FileInputStream fis = new FileInputStream(newXMLFile)) {
-            XPathParser parser = new XPathParser(fis, true, configuration.getVariables(), new XMLMapperEntityResolver());
+            XPathParser parser = new XPathParser(fis, true, configuration.getVariables(),
+                    new XMLMapperEntityResolver());
             XNode context = parser.evalNode("/mapper");
             String namespace = context.getStringAttribute("namespace");
             // 清除缓存
@@ -64,7 +56,7 @@ public class MyBatisBeanReloader {
             // 重新加载
             reloadXML(newXMLFile);
         } catch (Exception e) {
-            LOGGER.error("reload mybatis xml throw exception", e);
+            logger.error("reload mybatis xml throw exception", e);
         }
     }
 
@@ -78,7 +70,8 @@ public class MyBatisBeanReloader {
     private void clearMapperRegistry(String namespace) throws NoSuchFieldException, IllegalAccessException {
         Field field = MapperRegistry.class.getDeclaredField("knownMappers");
         field.setAccessible(true);
-        Map<Class<?>, MapperProxyFactory<?>> mapConfig = (Map<Class<?>, MapperProxyFactory<?>>) field.get(configuration.getMapperRegistry());
+        Map<Class<?>, MapperProxyFactory<?>> mapConfig =
+                (Map<Class<?>, MapperProxyFactory<?>>) field.get(configuration.getMapperRegistry());
         Class<?> refreshKey = null;
 
         for (Map.Entry<Class<?>, MapperProxyFactory<?>> item : mapConfig.entrySet()) {
@@ -127,8 +120,10 @@ public class MyBatisBeanReloader {
             if (Objects.equals("association", child.getName()) || Objects.equals("collection", child.getName()) || Objects.equals("case", child.getName())) {
 
                 if (child.getStringAttribute("select") == null) {
-                    configuration.getResultMapNames().remove(child.getStringAttribute("id", child.getValueBasedIdentifier()));
-                    configuration.getResultMapNames().remove(namespace + "." + child.getStringAttribute("id", child.getValueBasedIdentifier()));
+                    configuration.getResultMapNames().remove(child.getStringAttribute("id",
+                            child.getValueBasedIdentifier()));
+                    configuration.getResultMapNames().remove(namespace + "." + child.getStringAttribute("id",
+                            child.getValueBasedIdentifier()));
 
                     if (child.getChildren() != null && !child.getChildren().isEmpty()) {
                         clearResultMap(child, namespace);
@@ -168,4 +163,11 @@ public class MyBatisBeanReloader {
         }
     }
 
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
+    }
 }

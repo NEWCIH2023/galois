@@ -6,7 +6,6 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 
@@ -15,8 +14,8 @@ import java.util.Set;
  */
 public final class SpringBeanReloader {
 
-    private static final GaloisLog LOGGER = GaloisLog.getLogger(SpringBeanReloader.class);
-    private static final SpringBeanReloader SPRING_BEAN_RELOADER = new SpringBeanReloader();
+    private static final GaloisLog logger = GaloisLog.getLogger(SpringBeanReloader.class);
+    private static final SpringBeanReloader springBeanReloader = new SpringBeanReloader();
 
     private SpringBeanReloader() {
     }
@@ -28,52 +27,62 @@ public final class SpringBeanReloader {
     private ApplicationContext applicationContext;
 
     /**
-     * 通过Transform方式注册Bean扫描器
-     *
-     * @param scanner
-     */
-    public void registerBeanReloader(ClassPathBeanDefinitionScanner scanner) {
-        getInstance().scanner = scanner;
-    }
-
-    /**
-     * 通过Transform方式注册Spring上下文对象
-     *
-     * @param applicationContext
-     */
-    public void registerApplicationContext(ApplicationContext applicationContext) {
-        getInstance().applicationContext = applicationContext;
-    }
-
-    /**
      * 获取单例实例
      *
      * @return
      */
     public static SpringBeanReloader getInstance() {
-        return SPRING_BEAN_RELOADER;
+        return springBeanReloader;
     }
 
-    public void addBean(Class<?> clazz, Object bean) {
+    /**
+     * 判断当前bean的类是否归Spring管理
+     *
+     * @param clazz
+     * @return
+     */
+    public boolean isSpringBean(Class<?> clazz) {
+        DefaultListableBeanFactory beanFactory =
+                (DefaultListableBeanFactory) getApplicationContext().getAutowireCapableBeanFactory();
+        String[] tmp = beanFactory.getBeanNamesForType(clazz);
+        return tmp.length > 0;
+    }
+
+    /**
+     * 更新Spring管理的bean对象
+     *
+     * @param clazz
+     * @param bean
+     */
+    public void updateBean(Class<?> clazz, Object bean) {
         String packageName = clazz.getPackage().getName();
         Set<BeanDefinition> beanDefinitionSet = scanner.findCandidateComponents(packageName);
-        Iterator<BeanDefinition> definitionIterator = beanDefinitionSet.iterator();
-        BeanDefinition temp;
 
-        while (definitionIterator.hasNext()) {
-            temp = definitionIterator.next();
-
-            if (Objects.equals(temp.getBeanClassName(), clazz.getName())) {
-                DefaultListableBeanFactory beanFactory = (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
+        DefaultListableBeanFactory beanFactory = null;
+        for (BeanDefinition definition : beanDefinitionSet) {
+            if (Objects.equals(definition.getBeanClassName(), clazz.getName())) {
+                beanFactory = (DefaultListableBeanFactory) getApplicationContext().getAutowireCapableBeanFactory();
                 String beanName = beanFactory.getBeanNamesForType(clazz)[0];
                 beanFactory.destroySingleton(beanName);
                 beanFactory.registerSingleton(beanName, bean);
-
-                LOGGER.debug("register %s bean again", bean);
                 break;
             }
-
         }
     }
 
+    public ClassPathBeanDefinitionScanner getScanner() {
+        return scanner;
+    }
+
+    public void setScanner(ClassPathBeanDefinitionScanner scanner) {
+        this.scanner = scanner;
+    }
+
+    public ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
+
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 }

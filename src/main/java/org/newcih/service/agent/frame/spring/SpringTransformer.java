@@ -8,97 +8,98 @@ import org.newcih.utils.GaloisLog;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.security.ProtectionDomain;
-import java.util.Arrays;
-
-import static org.newcih.service.agent.frame.mybatis.MyBatisTransformer.SQL_SESSION_FACTORY_BEAN;
 
 public class SpringTransformer implements ClassFileTransformer {
 
     /**
      * Bean扫描服务类
      */
-    public static final String CLASS_PATH_BEAN_DEFINITION_SCANNER = "org.springframework.context.annotation.ClassPathBeanDefinitionScanner";
+    public static final String CLASS_PATH_BEAN_DEFINITION_SCANNER =
+            "org.springframework.context.annotation.ClassPathBeanDefinitionScanner";
 
     /**
      * Spring上下文服务类
      */
-    public static final String ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT = "org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext";
-    public static final GaloisLog LOGGER = GaloisLog.getLogger(SpringTransformer.class);
+    public static final String ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT =
+            "org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext";
 
-    private byte[] handleSpringApplicationContext(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) {
+    public static final GaloisLog logger = GaloisLog.getLogger(SpringTransformer.class);
+
+    private byte[] handleSpringApplicationContext(ClassLoader loader, String className, Class<?> classBeingRedefined,
+                                                  ProtectionDomain protectionDomain, byte[] classfileBuffer) {
 
         try {
-
             CtClass applicationContext = ClassPool.getDefault().get(className);
             CtConstructor constructor = applicationContext.getDeclaredConstructor(new CtClass[0]);
 
-            String insertCode = String.format("%s.getInstance().registerApplicationContext(this);", SpringBeanReloader.class.getName());
+            String insertCode = String.format("%s.getInstance().registerApplicationContext(this);",
+                    SpringBeanReloader.class.getName());
 
-            if (LOGGER.isDebugEnabled()) {
-                insertCode += String.format("System.out.println(\"injected constructor method of %s class in spring success\");", className);
+            if (logger.isDebugEnabled()) {
+                insertCode += String.format("System.out.println(\"injected constructor method of %s class in spring " +
+                        "success\");", className);
             }
 
             constructor.insertAfter(insertCode);
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("%s is handling %s method in %s class", getClass().getSimpleName(), constructor.getName(), className);
+            if (logger.isDebugEnabled()) {
+                logger.debug("%s is handling %s method in %s class", getClass().getSimpleName(),
+                        constructor.getName(), className);
             }
 
             return applicationContext.toBytecode();
-
         } catch (Exception e) {
-            LOGGER.error("inject constructor method of %s class in spring fail", className, e);
+            logger.error("inject constructor method of %s class in spring fail", className, e);
         }
 
         return null;
     }
 
-    private byte[] handleSpringBeanScanner(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) {
+    private byte[] handleSpringBeanScanner(ClassLoader loader, String className, Class<?> classBeingRedefined,
+                                           ProtectionDomain protectionDomain, byte[] classfileBuffer) {
 
         try {
 
             CtClass scanner = ClassPool.getDefault().get(className);
             CtMethod method = scanner.getDeclaredMethod("doScan");
-            String insertCode = String.format("%s.getInstance().registerBeanReloader(this);", SpringBeanReloader.class.getName());
+            String insertCode = String.format("%s.getInstance().registerBeanReloader(this);",
+                    SpringBeanReloader.class.getName());
 
-            if (LOGGER.isDebugEnabled()) {
-                insertCode += String.format("System.out.println(\"Spring的%s类的%s方法侵入成功\");", className, method.getName());
+            if (logger.isDebugEnabled()) {
+                insertCode += String.format("System.out.println(\"Spring的%s类的%s方法侵入成功\");", className,
+                        method.getName());
             }
 
             method.insertBefore(insertCode);
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("%s 正在处理 %s 类的 %s 方法", getClass().getSimpleName(), className, method.getName());
+            if (logger.isDebugEnabled()) {
+                logger.debug("%s 正在处理 %s 类的 %s 方法", getClass().getSimpleName(), className, method.getName());
             }
 
             return scanner.toBytecode();
         } catch (Exception e) {
-            LOGGER.error("侵入代码注册SpringBean管理器发生异常", e);
+            logger.error("侵入代码注册SpringBean管理器发生异常", e);
         }
 
         return null;
     }
 
     @Override
-    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) {
+    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
+                            ProtectionDomain protectionDomain, byte[] classfileBuffer) {
         if (className == null || className.trim().length() == 0) {
             return null;
         }
 
         String newClassName = className.replace("/", ".");
 
-        if (LOGGER.isDebugEnabled()) {
-            if (Arrays.asList(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT,
-                    CLASS_PATH_BEAN_DEFINITION_SCANNER, SQL_SESSION_FACTORY_BEAN).contains(newClassName)) {
-                LOGGER.debug("%s is scanning %s", getClass().getSimpleName(), newClassName);
-            }
-        }
-
         switch (newClassName) {
             case ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT:
-                return handleSpringApplicationContext(loader, newClassName, classBeingRedefined, protectionDomain, classfileBuffer);
+                return handleSpringApplicationContext(loader, newClassName, classBeingRedefined, protectionDomain,
+                        classfileBuffer);
             case CLASS_PATH_BEAN_DEFINITION_SCANNER:
-                return handleSpringBeanScanner(loader, newClassName, classBeingRedefined, protectionDomain, classfileBuffer);
+                return handleSpringBeanScanner(loader, newClassName, classBeingRedefined, protectionDomain,
+                        classfileBuffer);
             default:
         }
 

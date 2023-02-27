@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class PremainService {
 
-    public static final GaloisLog LOGGER = GaloisLog.getLogger(PremainService.class);
+    public static final GaloisLog logger = GaloisLog.getLogger(PremainService.class);
 
     /**
      * Premain入口
@@ -28,7 +28,7 @@ public class PremainService {
      * @param inst
      */
     public static void premain(String agentArgs, Instrumentation inst) {
-        LOGGER.info("PremainService服务启动");
+        logger.info("premainservice service started !");
 
         // 添加类转换器
         inst.addTransformer(new SpringTransformer());
@@ -40,7 +40,7 @@ public class PremainService {
                 new MyBatisXmlListener()
         );
         String outputPath = SystemUtil.getOutputPath();
-        LOGGER.info("Galois开始监听%s目录下文件变动", outputPath);
+        logger.info("begin listen file change in path [%s]", outputPath);
 
         ApacheFileWatchService watchService = new ApacheFileWatchService(outputPath, fileChangedListeners);
         watchService.start();
@@ -54,21 +54,21 @@ public class PremainService {
      */
     @Deprecated
     public static void oldpremain(String agentArgs, Instrumentation inst) {
-        LOGGER.info("PremainService服务启动");
+        logger.info("premainservice service started !");
 
         try {
             String name = ManagementFactory.getRuntimeMXBean().getName();
             String pid = name.split("@")[0];
             AgentService.attachProcess(pid);
         } catch (Exception e) {
-            LOGGER.error("启动AgentService服务失败", e);
+            logger.error("agentservice start failed", e);
             throw new RuntimeException(e);
         }
 
         inst.addTransformer(new SpringTransformer(), true);
         inst.addTransformer(new MyBatisTransformer(), true);
 
-        LOGGER.info("Premain服务执行完毕");
+        logger.info("premain service execute complete");
     }
 
 }

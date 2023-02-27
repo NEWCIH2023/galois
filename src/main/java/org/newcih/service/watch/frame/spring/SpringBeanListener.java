@@ -14,7 +14,7 @@ import java.lang.instrument.Instrumentation;
  */
 public final class SpringBeanListener implements FileChangedListener {
 
-    public static final GaloisLog LOGGER = GaloisLog.getLogger(SpringBeanListener.class);
+    public static final GaloisLog logger = GaloisLog.getLogger(SpringBeanListener.class);
     public static final String CLASS_FILE_SUFFIX = ".class";
 
     private final Instrumentation inst;
@@ -28,11 +28,16 @@ public final class SpringBeanListener implements FileChangedListener {
         return file.getName().endsWith(CLASS_FILE_SUFFIX);
     }
 
-    @Override
-    public void fileCreatedHandle(File changedFile) {
-        String outputPath = SystemUtil.getOutputPath(null);
-        String className = SystemUtil.getClassName(outputPath, changedFile);
-        LOGGER.info("检测到文件变动，当前需要加载%s", className);
+    /**
+     * 文件变动处理
+     *
+     * @param changedFile
+     */
+    public void fileChangedHandler(File changedFile) {
+        String classpath = SystemUtil.getOutputPath() + "classes" + File.separator;
+        String className = SystemUtil.getClassName(classpath, changedFile);
+
+        logger.info("检测到文件变动，当前需要加载%s", className);
 
         try {
             Class<?>[] classes = inst.getAllLoadedClasses();
@@ -41,22 +46,25 @@ public final class SpringBeanListener implements FileChangedListener {
                 if (clazz.getName().equals(className)) {
                     ClassDefinition newClassDef = new ClassDefinition(clazz, SystemUtil.readFile(changedFile));
                     inst.redefineClasses(newClassDef);
-                    LOGGER.info("已完成对类 %s 的重定义", clazz.getName());
 
                     Object newBean = clazz.newInstance();
-                    SpringBeanReloader.getInstance().addBean(clazz, newBean);
-                    LOGGER.info("已完成Spring对bean<%s>的重新装载", newBean);
+                    SpringBeanReloader.getInstance().updateBean(clazz, newBean);
                     break;
                 }
             }
         } catch (Throwable e) {
-            LOGGER.error("重新加载实例对象的过程中发生异常", e);
+            logger.error("重新加载实例对象的过程中发生异常", e);
         }
     }
 
     @Override
-    public void fileModifiedHandle(File file) {
+    public void fileCreatedHandle(File file) {
+        fileChangedHandler(file);
+    }
 
+    @Override
+    public void fileModifiedHandle(File file) {
+        fileChangedHandler(file);
     }
 
     @Override

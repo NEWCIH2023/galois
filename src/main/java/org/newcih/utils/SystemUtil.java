@@ -60,7 +60,7 @@ public class SystemUtil {
 
         try (
                 FileInputStream fileInputStream = new FileInputStream(file);
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()
         ) {
             byte[] b = new byte[1024];
             int n;
@@ -83,6 +83,7 @@ public class SystemUtil {
      * @return
      */
     public static String getClassName(String prefixPath, File classFile) {
-        return classFile.getAbsolutePath().replace(prefixPath, "").replaceAll(SystemUtil.isWindowOS() ? "\\\\" : "/", ".").replace(".class", "");
+        return classFile.getAbsolutePath().replace(prefixPath, "").replaceAll(SystemUtil.isWindowOS() ? "\\\\" : "/",
+                ".").replace(".class", "");
     }
 }

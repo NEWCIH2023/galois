@@ -8,7 +8,8 @@ import java.io.IOException;
 
 public class JavaUtil {
 
-    public static final String sourceCodePath = "C:\\Users\\liuguangsheng.SZSYY\\IdeaProjects\\galois\\src\\main\\java" +
+    public static final String sourceCodePath = "C:\\Users\\liuguangsheng.SZSYY\\IdeaProjects\\galois\\src\\main" +
+            "\\java" +
             "\\org\\newcih\\utils\\JavaUtil.java";
 
     private static final String tempDir = System.getProperty("java.io.tmpdir");

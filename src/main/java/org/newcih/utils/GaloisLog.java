@@ -1,111 +1,109 @@
 package org.newcih.utils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.logging.Formatter;
+import java.util.logging.*;
 
-public class GaloisLog {
+/**
+ * galois log service
+ *
+ * @author liuguangsheng
+ */
+public class GaloisLog extends Logger {
 
-    public static final String LOG_LEVEL = "log.level";
-    public static final String LOG_LEVEL_INFO = "info", LOG_LEVEL_DEBUG = "debug", LOG_LEVEL_WARN = "warn", LOG_LEVEL_ERROR = "error";
-    public static final int LOG_LEVEL_INFO_RANK = 0, LOG_LEVEL_DEBUG_RANK = -1, LOG_LEVEL_WARN_RANK = 5, LOG_LEVEL_ERROR_RANK = 10;
-    public static final Map<String, Integer> LOG_LEVEL_RANK_MAP = new HashMap<>();
-    public static final String MARKER = "## Galois ##";
-    public static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
-    public static final ConcurrentHashMap<String, GaloisLog> LOGGER_MAP = new ConcurrentHashMap<>(256);
-    private static final Properties LOG_PROPERTIES;
+    protected static final String MARKER = "Galois";
+
+    private static final Handler consoleHandler = new ConsoleHandler();
 
     static {
-        LOG_LEVEL_RANK_MAP.put(LOG_LEVEL_INFO, LOG_LEVEL_INFO_RANK);
-        LOG_LEVEL_RANK_MAP.put(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG_RANK);
-        LOG_LEVEL_RANK_MAP.put(LOG_LEVEL_WARN, LOG_LEVEL_WARN_RANK);
-        LOG_LEVEL_RANK_MAP.put(LOG_LEVEL_ERROR, LOG_LEVEL_ERROR_RANK);
+        consoleHandler.setLevel(Level.INFO);
+
+        Formatter formatter = new Formatter() {
+            @Override
+            public String format(LogRecord record) {
+                Date logDate = new Date();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+                logDate.setTime(record.getMillis());
+                return String.format("[%s] %s [%s] %s%n", MARKER, sdf.format(logDate), record.getLevel(),
+                        record.getMessage());
+            }
+        };
+        consoleHandler.setFormatter(formatter);
     }
 
-    static {
-        try (InputStream logFile = GaloisLog.class.getResourceAsStream("/galois-log.properties")) {
-            LOG_PROPERTIES = new Properties();
-            LOG_PROPERTIES.load(logFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+    /**
+     * Protected method to construct a logger for a named subsystem.
+     * <p>
+     * The logger will be initially configured with a null Level
+     * and with useParentHandlers set to true.
+     *
+     * @param name               A name for the logger.  This should
+     *                           be a dot-separated name and should normally
+     *                           be based on the package name or class name
+     *                           of the subsystem, such as java.net
+     *                           or javax.swing.  It may be null for anonymous Loggers.
+     * @param resourceBundleName name of ResourceBundle to be used for localizing
+     *                           messages for this logger.  May be null if none
+     *                           of the messages require localization.
+     */
+    protected GaloisLog(String name, String resourceBundleName) {
+        super(name, resourceBundleName);
+        addHandler(consoleHandler);
     }
 
     public static GaloisLog getLogger(Class<?> clazz) {
-        if (LOGGER_MAP.containsKey(clazz.getName())) {
-            return LOGGER_MAP.get(clazz.getName());
-        } else {
-            GaloisLog temp = new GaloisLog();
-            LOGGER_MAP.put(clazz.getName(), temp);
-            return temp;
-        }
-    }
-
-    private static int currentLogRank() {
-        return LOG_LEVEL_RANK_MAP.get(LOG_PROPERTIES.getProperty(LOG_LEVEL));
-    }
-
-    public void info(String msg, Object... args) {
-        if (currentLogRank() <= LOG_LEVEL_INFO_RANK) {
-            System.out.printf(LocalDateTime.now().format(DATE_TIME_FORMAT) + " " + MARKER + " [INFO] " + msg + "\n", args);
-        }
+        return new GaloisLog(clazz.getName(), null);
     }
 
     public boolean isInfoEnabled() {
-        return currentLogRank() <= LOG_LEVEL_INFO_RANK;
+        return isLoggable(Level.INFO);
     }
 
-    public void debug(String msg, Object... args) {
-        if (currentLogRank() <= LOG_LEVEL_DEBUG_RANK) {
-            System.out.printf(LocalDateTime.now().format(DATE_TIME_FORMAT) + " " + MARKER + " [DEBUG] " + msg + "\n", args);
-        }
+    public void info(String msg, Object... params) {
+        super.info(String.format(msg, params));
     }
 
     public boolean isDebugEnabled() {
-        return currentLogRank() <= LOG_LEVEL_DEBUG_RANK;
+        return isLoggable(Level.CONFIG);
     }
 
-    public void error(String msg, Object... args) {
-        AtomicReference<Throwable> throwable = new AtomicReference<>(null);
-        Object temp;
-
-        List<Object> argList = Stream.of(args).filter(arg -> {
-            if (arg instanceof Throwable) {
-                throwable.set((Throwable) arg);
-                return false;
-            }
-            return true;
-        }).collect(Collectors.toList());
-
-        if (currentLogRank() <= LOG_LEVEL_ERROR_RANK) {
-            System.out.printf(LocalDateTime.now().format(DATE_TIME_FORMAT) + " " + MARKER + " [ERROR] " + msg + "\n",
-                    argList.toArray());
-        }
-
-        if (throwable.get() != null) {
-            throwable.get().printStackTrace();
-        }
+    public void debug(String msg, Object... params) {
+        super.config(String.format(msg, params));
     }
 
-    public void error(String msg, Throwable throwable) {
-        if (currentLogRank() <= LOG_LEVEL_ERROR_RANK) {
-            System.err.println(LocalDateTime.now().format(DATE_TIME_FORMAT) + " " + MARKER + " [ERROR] " + msg + "\n");
-            throwable.printStackTrace();
-        }
+
+    public boolean isWarnEnabled() {
+        return isLoggable(Level.WARNING);
+    }
+
+    public void warn(String msg, Object... params) {
+        super.warning(String.format(msg, params));
     }
 
     public boolean isErrorEnabled() {
-        return currentLogRank() <= LOG_LEVEL_ERROR_RANK;
+        return isLoggable(Level.SEVERE);
     }
 
+    public void error(String msg, Object... params) {
+        Throwable throwable = null;
+        List<Object> objects = new ArrayList<>(16);
+        Collections.addAll(objects, params);
+        Iterator<Object> iterator = objects.listIterator();
+        Object temp;
+
+        while (iterator.hasNext()) {
+            temp = iterator.next();
+            if (temp instanceof Throwable) {
+                throwable = (Throwable) temp;
+                iterator.remove();
+            }
+        }
+
+        super.severe(String.format(msg, objects.toArray()));
+
+        if (throwable != null) {
+            throwable.printStackTrace();
+        }
+    }
 }

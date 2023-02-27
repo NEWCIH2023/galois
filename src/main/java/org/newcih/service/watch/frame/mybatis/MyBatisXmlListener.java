@@ -11,7 +11,7 @@ import java.io.File;
  */
 public class MyBatisXmlListener implements FileChangedListener {
 
-    private static final GaloisLog LOGGER = GaloisLog.getLogger(MyBatisXmlListener.class);
+    private static final GaloisLog logger = GaloisLog.getLogger(MyBatisXmlListener.class);
 
     @Override
     public boolean validFile(File file) {
@@ -22,14 +22,14 @@ public class MyBatisXmlListener implements FileChangedListener {
     public void fileCreatedHandle(File file) {
         MyBatisBeanReloader reloader = MyBatisBeanReloader.getInstance();
         reloader.addBean(file);
-        LOGGER.info("Mybatis已重新加载%s文件", file.getName());
+        logger.info("Mybatis已重新加载%s文件", file.getName());
     }
 
     @Override
     public void fileModifiedHandle(File file) {
         MyBatisBeanReloader reloader = MyBatisBeanReloader.getInstance();
         reloader.addBean(file);
-        LOGGER.info("Mybatis已重新加载%s文件", file.getName());
+        logger.info("Mybatis已重新加载%s文件", file.getName());
     }
 
     @Override
