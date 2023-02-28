@@ -17,8 +17,7 @@ public class GaloisLog extends Logger {
     private static final Handler consoleHandler = new ConsoleHandler();
 
     static {
-        consoleHandler.setLevel(Level.INFO);
-
+        consoleHandler.setLevel(Level.CONFIG);
         Formatter formatter = new Formatter() {
             @Override
             public String format(LogRecord record) {
@@ -57,7 +56,7 @@ public class GaloisLog extends Logger {
     }
 
     public boolean isInfoEnabled() {
-        return isLoggable(Level.INFO);
+        return consoleHandler.getLevel().intValue() >= Level.INFO.intValue();
     }
 
     public void info(String msg, Object... params) {
@@ -65,7 +64,7 @@ public class GaloisLog extends Logger {
     }
 
     public boolean isDebugEnabled() {
-        return isLoggable(Level.CONFIG);
+        return consoleHandler.getLevel().intValue() >= Level.CONFIG.intValue();
     }
 
     public void debug(String msg, Object... params) {
@@ -74,7 +73,7 @@ public class GaloisLog extends Logger {
 
 
     public boolean isWarnEnabled() {
-        return isLoggable(Level.WARNING);
+        return consoleHandler.getLevel().intValue() >= Level.WARNING.intValue();
     }
 
     public void warn(String msg, Object... params) {
@@ -82,7 +81,7 @@ public class GaloisLog extends Logger {
     }
 
     public boolean isErrorEnabled() {
-        return isLoggable(Level.SEVERE);
+        return consoleHandler.getLevel().intValue() >= Level.SEVERE.intValue();
     }
 
     public void error(String msg, Object... params) {

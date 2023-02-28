@@ -22,7 +22,7 @@ public class ApacheFileWatchService implements FileAlterationListener {
 
     public ApacheFileWatchService(String path) {
         observer = new FileAlterationObserver(new File(path));
-        monitor = new FileAlterationMonitor(500);
+        monitor = new FileAlterationMonitor(1000);
     }
 
     /**

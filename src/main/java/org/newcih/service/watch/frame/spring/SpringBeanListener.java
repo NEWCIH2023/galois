@@ -28,14 +28,11 @@ public final class SpringBeanListener implements FileChangedListener {
         return file.getName().endsWith(CLASS_FILE_SUFFIX);
     }
 
-    /**
-     * 文件变动处理
-     *
-     * @param changedFile
-     */
-    public void fileChangedHandler(File changedFile) {
-        String classpath = SystemUtil.getOutputPath() + "classes" + File.separator;
-        String className = SystemUtil.getClassName(classpath, changedFile);
+
+    @Override
+    public void fileCreatedHandle(File file) {
+        String classpath = SystemUtil.getOutputPath().replace("/", File.separator) + "classes" + File.separator;
+        String className = SystemUtil.getClassName(classpath, file);
 
         logger.info("检测到文件变动，当前需要加载%s", className);
 
@@ -44,7 +41,7 @@ public final class SpringBeanListener implements FileChangedListener {
             for (Class<?> clazz : classes) {
 
                 if (clazz.getName().equals(className)) {
-                    ClassDefinition newClassDef = new ClassDefinition(clazz, SystemUtil.readFile(changedFile));
+                    ClassDefinition newClassDef = new ClassDefinition(clazz, SystemUtil.readFile(file));
                     inst.redefineClasses(newClassDef);
 
                     Object newBean = clazz.newInstance();
@@ -54,17 +51,13 @@ public final class SpringBeanListener implements FileChangedListener {
             }
         } catch (Throwable e) {
             logger.error("重新加载实例对象的过程中发生异常", e);
+            e.printStackTrace();
         }
     }
 
     @Override
-    public void fileCreatedHandle(File file) {
-        fileChangedHandler(file);
-    }
-
-    @Override
     public void fileModifiedHandle(File file) {
-        fileChangedHandler(file);
+        // 不可以在变动时处理，此时class文件经历删除-新增，该阶段可能找不到class文件
     }
 
     @Override

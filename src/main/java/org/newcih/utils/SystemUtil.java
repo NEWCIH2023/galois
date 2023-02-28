@@ -58,10 +58,10 @@ public class SystemUtil {
             return null;
         }
 
-        try (
-                FileInputStream fileInputStream = new FileInputStream(file);
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()
-        ) {
+        System.out.println("before new fis, file is " + file);
+        try (FileInputStream fileInputStream = new FileInputStream(file);
+             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+
             byte[] b = new byte[1024];
             int n;
             while ((n = fileInputStream.read(b)) != -1) {
@@ -70,6 +70,7 @@ public class SystemUtil {
 
             return byteArrayOutputStream.toByteArray();
         } catch (Exception e) {
+            System.out.println("current file is " + file);
             e.printStackTrace();
         }
 
@@ -83,7 +84,9 @@ public class SystemUtil {
      * @return
      */
     public static String getClassName(String prefixPath, File classFile) {
-        return classFile.getAbsolutePath().replace(prefixPath, "").replaceAll(SystemUtil.isWindowOS() ? "\\\\" : "/",
-                ".").replace(".class", "");
+        return classFile.getAbsolutePath()
+                .replace(prefixPath, "")
+                .replaceAll(SystemUtil.isWindowOS() ? "\\\\" : "/", ".")
+                .replace(".class", "");
     }
 }
