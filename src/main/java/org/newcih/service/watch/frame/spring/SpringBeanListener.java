@@ -1,6 +1,7 @@
 package org.newcih.service.watch.frame.spring;
 
 import org.newcih.service.agent.frame.spring.SpringBeanReloader;
+import org.newcih.service.watch.ProjectFileManager;
 import org.newcih.service.watch.frame.FileChangedListener;
 import org.newcih.utils.SystemUtil;
 import org.slf4j.Logger;
@@ -10,15 +11,18 @@ import java.io.File;
 import java.lang.instrument.ClassDefinition;
 import java.lang.instrument.Instrumentation;
 
+import static org.newcih.constants.FileTypeConstant.CLASS_FILE_TYPE;
+
 /**
  * Spring的Bean变动监听器
  */
 public final class SpringBeanListener implements FileChangedListener {
 
     public static final Logger logger = LoggerFactory.getLogger(SpringBeanListener.class);
-    public static final String CLASS_FILE_SUFFIX = ".class";
 
     private final Instrumentation inst;
+
+    private final static ProjectFileManager fileManager = ProjectFileManager.getInstance();
 
     public SpringBeanListener(Instrumentation inst) {
         this.inst = inst;
@@ -26,33 +30,27 @@ public final class SpringBeanListener implements FileChangedListener {
 
     @Override
     public boolean validFile(File file) {
-        return file.getName().endsWith(CLASS_FILE_SUFFIX);
+        return file.getName().endsWith(CLASS_FILE_TYPE);
     }
 
 
     @Override
     public void fileCreatedHandle(File file) {
-        String classpath = SystemUtil.getOutputPath().replace("/", File.separator) + "classes" + File.separator;
-        String className = SystemUtil.getClassName(classpath, file);
-
-        logger.info("检测到文件变动，当前需要加载{}", className);
+        String className = SystemUtil.getClassName(fileManager.getClassPath(), file);
 
         try {
             Class<?>[] classes = inst.getAllLoadedClasses();
             for (Class<?> clazz : classes) {
-
                 if (clazz.getName().equals(className)) {
                     ClassDefinition newClassDef = new ClassDefinition(clazz, SystemUtil.readFile(file));
                     inst.redefineClasses(newClassDef);
-
                     Object newBean = clazz.newInstance();
                     SpringBeanReloader.getInstance().updateBean(clazz, newBean);
                     break;
                 }
             }
         } catch (Throwable e) {
-            logger.error("重新加载实例对象的过程中发生异常", e);
-            e.printStackTrace();
+            logger.error("reload bean under file create event failed", e);
         }
     }
 

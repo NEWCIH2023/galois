@@ -4,10 +4,10 @@ import org.newcih.service.agent.frame.mybatis.SqlSessionFactoryBeanVisitor;
 import org.newcih.service.agent.frame.spring.ApplicationContextVisitor;
 import org.newcih.service.agent.frame.spring.BeanDefinitionScannerVisitor;
 import org.newcih.service.watch.ApacheFileWatchService;
+import org.newcih.service.watch.ProjectFileManager;
 import org.newcih.service.watch.frame.FileChangedListener;
 import org.newcih.service.watch.frame.mybatis.MyBatisXmlListener;
 import org.newcih.service.watch.frame.spring.SpringBeanListener;
-import org.newcih.utils.SystemUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,13 +24,15 @@ import java.util.Map;
 public class PremainService {
 
     public static final Logger logger = LoggerFactory.getLogger(PremainService.class);
-
     private static final Map<String, MethodAdapter> mac = new HashMap<>(64);
+    private static final ProjectFileManager fileManager = ProjectFileManager.getInstance();
 
     static {
-        new ApplicationContextVisitor().install(mac);
-        new BeanDefinitionScannerVisitor().install(mac);
-        new SqlSessionFactoryBeanVisitor().install(mac);
+        Arrays.asList(
+                new ApplicationContextVisitor(),
+                new BeanDefinitionScannerVisitor(),
+                new SqlSessionFactoryBeanVisitor()
+        ).forEach(visit -> visit.install(mac));
     }
 
     /**
@@ -57,12 +59,13 @@ public class PremainService {
             return null;
         });
 
-        // 启用文件变更监听服务
+        // start file change listener service
         List<FileChangedListener> fileChangedListeners = Arrays.asList(
                 new SpringBeanListener(inst),
                 new MyBatisXmlListener()
         );
-        String outputPath = SystemUtil.getOutputPath();
+
+        String outputPath = fileManager.getOutputPath();
         logger.info("begin listen file change in path [{}]", outputPath);
 
         ApacheFileWatchService watchService = new ApacheFileWatchService(outputPath, fileChangedListeners);
