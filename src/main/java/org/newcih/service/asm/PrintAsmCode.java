@@ -12,6 +12,7 @@ public class PrintAsmCode {
 
     public static void main(String[] args) throws IOException {
         String className = "org.newcih.service.asm.DemoCodeForAsm";
+
         int parsingOptions = ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG;
         Printer printer = new ASMifier();
         PrintWriter printWriter = new PrintWriter(System.out, true);

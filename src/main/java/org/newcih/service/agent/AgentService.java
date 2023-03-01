@@ -4,14 +4,13 @@ import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
-import org.newcih.service.agent.frame.mybatis.MyBatisTransformer;
-import org.newcih.service.agent.frame.spring.SpringTransformer;
 import org.newcih.service.watch.ApacheFileWatchService;
 import org.newcih.service.watch.frame.FileChangedListener;
 import org.newcih.service.watch.frame.mybatis.MyBatisXmlListener;
 import org.newcih.service.watch.frame.spring.SpringBeanListener;
-import org.newcih.utils.GaloisLog;
 import org.newcih.utils.SystemUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
@@ -25,7 +24,7 @@ import java.util.stream.Stream;
  * 用于动态调试使用
  */
 public class AgentService {
-    public static final GaloisLog logger = GaloisLog.getLogger(AgentService.class);
+    public static final Logger logger = LoggerFactory.getLogger(AgentService.class);
 
     public static final String SUN_JVM_ARGS = "sun.jvm.args";
     public static final String AGENT_JAR_NAME = "galois-jar-with-dependencies.jar";
@@ -41,8 +40,8 @@ public class AgentService {
         logger.info("AgentService服务启动");
 
         // 添加类转换器
-        inst.addTransformer(new SpringTransformer());
-        inst.addTransformer(new MyBatisTransformer());
+//        inst.addTransformer(new SpringTransformer());
+//        inst.addTransformer(new MyBatisTransformer());
 
         // 创建文件类型监听器
         List<FileChangedListener> fileChangedListeners = Arrays.asList(
@@ -50,7 +49,7 @@ public class AgentService {
                 new MyBatisXmlListener()
         );
         String outputPath = SystemUtil.getOutputPath();
-        logger.info("Galois开始监听%s目录下文件变动", outputPath);
+        logger.info("Galois开始监听{}目录下文件变动", outputPath);
 
         ApacheFileWatchService watchService = new ApacheFileWatchService(outputPath, fileChangedListeners);
         watchService.start();
@@ -58,17 +57,18 @@ public class AgentService {
         try {
             logger.debug("动态转换类开始");
             // 动态转换类
-            inst.retransformClasses(
-                    Class.forName(SpringTransformer.CLASS_PATH_BEAN_DEFINITION_SCANNER),
-                    Class.forName(SpringTransformer.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT),
-                    Class.forName(MyBatisTransformer.SQL_SESSION_FACTORY_BEAN)
-            );
+//            inst.retransformClasses(
+//                    Class.forName(SpringTransformer.CLASS_PATH_BEAN_DEFINITION_SCANNER),
+//                    Class.forName(SpringTransformer.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT),
+//                    Class.forName(MyBatisTransformer.SQL_SESSION_FACTORY_BEAN)
+//            );
         } catch (Exception e) {
             logger.error("动态转换类发生异常", e);
         }
     }
 
-    public static void attachProcess(String pid) throws AgentLoadException, IOException, AttachNotSupportedException, AgentInitializationException {
+    public static void attachProcess(String pid) throws AgentLoadException, IOException, AttachNotSupportedException,
+            AgentInitializationException {
         attachProcess(pid, null);
     }
 
@@ -83,7 +83,7 @@ public class AgentService {
      */
     public static void attachProcess(String pid, String agentPath) throws IOException, AttachNotSupportedException,
             AgentLoadException, AgentInitializationException {
-        logger.info("AgentService将绑定到pid为[%s]的java进程中", pid);
+        logger.info("AgentService将绑定到pid为[{}]的java进程中", pid);
 
         VirtualMachine vm = VirtualMachine.attach(pid);
         if (agentPath == null || agentPath.trim().isEmpty()) {
@@ -100,7 +100,8 @@ public class AgentService {
         vm.detach();
     }
 
-    public static void main(String[] args) throws AgentLoadException, IOException, AttachNotSupportedException, AgentInitializationException {
+    public static void main(String[] args) throws AgentLoadException, IOException, AttachNotSupportedException,
+            AgentInitializationException {
         final String pidPrefix = "-pid:";
         final String agentJarPathPrefix = "-agentpath:";
         String pid = "", agentPath = "";

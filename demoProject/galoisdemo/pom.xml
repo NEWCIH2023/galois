@@ -28,11 +28,11 @@
             <version>2.2.1</version>
         </dependency>
 
-        <!--        <dependency>-->
-        <!--            <groupId>com.dm</groupId>-->
-        <!--            <artifactId>dm.jdbc.driver</artifactId>-->
-        <!--            <version>8.0.0</version>-->
-        <!--        </dependency>-->
+        <dependency>
+            <groupId>com.dm</groupId>
+            <artifactId>dm.jdbc.driver</artifactId>
+            <version>8.0.0</version>
+        </dependency>
 
     </dependencies>
 

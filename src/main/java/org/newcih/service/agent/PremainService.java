@@ -1,25 +1,39 @@
 package org.newcih.service.agent;
 
-import org.newcih.service.agent.frame.mybatis.MyBatisTransformer;
-import org.newcih.service.agent.frame.spring.SpringTransformer;
+import org.newcih.service.agent.frame.mybatis.SqlSessionFactoryBeanVisitor;
+import org.newcih.service.agent.frame.spring.ApplicationContextVisitor;
+import org.newcih.service.agent.frame.spring.BeanDefinitionScannerVisitor;
 import org.newcih.service.watch.ApacheFileWatchService;
+import org.newcih.service.watch.ProjectFileManager;
 import org.newcih.service.watch.frame.FileChangedListener;
 import org.newcih.service.watch.frame.mybatis.MyBatisXmlListener;
 import org.newcih.service.watch.frame.spring.SpringBeanListener;
-import org.newcih.utils.GaloisLog;
-import org.newcih.utils.SystemUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * PreMain服务类
  */
 public class PremainService {
 
-    public static final GaloisLog logger = GaloisLog.getLogger(PremainService.class);
+    public static final Logger logger = LoggerFactory.getLogger(PremainService.class);
+    private static final Map<String, MethodAdapter> mac = new HashMap<>(64);
+    private static final ProjectFileManager fileManager = ProjectFileManager.getInstance();
+
+    static {
+        Arrays.asList(
+                new ApplicationContextVisitor(),
+                new BeanDefinitionScannerVisitor(),
+                new SqlSessionFactoryBeanVisitor()
+        ).forEach(visit -> visit.install(mac));
+    }
 
     /**
      * Premain入口
@@ -31,16 +45,28 @@ public class PremainService {
         logger.info("premainservice service started !");
 
         // 添加类转换器
-        inst.addTransformer(new SpringTransformer());
-        inst.addTransformer(new MyBatisTransformer());
+        inst.addTransformer((loader, className, classBeingRedefined, protectionDomain, classfileBuffer) -> {
+            if (className == null || className.trim().length() == 0) {
+                return null;
+            }
 
-        // 启用文件变更监听服务
+            String newClassName = className.replace("/", ".");
+            MethodAdapter methodAdapter = mac.get(newClassName);
+            if (methodAdapter != null) {
+                return methodAdapter.transform();
+            }
+
+            return null;
+        });
+
+        // start file change listener service
         List<FileChangedListener> fileChangedListeners = Arrays.asList(
                 new SpringBeanListener(inst),
                 new MyBatisXmlListener()
         );
-        String outputPath = SystemUtil.getOutputPath();
-        logger.info("begin listen file change in path [%s]", outputPath);
+
+        String outputPath = fileManager.getOutputPath();
+        logger.info("begin listen file change in path [{}]", outputPath);
 
         ApacheFileWatchService watchService = new ApacheFileWatchService(outputPath, fileChangedListeners);
         watchService.start();
@@ -64,9 +90,6 @@ public class PremainService {
             logger.error("agentservice start failed", e);
             throw new RuntimeException(e);
         }
-
-        inst.addTransformer(new SpringTransformer(), true);
-        inst.addTransformer(new MyBatisTransformer(), true);
 
         logger.info("premain service execute complete");
     }

@@ -1,5 +1,9 @@
 package org.newcih.galoisdemo.controller;
 
+import org.newcih.galoisdemo.dao.TestTemp2Mapper;
+import org.newcih.galoisdemo.model.TestTemp2;
+import org.newcih.galoisdemo.model.TestTemp2Example;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,6 +14,9 @@ public class DemoController {
 
     private int hash = 1000;
 
+    @Autowired
+    private TestTemp2Mapper mapper;
+
     public DemoController() {
     }
 
@@ -19,7 +26,10 @@ public class DemoController {
 
     @GetMapping("/getString")
     public String getString() {
-        return "hui";
+        TestTemp2Example example = new TestTemp2Example();
+        example.createCriteria().andIdIsNotNull();
+        TestTemp2 testTemp2 = mapper.selectByExample(example).get(0);
+        return "" + testTemp2.getName();
     }
 
     @GetMapping("/getInt")
@@ -31,7 +41,7 @@ public class DemoController {
         return System.currentTimeMillis();
     }
 
-    private final String temp = "te";
+    private final String temp = "tehuihui";
 
     @GetMapping("/getS")
     public String getS() {

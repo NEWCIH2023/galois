@@ -2,7 +2,8 @@ package org.newcih.service.watch.frame.mybatis;
 
 import org.newcih.service.agent.frame.mybatis.MyBatisBeanReloader;
 import org.newcih.service.watch.frame.FileChangedListener;
-import org.newcih.utils.GaloisLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
@@ -11,7 +12,9 @@ import java.io.File;
  */
 public class MyBatisXmlListener implements FileChangedListener {
 
-    private static final GaloisLog logger = GaloisLog.getLogger(MyBatisXmlListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(MyBatisXmlListener.class);
+
+    private static final MyBatisBeanReloader reloader = MyBatisBeanReloader.getInstance();
 
     @Override
     public boolean validFile(File file) {
@@ -20,16 +23,12 @@ public class MyBatisXmlListener implements FileChangedListener {
 
     @Override
     public void fileCreatedHandle(File file) {
-        MyBatisBeanReloader reloader = MyBatisBeanReloader.getInstance();
-        reloader.addBean(file);
-        logger.info("Mybatis已重新加载%s文件", file.getName());
+        reloader.updateBean(file);
     }
 
     @Override
     public void fileModifiedHandle(File file) {
-        MyBatisBeanReloader reloader = MyBatisBeanReloader.getInstance();
-        reloader.addBean(file);
-        logger.info("Mybatis已重新加载%s文件", file.getName());
+        reloader.updateBean(file);
     }
 
     @Override

@@ -64,7 +64,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, NAME || 'aaaaaaaa' NAME
+    ID, NAME || '53' NAME
   </sql>
   <select id="selectByExample" parameterType="org.newcih.galoisdemo.model.TestTemp2Example" resultMap="BaseResultMap">
     select
