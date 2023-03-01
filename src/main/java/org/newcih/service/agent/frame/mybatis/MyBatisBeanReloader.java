@@ -9,6 +9,7 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.parsing.XPathParser;
 import org.apache.ibatis.session.Configuration;
+import org.newcih.service.agent.BeanReloader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +23,7 @@ import java.util.*;
 /**
  * MyBatis的Mapper重新加载服务类
  */
-public class MyBatisBeanReloader {
+public class MyBatisBeanReloader implements BeanReloader<File> {
 
     public static final MyBatisBeanReloader mybatisBeanReloder = new MyBatisBeanReloader();
     private static final Logger logger = LoggerFactory.getLogger(MyBatisBeanReloader.class);
@@ -40,6 +41,12 @@ public class MyBatisBeanReloader {
         return mybatisBeanReloder;
     }
 
+    /**
+     * 更新bean实例
+     *
+     * @param newXMLFile
+     */
+    @Override
     public void updateBean(File newXMLFile) {
         try (FileInputStream fis = new FileInputStream(newXMLFile)) {
             XPathParser parser = new XPathParser(fis, true, configuration.getVariables(),
@@ -48,7 +55,7 @@ public class MyBatisBeanReloader {
             String namespace = context.getStringAttribute("namespace");
             // 清除缓存
             clearMapperRegistry(namespace);
-            clearLoadedResources(newXMLFile.getName());
+            // clearLoadedResources(newXMLFile.getName());
             clearCachedNames(namespace);
             clearParameterMap(context.evalNodes("/mapper/parameterMap"), namespace);
             clearResultMap(context.evalNodes("/mapper/resultMap"), namespace);
@@ -59,6 +66,15 @@ public class MyBatisBeanReloader {
         } catch (Exception e) {
             logger.error("reload mybatis xml throw exception", e);
         }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("reload mybatis xml file {} success", newXMLFile.getPath());
+        }
+    }
+
+    @Override
+    public boolean validBean(File file) {
+        return false;
     }
 
     private void reloadXML(File newXMLFile) throws IOException {
@@ -88,6 +104,7 @@ public class MyBatisBeanReloader {
     }
 
     @SuppressWarnings("rawtypes")
+    @Deprecated
     private void clearLoadedResources(String fileName) throws NoSuchFieldException, IllegalAccessException {
         Field loadedResourcesField = configuration.getClass().getDeclaredField("loadedResources");
         loadedResourcesField.setAccessible(true);

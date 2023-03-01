@@ -82,7 +82,7 @@ public class ApacheFileWatchService implements FileAlterationListener {
 
     @Override
     public void onFileCreate(File file) {
-        logger.debug("文件创建监听: {}", file.getName());
+        logger.debug("file created: {}", file.getName());
 
         if (listeners == null || listeners.isEmpty()) {
             return;
@@ -93,7 +93,7 @@ public class ApacheFileWatchService implements FileAlterationListener {
 
     @Override
     public void onFileChange(File file) {
-        logger.debug("文件更新监听: {}", file.getName());
+        logger.debug("file modified: {}", file.getName());
 
         if (listeners == null || listeners.isEmpty()) {
             return;
@@ -104,7 +104,7 @@ public class ApacheFileWatchService implements FileAlterationListener {
 
     @Override
     public void onFileDelete(File file) {
-        logger.debug("文件删除监听: {}", file.getName());
+        logger.debug("file deleted: {}", file.getName());
 
         if (listeners == null || listeners.isEmpty()) {
             return;

@@ -19,9 +19,8 @@ import static org.newcih.constants.FileTypeConstant.CLASS_FILE_TYPE;
 public final class SpringBeanListener implements FileChangedListener {
 
     public static final Logger logger = LoggerFactory.getLogger(SpringBeanListener.class);
-
     private final Instrumentation inst;
-
+    private final static SpringBeanReloader reloader = SpringBeanReloader.getInstance();
     private final static ProjectFileManager fileManager = ProjectFileManager.getInstance();
 
     public SpringBeanListener(Instrumentation inst) {
@@ -45,7 +44,10 @@ public final class SpringBeanListener implements FileChangedListener {
                     ClassDefinition newClassDef = new ClassDefinition(clazz, SystemUtil.readFile(file));
                     inst.redefineClasses(newClassDef);
                     Object newBean = clazz.newInstance();
-                    SpringBeanReloader.getInstance().updateBean(clazz, newBean);
+
+                    if (reloader.validBean(newBean)) {
+                        reloader.updateBean(newBean);
+                    }
                     break;
                 }
             }

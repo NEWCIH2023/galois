@@ -24,13 +24,11 @@ public class MyBatisXmlListener implements FileChangedListener {
     @Override
     public void fileCreatedHandle(File file) {
         reloader.updateBean(file);
-        logger.info("Mybatis已重新加载{}文件", file.getName());
     }
 
     @Override
     public void fileModifiedHandle(File file) {
         reloader.updateBean(file);
-        logger.info("Mybatis已重新加载{}文件", file.getName());
     }
 
     @Override

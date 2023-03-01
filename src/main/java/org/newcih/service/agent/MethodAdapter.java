@@ -1,17 +1,17 @@
 package org.newcih.service.agent;
 
 import org.apache.commons.io.IOUtils;
+import org.newcih.service.watch.ProjectFileManager;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Map;
-import java.util.Objects;
 
+import static org.newcih.constants.FileTypeConstant.CLASS_FILE_TYPE;
 import static org.objectweb.asm.Opcodes.ASM9;
 
 public class MethodAdapter extends ClassVisitor {
@@ -19,6 +19,8 @@ public class MethodAdapter extends ClassVisitor {
     private static final Logger logger = LoggerFactory.getLogger(MethodAdapter.class);
     protected ClassReader cr;
     protected ClassWriter cw;
+
+    private static final ProjectFileManager fileManager = ProjectFileManager.getInstance();
 
     private final String className;
 
@@ -48,14 +50,10 @@ public class MethodAdapter extends ClassVisitor {
         byte[] result = cw.toByteArray();
 
         if (logger.isDebugEnabled()) {
-            try {
-                String path =
-                        Objects.requireNonNull(Logger.class.getResource("/")).getPath().substring(1).replace("/",
-                                File.separator);
-                path += getClass().getSimpleName() + ".class";
-                FileOutputStream fos = new FileOutputStream(path);
+            try (FileOutputStream fos = new FileOutputStream(
+                    fileManager.getClassPath() + getClass().getSimpleName() + CLASS_FILE_TYPE
+            )) {
                 IOUtils.write(result, fos);
-                logger.debug("dump injected class file success <{}>.", path);
             } catch (Throwable e) {
                 logger.error("dump injected class file error", e);
             }
