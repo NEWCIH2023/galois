@@ -9,7 +9,8 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.parsing.XPathParser;
 import org.apache.ibatis.session.Configuration;
-import org.newcih.utils.GaloisLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,8 +24,8 @@ import java.util.*;
  */
 public class MyBatisBeanReloader {
 
-    private static final GaloisLog logger = GaloisLog.getLogger(MyBatisBeanReloader.class);
     public static final MyBatisBeanReloader mybatisBeanReloder = new MyBatisBeanReloader();
+    private static final Logger logger = LoggerFactory.getLogger(MyBatisBeanReloader.class);
     protected Configuration configuration;
 
     private MyBatisBeanReloader() {
@@ -39,7 +40,7 @@ public class MyBatisBeanReloader {
         return mybatisBeanReloder;
     }
 
-    public void addBean(File newXMLFile) {
+    public void updateBean(File newXMLFile) {
         try (FileInputStream fis = new FileInputStream(newXMLFile)) {
             XPathParser parser = new XPathParser(fis, true, configuration.getVariables(),
                     new XMLMapperEntityResolver());

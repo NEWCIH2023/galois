@@ -12,7 +12,7 @@ import java.io.PrintWriter;
 public class AsmDemo extends ClassLoader implements Opcodes {
 
     public static void writeClassFile(byte[] bytes, String className) throws IOException {
-        FileOutputStream fos = new FileOutputStream(String.format("target\\classes\\%s.class", className));
+        FileOutputStream fos = new FileOutputStream(String.format("target\\classes\\{}.class", className));
         fos.write(bytes);
         fos.close();
     }

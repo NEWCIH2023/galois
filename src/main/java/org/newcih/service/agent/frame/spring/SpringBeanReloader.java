@@ -1,6 +1,7 @@
 package org.newcih.service.agent.frame.spring;
 
-import org.newcih.utils.GaloisLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -14,17 +15,16 @@ import java.util.Set;
  */
 public final class SpringBeanReloader {
 
-    private static final GaloisLog logger = GaloisLog.getLogger(SpringBeanReloader.class);
+    private static final Logger logger = LoggerFactory.getLogger(SpringBeanReloader.class);
     private static final SpringBeanReloader springBeanReloader = new SpringBeanReloader();
-
-    private SpringBeanReloader() {
-    }
-
     /**
      * 待注入属性
      */
     private ClassPathBeanDefinitionScanner scanner;
     private ApplicationContext applicationContext;
+
+    private SpringBeanReloader() {
+    }
 
     /**
      * 获取单例实例

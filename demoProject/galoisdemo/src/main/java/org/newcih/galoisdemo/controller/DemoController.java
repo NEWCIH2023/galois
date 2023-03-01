@@ -29,7 +29,7 @@ public class DemoController {
         TestTemp2Example example = new TestTemp2Example();
         example.createCriteria().andIdIsNotNull();
         TestTemp2 testTemp2 = mapper.selectByExample(example).get(0);
-        return "hui" + testTemp2.getName();
+        return "" + testTemp2.getName();
     }
 
     @GetMapping("/getInt")

@@ -2,8 +2,9 @@ package org.newcih.service.watch.frame.spring;
 
 import org.newcih.service.agent.frame.spring.SpringBeanReloader;
 import org.newcih.service.watch.frame.FileChangedListener;
-import org.newcih.utils.GaloisLog;
 import org.newcih.utils.SystemUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.instrument.ClassDefinition;
@@ -14,7 +15,7 @@ import java.lang.instrument.Instrumentation;
  */
 public final class SpringBeanListener implements FileChangedListener {
 
-    public static final GaloisLog logger = GaloisLog.getLogger(SpringBeanListener.class);
+    public static final Logger logger = LoggerFactory.getLogger(SpringBeanListener.class);
     public static final String CLASS_FILE_SUFFIX = ".class";
 
     private final Instrumentation inst;
@@ -34,7 +35,7 @@ public final class SpringBeanListener implements FileChangedListener {
         String classpath = SystemUtil.getOutputPath().replace("/", File.separator) + "classes" + File.separator;
         String className = SystemUtil.getClassName(classpath, file);
 
-        logger.info("检测到文件变动，当前需要加载%s", className);
+        logger.info("检测到文件变动，当前需要加载{}", className);
 
         try {
             Class<?>[] classes = inst.getAllLoadedClasses();

@@ -2,7 +2,9 @@ server:
   port: 8090
 logging:
   level:
-    root: ERROR
+    org:
+      newcih:
+        DEBUG
 spring:
   datasource:
     driver-class-name: dm.jdbc.driver.DmDriver

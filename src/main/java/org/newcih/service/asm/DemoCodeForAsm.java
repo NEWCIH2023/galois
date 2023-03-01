@@ -1,7 +1,6 @@
 package org.newcih.service.asm;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.ibatis.session.Configuration;
 import org.newcih.service.agent.frame.spring.SpringBeanReloader;
 import org.objectweb.asm.*;
 import org.springframework.context.ApplicationContext;
@@ -16,21 +15,10 @@ import static org.objectweb.asm.Opcodes.*;
 
 public class DemoCodeForAsm {
 
+    private final Object configuration = null;
+
     public static DemoCodeForAsm getInstance() {
         return new DemoCodeForAsm();
-    }
-
-    private Object configuration = null;
-
-    public void printCode() {
-        SpringBeanReloader.getInstance().setApplicationContext((ApplicationContext) this);
-    }
-
-    public void testB() {
-        long var1 = System.currentTimeMillis();
-        System.err.println("========>I am B");
-        long var3 = System.currentTimeMillis();
-        System.out.println((new StringBuilder()).append("cost:").append(var3 - var1).toString());
     }
 
     public static void main(String[] args) throws IOException {
@@ -99,5 +87,22 @@ public class DemoCodeForAsm {
                 .substring(1).replace("/", File.separator) + "DemoCodeForAsmTran.class";
         System.out.println("类生成的位置" + path);
         IOUtils.write(cw.toByteArray(), Files.newOutputStream(Paths.get(path)));
+    }
+
+    public void printCode() {
+        {
+            System.out.println("2");
+        }
+        SpringBeanReloader.getInstance().setApplicationContext((ApplicationContext) this);
+        {
+            System.out.println(5);
+        }
+    }
+
+    public void testB() {
+        long var1 = System.currentTimeMillis();
+        System.err.println("========>I am B");
+        long var3 = System.currentTimeMillis();
+        System.out.println("cost:" + (var3 - var1));
     }
 }

@@ -1,8 +1,6 @@
 package org.newcih.service;
 
 import java.util.Iterator;
-import java.util.PrimitiveIterator;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class ClassExample {
@@ -13,11 +11,6 @@ public class ClassExample {
 
     public static void main(String[] args) {
         test1();
-    }
-
-    public String test() {
-        System.out.println("test method");
-        return "test";
     }
 
     public static void test1() {
@@ -32,6 +25,11 @@ public class ClassExample {
         System.out.println(is.count());
     }
 
-    public static void test2(){
+    public static void test2() {
+    }
+
+    public String test() {
+        System.out.println("test method");
+        return "test";
     }
 }

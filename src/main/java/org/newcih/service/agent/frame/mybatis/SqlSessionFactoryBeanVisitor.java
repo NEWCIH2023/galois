@@ -1,19 +1,21 @@
 package org.newcih.service.agent.frame.mybatis;
 
 import org.newcih.service.agent.MethodAdapter;
-import org.newcih.utils.GaloisLog;
 import org.objectweb.asm.MethodVisitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
+import static org.newcih.constants.ClassNameConstant.DEFAULT_SQL_SESSION_FACTORY;
 import static org.objectweb.asm.Opcodes.*;
 
 public class SqlSessionFactoryBeanVisitor extends MethodAdapter {
 
-    private static final GaloisLog logger = GaloisLog.getLogger(SqlSessionFactoryBeanVisitor.class);
+    private static final Logger logger = LoggerFactory.getLogger(SqlSessionFactoryBeanVisitor.class);
 
     public SqlSessionFactoryBeanVisitor() {
-        super(MyBatisTransformer.SQL_SESSION_FACTORY_BEAN);
+        super(DEFAULT_SQL_SESSION_FACTORY);
     }
 
     @Override

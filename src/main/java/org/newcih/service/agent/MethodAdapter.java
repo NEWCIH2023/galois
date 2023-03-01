@@ -1,23 +1,30 @@
 package org.newcih.service.agent;
 
 import org.apache.commons.io.IOUtils;
-import org.newcih.utils.GaloisLog;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.Map;
 import java.util.Objects;
 
 import static org.objectweb.asm.Opcodes.ASM9;
 
 public class MethodAdapter extends ClassVisitor {
 
-    private static final GaloisLog logger = GaloisLog.getLogger(MethodAdapter.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodAdapter.class);
+    protected ClassReader cr;
+    protected ClassWriter cw;
+
+    private final String className;
 
     public MethodAdapter(String className) {
         super(ASM9);
+        this.className = className;
 
         try {
             this.cr = new ClassReader(className);
@@ -28,9 +35,13 @@ public class MethodAdapter extends ClassVisitor {
         }
     }
 
-    protected ClassReader cr;
+    public void install(Map<String, MethodAdapter> context) {
+        if (context == null) {
+            return;
+        }
 
-    protected ClassWriter cw;
+        context.put(this.className, this);
+    }
 
     public byte[] transform() {
         cr.accept(this, 0);
@@ -39,12 +50,12 @@ public class MethodAdapter extends ClassVisitor {
         if (logger.isDebugEnabled()) {
             try {
                 String path =
-                        Objects.requireNonNull(GaloisLog.class.getResource("/")).getPath().substring(1).replace("/",
+                        Objects.requireNonNull(Logger.class.getResource("/")).getPath().substring(1).replace("/",
                                 File.separator);
                 path += getClass().getSimpleName() + ".class";
                 FileOutputStream fos = new FileOutputStream(path);
                 IOUtils.write(result, fos);
-                logger.debug("dump injected class file success <%s>.", path);
+                logger.debug("dump injected class file success <{}>.", path);
             } catch (Throwable e) {
                 logger.error("dump injected class file error", e);
             }
