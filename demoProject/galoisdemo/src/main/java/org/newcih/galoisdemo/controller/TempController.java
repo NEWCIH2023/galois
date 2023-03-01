@@ -11,13 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TempController {
 
-    @Autowired
-    private TestTemp2Mapper mapper;
+//    @Autowired
+//    private TestTemp2Mapper mapper;
 
     @GetMapping("temp")
     public String getTemp() {
-        TestTemp2Example example = new TestTemp2Example();
-        example.createCriteria().andIdIsNotNull();
-        return mapper.selectByExample(example).get(0).getName();
+//        TestTemp2Example example = new TestTemp2Example();
+//        example.createCriteria().andIdIsNotNull();
+//        return mapper.selectByExample(example).get(0).getName();
+        return "";
     }
 }
