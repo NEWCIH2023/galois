@@ -1,13 +1,9 @@
 package org.newcih.service.asm;
 
-<<<<<<< HEAD
-import org.objectweb.asm.*;
-=======
 import org.apache.commons.io.IOUtils;
 import org.newcih.service.agent.frame.spring.SpringBeanReloader;
 import org.objectweb.asm.*;
 import org.springframework.context.ApplicationContext;
->>>>>>> f8957cf8a80aba24d6752b7054ffcb12ebcc1479
 
 import java.io.File;
 import java.io.IOException;
@@ -32,16 +28,6 @@ public class DemoCodeForAsm {
     public static void testInspectCode() throws IOException {
         ClassReader cr = new ClassReader("org.newcih.service.asm.DemoCodeForAsm");
         ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
-<<<<<<< HEAD
-//        cr.accept(new ClassVisitor(ASM9, cw) {
-//            @Override
-//            public MethodVisitor visitMethod(int access, final String name, String descriptor, String signature,
-//                                             String[] exceptions) {
-//                MethodVisitor mv = cv.visitMethod(access, name, descriptor, signature, exceptions);
-//                return mv;
-//            }
-//        });
-=======
         cr.accept(new ClassVisitor(ASM9, cw) {
             @Override
             public MethodVisitor visitMethod(int access, final String name, String descriptor, String signature,
@@ -75,10 +61,10 @@ public class DemoCodeForAsm {
                             mv.visitInsn(LSUB);
                             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(J)Ljava/lang" +
                                     "/StringBuilder", false);
-                            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang" +
-                                    "/String", false);
-                            mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)" +
-                                    "V", false);
+                            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString",
+                                    "()Ljava/lang" + "/String", false);
+                            mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)"
+                                    + "V", false);
                         }
 
                         mv.visitInsn(opcode);
@@ -97,8 +83,8 @@ public class DemoCodeForAsm {
             }
         }, 0);
 
-        String path = Objects.requireNonNull(DemoCodeForAsm.class.getResource("")).getPath()
-                .substring(1).replace("/", File.separator) + "DemoCodeForAsmTran.class";
+        String path = Objects.requireNonNull(DemoCodeForAsm.class.getResource("")).getPath().substring(1).replace("/"
+                , File.separator) + "DemoCodeForAsmTran.class";
         System.out.println("类生成的位置" + path);
         IOUtils.write(cw.toByteArray(), Files.newOutputStream(Paths.get(path)));
     }
@@ -118,6 +104,5 @@ public class DemoCodeForAsm {
         System.err.println("========>I am B");
         long var3 = System.currentTimeMillis();
         System.out.println("cost:" + (var3 - var1));
->>>>>>> f8957cf8a80aba24d6752b7054ffcb12ebcc1479
     }
 }
