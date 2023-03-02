@@ -1,3 +1,26 @@
+/*
+ * MIT License
+ * Copyright (c) [2023] [liuguangsheng]
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.newcih.galois.service.watch;
 
 import org.apache.commons.io.monitor.FileAlterationListener;
@@ -21,6 +44,10 @@ public class ApacheFileWatchService implements FileAlterationListener {
     private List<FileChangedListener> listeners;
 
     public ApacheFileWatchService(String path) {
+        if (path == null || path.isEmpty()) {
+            throw new NullPointerException("empty path for galois listener!");
+        }
+
         observer = new FileAlterationObserver(new File(path));
         monitor = new FileAlterationMonitor(1000);
     }
@@ -33,30 +60,28 @@ public class ApacheFileWatchService implements FileAlterationListener {
         this.listeners = listeners;
     }
 
-    public boolean start() {
+    public void start() {
         try {
             monitor.addObserver(observer);
             observer.addListener(this);
             monitor.start();
+            Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
 
-            logger.debug("FileWatchService文件监听服务已启动！");
+            if (logger.isDebugEnabled()) {
+                logger.debug("filewatchservice had already started!");
+            }
         } catch (Exception e) {
-            logger.error("启动文件监听服务FileWatchService失败", e);
-            return false;
+            logger.error("start filewatchservice failed!", e);
         }
 
-        return true;
     }
 
-    public boolean stop() {
+    public void stop() {
         try {
             monitor.stop();
         } catch (Exception e) {
-            logger.error("关闭文件监听服务FileWatchService失败", e);
-            return false;
+            logger.error("close filewatchservice failed!", e);
         }
-
-        return true;
     }
 
     @Override
@@ -81,35 +106,53 @@ public class ApacheFileWatchService implements FileAlterationListener {
 
     @Override
     public void onFileCreate(File file) {
-        logger.debug("file created: {}", file.getName());
+        if (logger.isDebugEnabled()) {
+            logger.debug("file created event <{}>", file.getName());
+        }
 
         if (listeners == null || listeners.isEmpty()) {
             return;
         }
 
-        listeners.stream().filter(listener -> listener.validFile(file)).forEach(listener -> listener.fileCreatedHandle(file));
+        for (FileChangedListener listener : listeners) {
+            if (listener.validFile(file)) {
+                listener.fileCreatedHandle(file);
+            }
+        }
     }
 
     @Override
     public void onFileChange(File file) {
-        logger.debug("file modified: {}", file.getName());
+        if (logger.isDebugEnabled()) {
+            logger.debug("file modified event <{}>", file.getName());
+        }
 
         if (listeners == null || listeners.isEmpty()) {
             return;
         }
 
-        listeners.stream().filter(listener -> listener.validFile(file)).forEach(listener -> listener.fileCreatedHandle(file));
+        for (FileChangedListener listener : listeners) {
+            if (listener.validFile(file)) {
+                listener.fileModifiedHandle(file);
+            }
+        }
     }
 
     @Override
     public void onFileDelete(File file) {
-        logger.debug("file deleted: {}", file.getName());
+        if (logger.isDebugEnabled()) {
+            logger.debug("file deleted event <{}>", file.getName());
+        }
 
         if (listeners == null || listeners.isEmpty()) {
             return;
         }
 
-        listeners.stream().filter(listener -> listener.validFile(file)).forEach(listener -> listener.fileCreatedHandle(file));
+        for (FileChangedListener listener : listeners) {
+            if (listener.validFile(file)) {
+                listener.fileDeletedHandle(file);
+            }
+        }
     }
 
     @Override
