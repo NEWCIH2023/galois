@@ -91,8 +91,8 @@
                             <addClasspath>true</addClasspath>
                         </manifest>
                         <manifestEntries>
-                            <Agent-Class>org.newcih.service.agent.AgentService</Agent-Class>
-                            <Premain-Class>org.newcih.service.agent.PremainService</Premain-Class>
+                            <Agent-Class>org.newcih.galois.service.agent.AgentService</Agent-Class>
+                            <Premain-Class>org.newcih.galois.service.agent.PremainService</Premain-Class>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
                         </manifestEntries>

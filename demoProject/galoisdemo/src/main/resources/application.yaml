@@ -2,17 +2,6 @@ server:
   port: 8090
 logging:
   level:
-<<<<<<< HEAD
-    root: ERROR
-#spring:
-#  datasource:
-#    driver-class-name: dm.jdbc.driver.DmDriver
-#    url: jdbc:dm://10.92.225.249/DAMENG
-#    username: GMP_MM_SDC
-#    password: GMP_MM_SDC#123
-#mybatis:
-#  mapper-locations: classpath:mapper/*.xml
-=======
     org:
       newcih:
         DEBUG
@@ -24,6 +13,4 @@ spring:
     password: GMP_MM_SDC#123
 mybatis:
   mapper-locations: classpath:mapper/*.xml
->>>>>>> f8957cf8a80aba24d6752b7054ffcb12ebcc1479
-
 
