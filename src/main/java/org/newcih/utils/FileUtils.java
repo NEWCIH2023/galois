@@ -5,6 +5,7 @@ import java.io.File;
 public class FileUtils {
 
     public static boolean isMyBatisXML(File file) {
+        return false;
 
     }
 
@@ -13,6 +14,6 @@ public class FileUtils {
             return false;
         }
 
-        return file.
+        return false;
     }
 }
