@@ -92,7 +92,7 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("reload mybatis xml file {} success", newXMLFile.getPath());
+            logger.debug("reload mybatis xml file {} success", newXMLFile.getName());
         }
     }
 

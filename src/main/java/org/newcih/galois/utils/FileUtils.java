@@ -34,8 +34,13 @@ public class FileUtils {
 
         String name = file.getName();
         int index = name.lastIndexOf(".");
-        String fileType = name.substring(index);
-        return fileType.toLowerCase();
+
+        if (index != -1) {
+            String fileType = name.substring(index);
+            return fileType.toLowerCase();
+        }
+
+        return "";
     }
 
 }
