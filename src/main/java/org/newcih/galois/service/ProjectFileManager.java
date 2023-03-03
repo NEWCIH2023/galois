@@ -21,44 +21,30 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.watch;
+package org.newcih.galois.service;
 
-import org.newcih.galois.utils.SystemUtil;
+import org.newcih.galois.utils.GaloisLog;
 
-import java.io.File;
+import static org.newcih.galois.constants.Constant.USER_DIR;
 
 /**
  * project file manager
  */
 public class ProjectFileManager {
 
+    private static final GaloisLog logger = GaloisLog.getLogger(ProjectFileManager.class);
     private static final ProjectFileManager manager = new ProjectFileManager();
-    private String outputPath;
-    private String classPath;
+    private final String sourcePath;
 
     private ProjectFileManager() {
-        outputPath = SystemUtil.getOutputPath();
-        classPath = outputPath.replace("/", File.separator) + "classes" + File.separator;
+        this.sourcePath = System.getProperty(USER_DIR);
     }
 
     public static ProjectFileManager getInstance() {
         return manager;
     }
 
-    public String getOutputPath() {
-        return outputPath;
+    public String getSourcePath() {
+        return sourcePath;
     }
-
-    public void setOutputPath(String outputPath) {
-        this.outputPath = outputPath;
-    }
-
-    public String getClassPath() {
-        return classPath;
-    }
-
-    public void setClassPath(String classPath) {
-        this.classPath = classPath;
-    }
-
 }

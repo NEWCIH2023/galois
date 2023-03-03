@@ -27,7 +27,11 @@ import org.newcih.galois.service.agent.frame.mybatis.MyBatisBeanReloader;
 import org.newcih.galois.service.watch.frame.FileChangedListener;
 import org.newcih.galois.utils.FileUtils;
 import org.newcih.galois.utils.GaloisLog;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.util.Objects;
 
@@ -44,18 +48,25 @@ public class MyBatisXmlListener implements FileChangedListener {
 
     @Override
     public boolean validFile(File file) {
-        return Objects.equals(FileUtils.getFileType(file), XML_FILE);
-    }
+        boolean fileTypeCheck = Objects.equals(FileUtils.getFileType(file), XML_FILE);
 
-    /**
-     * determine whether a file is mybatis mapper xml file
-     *
-     * @param file
-     * @return
-     */
-    private boolean isMybatisXml(File file) {
-// TODO
-        return false;
+        if (!fileTypeCheck) {
+            return false;
+        }
+
+        // check xml file node contains mapper
+
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document document = db.parse(file);
+            NodeList nodeList = document.getElementsByTagName("mapper");
+            return nodeList != null && nodeList.getLength() > 0;
+        } catch (Exception e) {
+            logger.error("parse xml file failed", e);
+            return false;
+        }
+
     }
 
     @Override
@@ -70,6 +81,6 @@ public class MyBatisXmlListener implements FileChangedListener {
 
     @Override
     public void fileDeletedHandle(File file) {
-
+        // TODO
     }
 }

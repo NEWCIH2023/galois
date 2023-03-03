@@ -24,7 +24,7 @@
 package org.newcih.galois.service.agent;
 
 import org.apache.commons.io.IOUtils;
-import org.newcih.galois.service.watch.ProjectFileManager;
+import org.newcih.galois.service.ProjectFileManager;
 import org.newcih.galois.utils.GaloisLog;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -34,7 +34,7 @@ import java.io.FileOutputStream;
 import java.util.Map;
 
 import static org.newcih.galois.constants.FileTypeConstant.CLASS_FILE;
-import static org.objectweb.asm.Opcodes.ASM9;
+import static org.objectweb.asm.Opcodes.ASM5;
 
 public class MethodAdapter extends ClassVisitor {
 
@@ -45,7 +45,12 @@ public class MethodAdapter extends ClassVisitor {
     protected ClassWriter cw;
 
     public MethodAdapter(String className) {
-        super(ASM9);
+        super(ASM5);
+
+        if (className == null || className.isEmpty()) {
+            throw new NullPointerException("methodAdapter's classname cannot be null or empty");
+        }
+
         this.className = className;
 
         try {
@@ -80,7 +85,7 @@ public class MethodAdapter extends ClassVisitor {
         byte[] result = cw.toByteArray();
 
         if (logger.isDebugEnabled()) {
-            String tempClassFile = fileManager.getClassPath() + getClass().getSimpleName() + CLASS_FILE;
+            String tempClassFile = "" + getClass().getSimpleName() + CLASS_FILE;
             try (FileOutputStream fos = new FileOutputStream(tempClassFile)) {
                 IOUtils.write(result, fos);
             } catch (Throwable e) {
@@ -89,5 +94,14 @@ public class MethodAdapter extends ClassVisitor {
         }
 
         return result;
+    }
+
+    /**
+     * check if methodadapter can injecte this version of service
+     *
+     * @return
+     */
+    public boolean usable() {
+        return true;
     }
 }

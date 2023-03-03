@@ -36,11 +36,9 @@ import static org.newcih.galois.constants.ConfConstant.LOGGING_LEVEL;
 
 public class GaloisLog implements Logger {
 
-    private final Logger logger;
-
-    private final boolean loggingEnabled = GlobalConfiguration.getBoolean(LOGGING_ENABLED);
-
     private final static Level loggingLevel;
+
+    public static final String logPrefix = "[Galois] ";
 
     static {
         String level = Optional.ofNullable(GlobalConfiguration.getString(LOGGING_LEVEL))
@@ -48,6 +46,9 @@ public class GaloisLog implements Logger {
         level = level.toUpperCase();
         loggingLevel = Level.valueOf(level);
     }
+
+    private final Logger logger;
+    private final boolean loggingEnabled = GlobalConfiguration.getBoolean(LOGGING_ENABLED);
 
     public GaloisLog(Class<?> clazz) {
         this.logger = LoggerFactory.getLogger(clazz);
@@ -70,35 +71,35 @@ public class GaloisLog implements Logger {
     @Override
     public void trace(String msg) {
         if (isTraceEnabled()) {
-            logger.trace(msg);
+            logger.trace(logPrefix + msg);
         }
     }
 
     @Override
     public void trace(String format, Object arg) {
         if (isTraceEnabled()) {
-            logger.trace(format, arg);
+            logger.trace(logPrefix + format, arg);
         }
     }
 
     @Override
     public void trace(String format, Object arg1, Object arg2) {
         if (isTraceEnabled()) {
-            logger.trace(format, arg1, arg2);
+            logger.trace(logPrefix + format, arg1, arg2);
         }
     }
 
     @Override
     public void trace(String format, Object... arguments) {
         if (isTraceEnabled()) {
-            logger.trace(format, arguments);
+            logger.trace(logPrefix + format, arguments);
         }
     }
 
     @Override
     public void trace(String msg, Throwable t) {
         if (isTraceEnabled()) {
-            logger.trace(msg, t);
+            logger.trace(logPrefix + msg, t);
         }
     }
 
@@ -150,35 +151,35 @@ public class GaloisLog implements Logger {
     @Override
     public void debug(String msg) {
         if (isDebugEnabled()) {
-            logger.debug(msg);
+            logger.debug(logPrefix + msg);
         }
     }
 
     @Override
     public void debug(String format, Object arg) {
         if (isDebugEnabled()) {
-            logger.debug(format, arg);
+            logger.debug(logPrefix + format, arg);
         }
     }
 
     @Override
     public void debug(String format, Object arg1, Object arg2) {
         if (isDebugEnabled()) {
-            logger.debug(format, arg1, arg2);
+            logger.debug(logPrefix + format, arg1, arg2);
         }
     }
 
     @Override
     public void debug(String format, Object... arguments) {
         if (isDebugEnabled()) {
-            logger.debug(format, arguments);
+            logger.debug(logPrefix + format, arguments);
         }
     }
 
     @Override
     public void debug(String msg, Throwable t) {
         if (isDebugEnabled()) {
-            logger.debug(msg, t);
+            logger.debug(logPrefix + msg, t);
         }
     }
 
@@ -230,35 +231,35 @@ public class GaloisLog implements Logger {
     @Override
     public void info(String msg) {
         if (isInfoEnabled()) {
-            logger.info(msg);
+            logger.info(logPrefix + msg);
         }
     }
 
     @Override
     public void info(String format, Object arg) {
         if (isInfoEnabled()) {
-            logger.info(format, arg);
+            logger.info(logPrefix + format, arg);
         }
     }
 
     @Override
     public void info(String format, Object arg1, Object arg2) {
         if (isInfoEnabled()) {
-            logger.info(format, arg1, arg2);
+            logger.info(logPrefix + format, arg1, arg2);
         }
     }
 
     @Override
     public void info(String format, Object... arguments) {
         if (isInfoEnabled()) {
-            logger.info(format, arguments);
+            logger.info(logPrefix + format, arguments);
         }
     }
 
     @Override
     public void info(String msg, Throwable t) {
         if (isInfoEnabled()) {
-            logger.info(msg, t);
+            logger.info(logPrefix + msg, t);
         }
     }
 
@@ -310,35 +311,35 @@ public class GaloisLog implements Logger {
     @Override
     public void warn(String msg) {
         if (isWarnEnabled()) {
-            logger.warn(msg);
+            logger.warn(logPrefix + msg);
         }
     }
 
     @Override
     public void warn(String format, Object arg) {
         if (isWarnEnabled()) {
-            logger.warn(format, arg);
+            logger.warn(logPrefix + format, arg);
         }
     }
 
     @Override
     public void warn(String format, Object... arguments) {
         if (isWarnEnabled()) {
-            logger.warn(format, arguments);
+            logger.warn(logPrefix + format, arguments);
         }
     }
 
     @Override
     public void warn(String format, Object arg1, Object arg2) {
         if (isWarnEnabled()) {
-            logger.warn(format, arg1, arg2);
+            logger.warn(logPrefix + format, arg1, arg2);
         }
     }
 
     @Override
     public void warn(String msg, Throwable t) {
         if (isWarnEnabled()) {
-            logger.warn(msg, t);
+            logger.warn(logPrefix + msg, t);
         }
     }
 
@@ -390,35 +391,35 @@ public class GaloisLog implements Logger {
     @Override
     public void error(String msg) {
         if (isErrorEnabled()) {
-            logger.error(msg);
+            logger.error(logPrefix + msg);
         }
     }
 
     @Override
     public void error(String format, Object arg) {
         if (isErrorEnabled()) {
-            logger.error(format, arg);
+            logger.error(logPrefix + format, arg);
         }
     }
 
     @Override
     public void error(String format, Object arg1, Object arg2) {
         if (isErrorEnabled()) {
-            logger.error(format, arg1, arg2);
+            logger.error(logPrefix + format, arg1, arg2);
         }
     }
 
     @Override
     public void error(String format, Object... arguments) {
         if (isErrorEnabled()) {
-            logger.error(format, arguments);
+            logger.error(logPrefix + format, arguments);
         }
     }
 
     @Override
     public void error(String msg, Throwable t) {
         if (isErrorEnabled()) {
-            logger.error(msg, t);
+            logger.error(logPrefix + msg, t);
         }
     }
 

@@ -21,16 +21,10 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.demo;
+package org.newcih.galois.constants;
 
+public class Constant {
 
-public class PremainDemo {
+    public static final String USER_DIR = "user.dir";
 
-    public static void main(String[] args) throws InterruptedException {
-        Thread.currentThread().join();
-    }
-
-    public String getName() {
-        return " first versbon getName method !";
-    }
 }

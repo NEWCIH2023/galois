@@ -47,10 +47,15 @@ public class SqlSessionFactoryBeanVisitor extends MethodAdapter {
         MethodVisitor mv = cv.visitMethod(access, name, descriptor, signature, exceptions);
 
         if (Objects.equals("<init>", name)) {
-            return new ConstructorVisitor(ASM9, mv);
+            return new ConstructorVisitor(ASM5, mv);
         }
 
         return mv;
+    }
+
+    @Override
+    public boolean usable() {
+        return true;
     }
 
     /**

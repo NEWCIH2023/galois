@@ -46,7 +46,7 @@ public class BeanDefinitionScannerVisitor extends MethodAdapter {
         MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
 
         if (Objects.equals("doScan", name)) {
-            return new DoScanMethodVisitor(ASM9, mv);
+            return new DoScanMethodVisitor(ASM5, mv);
         }
 
         return mv;

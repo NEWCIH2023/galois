@@ -30,8 +30,7 @@ import org.objectweb.asm.MethodVisitor;
 
 import java.util.Objects;
 
-import static org.objectweb.asm.Opcodes.ASM9;
-import static org.springframework.asm.Opcodes.*;
+import static org.objectweb.asm.Opcodes.*;
 
 
 public class ApplicationContextVisitor extends MethodAdapter {
@@ -48,7 +47,7 @@ public class ApplicationContextVisitor extends MethodAdapter {
         MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
 
         if (Objects.equals("<init>", name) && Objects.equals(descriptor, "()V")) {
-            return new ConstructorVisiter(ASM9, mv);
+            return new ConstructorVisiter(ASM5, mv);
         }
 
         return mv;

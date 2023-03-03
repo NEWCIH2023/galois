@@ -26,7 +26,6 @@ package org.newcih.galois.utils;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.Objects;
 
 public class SystemUtil {
 
@@ -42,32 +41,6 @@ public class SystemUtil {
      */
     public static boolean isWindowOS() {
         return System.getProperty(OS_NAME).startsWith(WIN);
-    }
-
-    /**
-     * 获取项目编译输出路径
-     *
-     * @return
-     */
-    public static String getOutputPath() {
-        return getOutputPath(null);
-    }
-
-    /**
-     * 获取项目编译输出路径
-     *
-     * @param clazz 通过这个类获取classpath路径
-     * @return
-     */
-    public static String getOutputPath(Class<?> clazz) {
-        if (clazz == null) {
-            clazz = String.class;
-        }
-
-        String path = Objects.requireNonNull(clazz.getResource("/")).getPath();
-        path = path.substring(1, path.indexOf(CLASSES_PATH));
-
-        return path;
     }
 
     /**

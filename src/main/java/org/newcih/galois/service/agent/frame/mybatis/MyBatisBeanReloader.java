@@ -70,20 +70,22 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
      */
     @Override
     public void updateBean(File newXMLFile) {
+
         try (FileInputStream fis = new FileInputStream(newXMLFile)) {
+
             XPathParser parser = new XPathParser(fis, true, configuration.getVariables(),
                     new XMLMapperEntityResolver());
             XNode context = parser.evalNode("/mapper");
             String namespace = context.getStringAttribute("namespace");
-            // 清除缓存
+            // clear cache
             clearMapperRegistry(namespace);
-            // clearLoadedResources(newXMLFile.getName());
+            clearLoadedResources(newXMLFile.getName());
             clearCachedNames(namespace);
             clearParameterMap(context.evalNodes("/mapper/parameterMap"), namespace);
             clearResultMap(context.evalNodes("/mapper/resultMap"), namespace);
             clearKeyGenerators(context.evalNodes("insert|update|select|delete"), namespace);
             clearSqlElement(context.evalNodes("/mapper/sql"), namespace);
-            // 重新加载
+            // reparse mybatis mapper xml file
             reloadXML(newXMLFile);
         } catch (Exception e) {
             logger.error("reload mybatis xml throw exception", e);

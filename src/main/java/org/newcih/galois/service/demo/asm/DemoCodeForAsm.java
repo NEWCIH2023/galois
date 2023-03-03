@@ -51,12 +51,12 @@ public class DemoCodeForAsm {
     public static void testInspectCode() throws IOException {
         ClassReader cr = new ClassReader("org.newcih.service.asm.DemoCodeForAsm");
         ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
-        cr.accept(new ClassVisitor(ASM9, cw) {
+        cr.accept(new ClassVisitor(ASM5, cw) {
             @Override
             public MethodVisitor visitMethod(int access, final String name, String descriptor, String signature,
                                              String[] exceptions) {
                 MethodVisitor mv = cv.visitMethod(access, name, descriptor, signature, exceptions);
-                return new MethodVisitor(ASM9, mv) {
+                return new MethodVisitor(ASM5, mv) {
                     @Override
                     public void visitLineNumber(int i, Label label) {
                         System.out.println("经过这个测试行数：" + i);

@@ -23,19 +23,15 @@
 
 package org.newcih.galois.service.watch.frame.spring;
 
+import org.newcih.galois.service.ProjectFileManager;
 import org.newcih.galois.service.agent.frame.spring.SpringBeanReloader;
-import org.newcih.galois.service.watch.ProjectFileManager;
 import org.newcih.galois.service.watch.frame.FileChangedListener;
-import org.newcih.galois.utils.FileUtils;
 import org.newcih.galois.utils.GaloisLog;
 import org.newcih.galois.utils.SystemUtil;
 
 import java.io.File;
 import java.lang.instrument.ClassDefinition;
 import java.lang.instrument.Instrumentation;
-import java.util.Objects;
-
-import static org.newcih.galois.constants.FileTypeConstant.CLASS_FILE;
 
 /**
  * Spring的Bean变动监听器
@@ -53,30 +49,32 @@ public final class SpringBeanListener implements FileChangedListener {
 
     @Override
     public boolean validFile(File file) {
-        return Objects.equals(FileUtils.getFileType(file), CLASS_FILE);
+//        return Objects.equals(FileUtils.getFileType(file), CLASS_FILE);
+        return false;
     }
-
 
     @Override
     public void fileCreatedHandle(File file) {
-        String className = SystemUtil.getClassName(fileManager.getClassPath(), file);
+        String className = "";
 
         try {
             Class<?>[] classes = inst.getAllLoadedClasses();
             for (Class<?> clazz : classes) {
+
                 if (clazz.getName().equals(className)) {
                     ClassDefinition newClassDef = new ClassDefinition(clazz, SystemUtil.readFile(file));
                     inst.redefineClasses(newClassDef);
                     Object newBean = clazz.newInstance();
-
+                    // there should update bean in spring context if spring managed this bean
                     if (reloader.validBean(newBean)) {
                         reloader.updateBean(newBean);
                     }
                     break;
                 }
+
             }
         } catch (Throwable e) {
-            logger.error("reload bean under file create event failed", e);
+            logger.error("reload bean under file created event failed", e);
         }
     }
 

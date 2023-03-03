@@ -32,7 +32,6 @@ import org.newcih.galois.service.watch.frame.FileChangedListener;
 import org.newcih.galois.service.watch.frame.mybatis.MyBatisXmlListener;
 import org.newcih.galois.service.watch.frame.spring.SpringBeanListener;
 import org.newcih.galois.utils.GaloisLog;
-import org.newcih.galois.utils.SystemUtil;
 
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
@@ -70,7 +69,7 @@ public class AgentService {
                 new SpringBeanListener(inst),
                 new MyBatisXmlListener()
         );
-        String outputPath = SystemUtil.getOutputPath();
+        String outputPath = "";
         logger.info("Galois开始监听{}目录下文件变动", outputPath);
 
         ApacheFileWatchService watchService = new ApacheFileWatchService(outputPath, fileChangedListeners);
