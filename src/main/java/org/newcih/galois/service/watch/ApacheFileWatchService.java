@@ -106,10 +106,6 @@ public class ApacheFileWatchService implements FileAlterationListener {
 
     @Override
     public void onFileCreate(File file) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("file created event <{}>", file.getName());
-        }
-
         if (listeners == null || listeners.isEmpty()) {
             return;
         }
@@ -123,10 +119,6 @@ public class ApacheFileWatchService implements FileAlterationListener {
 
     @Override
     public void onFileChange(File file) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("file modified event <{}>", file.getName());
-        }
-
         if (listeners == null || listeners.isEmpty()) {
             return;
         }
@@ -140,10 +132,6 @@ public class ApacheFileWatchService implements FileAlterationListener {
 
     @Override
     public void onFileDelete(File file) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("file deleted event <{}>", file.getName());
-        }
-
         if (listeners == null || listeners.isEmpty()) {
             return;
         }

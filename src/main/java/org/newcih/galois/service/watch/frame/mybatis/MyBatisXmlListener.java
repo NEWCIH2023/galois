@@ -28,10 +28,12 @@ import org.newcih.galois.service.watch.frame.FileChangedListener;
 import org.newcih.galois.utils.FileUtils;
 import org.newcih.galois.utils.GaloisLog;
 import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.DocumentType;
+import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.Objects;
 
@@ -41,6 +43,8 @@ import static org.newcih.galois.constants.FileTypeConstant.XML_FILE;
  * MyBatis的XML文件变更监听处理
  */
 public class MyBatisXmlListener implements FileChangedListener {
+
+    public static final String DOC_TYPE = "mapper";
 
     private static final GaloisLog logger = GaloisLog.getLogger(MyBatisXmlListener.class);
 
@@ -58,10 +62,13 @@ public class MyBatisXmlListener implements FileChangedListener {
 
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setValidating(false);
             DocumentBuilder db = dbf.newDocumentBuilder();
+            // do no validate dtd
+            db.setEntityResolver(((publicId, systemId) -> new InputSource(new ByteArrayInputStream(new byte[0]))));
             Document document = db.parse(file);
-            NodeList nodeList = document.getElementsByTagName("mapper");
-            return nodeList != null && nodeList.getLength() > 0;
+            DocumentType documentType = document.getDoctype();
+            return documentType != null && documentType.toString().contains(DOC_TYPE);
         } catch (Exception e) {
             logger.error("parse xml file failed", e);
             return false;

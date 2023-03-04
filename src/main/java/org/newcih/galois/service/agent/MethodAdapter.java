@@ -39,8 +39,8 @@ import static org.objectweb.asm.Opcodes.ASM5;
 public class MethodAdapter extends ClassVisitor {
 
     private static final GaloisLog logger = GaloisLog.getLogger(MethodAdapter.class);
-    private static final ProjectFileManager fileManager = ProjectFileManager.getInstance();
-    private final String className;
+    protected static final ProjectFileManager fileManager = ProjectFileManager.getInstance();
+    protected final String className;
     protected ClassReader cr;
     protected ClassWriter cw;
 
