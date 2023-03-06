@@ -52,14 +52,6 @@ public class MethodAdapter extends ClassVisitor {
         }
 
         this.className = className;
-
-        try {
-            this.cr = new ClassReader(className);
-            this.cw = new ClassWriter(cr, ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
-            this.cv = this.cw;
-        } catch (Exception e) {
-            logger.error("create new methodadapter for class {} failed!", className, e);
-        }
     }
 
     /**
@@ -81,6 +73,15 @@ public class MethodAdapter extends ClassVisitor {
      * @return
      */
     public byte[] transform() {
+
+        try {
+            cr = new ClassReader(className);
+            cw = new ClassWriter(cr, ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
+            cv = this.cw;
+        } catch (Exception e) {
+            logger.error("create new methodadapter for class {} failed!", className, e);
+        }
+
         cr.accept(this, 0);
         byte[] result = cw.toByteArray();
 

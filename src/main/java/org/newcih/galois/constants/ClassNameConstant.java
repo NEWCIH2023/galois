@@ -29,6 +29,8 @@ public final class ClassNameConstant {
      */
     public static final String DEFAULT_SQL_SESSION_FACTORY =
             "org.apache.ibatis.session.defaults.DefaultSqlSessionFactory";
+
+    public static final String COMTOP_SQL_SESSION_FACTORY = "com.comtop.corm.session.defaults.DefaultSqlSessionFactory";
     /**
      * Bean扫描服务类
      */

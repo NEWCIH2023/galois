@@ -49,12 +49,11 @@ public class PremainService {
     private static final Map<String, MethodAdapter> mac = new HashMap<>(64);
     private static final ProjectFileManager fileManager = ProjectFileManager.getInstance();
     private static Instrumentation instrumentation;
-
-    static {
-        // register method adapter
-        Arrays.asList(new ApplicationContextVisitor(), new BeanDefinitionScannerVisitor(),
-                new SqlSessionFactoryBeanVisitor()).forEach(visit -> visit.install(mac));
-    }
+    private static final List<MethodAdapter> methodAdapters = Arrays.asList(
+            new ApplicationContextVisitor(),
+            new BeanDefinitionScannerVisitor(),
+            new SqlSessionFactoryBeanVisitor()
+    );
 
     /**
      * Premain入口
