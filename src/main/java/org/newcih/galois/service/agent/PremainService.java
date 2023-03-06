@@ -25,7 +25,6 @@ package org.newcih.galois.service.agent;
 
 import org.newcih.galois.service.BannerService;
 import org.newcih.galois.service.ProjectFileManager;
-import org.newcih.galois.service.agent.frame.mybatis.SqlSessionFactoryBeanVisitor;
 import org.newcih.galois.service.agent.frame.spring.ApplicationContextVisitor;
 import org.newcih.galois.service.agent.frame.spring.BeanDefinitionScannerVisitor;
 import org.newcih.galois.service.watch.ApacheFileWatchService;
@@ -49,11 +48,15 @@ public class PremainService {
     private static final Map<String, MethodAdapter> mac = new HashMap<>(64);
     private static final ProjectFileManager fileManager = ProjectFileManager.getInstance();
     private static Instrumentation instrumentation;
-    private static final List<MethodAdapter> methodAdapters = Arrays.asList(
-            new ApplicationContextVisitor(),
-            new BeanDefinitionScannerVisitor(),
-            new SqlSessionFactoryBeanVisitor()
-    );
+
+    static {
+
+        Arrays.asList(
+                new ApplicationContextVisitor(),
+                new BeanDefinitionScannerVisitor()
+        ).forEach(visitor -> visitor.install(mac));
+
+    }
 
     /**
      * Premain入口

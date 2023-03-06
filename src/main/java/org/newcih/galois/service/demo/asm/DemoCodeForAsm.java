@@ -116,7 +116,7 @@ public class DemoCodeForAsm {
         {
             System.out.println("2");
         }
-        SpringBeanReloader.getInstance().setApplicationContext((ApplicationContext) this);
+        SpringBeanReloader.getInstance().setContext((ApplicationContext) this);
         {
             System.out.println(5);
         }

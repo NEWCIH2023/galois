@@ -27,4 +27,7 @@ public class Constant {
 
     public static final String USER_DIR = "user.dir";
 
+    public static final String ID = "id";
+
+    public static final String NAMESPACE = "namespace";
 }

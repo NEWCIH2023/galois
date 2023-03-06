@@ -68,7 +68,7 @@ public class ApplicationContextVisitor extends MethodAdapter {
                 mv.visitVarInsn(ALOAD, 0);
                 mv.visitTypeInsn(CHECKCAST, "org/springframework/context/ApplicationContext");
                 mv.visitMethodInsn(INVOKEVIRTUAL, reloaderClassName,
-                        "setApplicationContext", "(Lorg/springframework/context/ApplicationContext;)V", false);
+                        "setContext", "(Lorg/springframework/context/ApplicationContext;)V", false);
 
                 if (logger.isDebugEnabled()) {
                     logger.debug("injected applicationContext constructor by ASM success!");

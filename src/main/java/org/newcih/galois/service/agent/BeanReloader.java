@@ -28,4 +28,6 @@ public interface BeanReloader<T> {
     void updateBean(T object);
 
     boolean validBean(T object);
+
+    boolean validVersion();
 }

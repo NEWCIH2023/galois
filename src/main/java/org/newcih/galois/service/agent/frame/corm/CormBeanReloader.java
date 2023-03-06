@@ -23,6 +23,7 @@
 
 package org.newcih.galois.service.agent.frame.corm;
 
+import com.comtop.corm.builder.xml.XMLMapperBuilder;
 import com.comtop.corm.builder.xml.XMLMapperEntityResolver;
 import com.comtop.corm.executor.keygen.SelectKeyGenerator;
 import com.comtop.corm.mapping.MappedStatement;
@@ -36,6 +37,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.util.*;
 
 /**
@@ -97,10 +99,17 @@ public class CormBeanReloader implements BeanReloader<File> {
         return false;
     }
 
+    /**
+     * @return
+     */
+    @Override
+    public boolean validVersion() {
+        return false;
+    }
+
     private void reloadXML(File newXMLFile) throws IOException {
-//        XMLMapperBuilder builder = new XMLMapperBuilder(Files.newInputStream(newXMLFile.toPath()), configuration,
-//                newXMLFile.getName(), configuration.getSqlFragments());
-//        builder.parse();
+        XMLMapperBuilder builder = new XMLMapperBuilder(Files.newInputStream(newXMLFile.toPath()), configuration, newXMLFile.getName(), configuration.getSqlFragments());
+        builder.parse();
     }
 
     @SuppressWarnings("unchecked")

@@ -23,9 +23,16 @@
 
 package org.newcih.galois.utils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 
 public class FileUtils {
+
+    private FileUtils() {
+    }
+
+    private static final GaloisLog logger = GaloisLog.getLogger(FileUtils.class);
 
     public static String getFileType(File file) {
         if (file == null) {
@@ -41,6 +48,34 @@ public class FileUtils {
         }
 
         return "";
+    }
+
+    /**
+     * 将File转为byte[]数组
+     *
+     * @param file
+     * @return
+     */
+    public static byte[] readFile(File file) {
+        if (file == null) {
+            return new byte[0];
+        }
+
+        try (FileInputStream fileInputStream = new FileInputStream(file);
+             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+
+            byte[] b = new byte[1024];
+            int n;
+            while ((n = fileInputStream.read(b)) != -1) {
+                byteArrayOutputStream.write(b, 0, n);
+            }
+
+            return byteArrayOutputStream.toByteArray();
+        } catch (Exception e) {
+            logger.error("convert file to byte[] failed", e);
+        }
+
+        return new byte[0];
     }
 
 }

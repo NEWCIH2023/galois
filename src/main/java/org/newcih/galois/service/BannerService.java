@@ -23,7 +23,9 @@
 
 package org.newcih.galois.service;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Map;
 
 public class BannerService {
 
@@ -64,6 +66,13 @@ public class BannerService {
     }
 
     public static String mybatisVersion() {
-        return "-";
+        try {
+            Class<?> mapperRegistry = Class.forName("org.apache.ibatis.binding.MapperRegistry");
+            Field knownMappers = mapperRegistry.getDeclaredField("knownMappers");
+            boolean flag = knownMappers.getType().equals(Map.class);
+            return flag ? ">= 3.2.0" : "<= 3.1.0";
+        } catch (Exception e) {
+            return "-";
+        }
     }
 }

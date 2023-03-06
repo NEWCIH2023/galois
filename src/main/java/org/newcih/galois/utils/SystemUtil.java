@@ -43,46 +43,4 @@ public class SystemUtil {
         return System.getProperty(OS_NAME).startsWith(WIN);
     }
 
-    /**
-     * 将File转为byte[]数组
-     *
-     * @param file
-     * @return
-     */
-    public static byte[] readFile(File file) {
-        if (file == null) {
-            return null;
-        }
-
-        System.out.println("before new fis, file is " + file);
-        try (FileInputStream fileInputStream = new FileInputStream(file);
-             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-
-            byte[] b = new byte[1024];
-            int n;
-            while ((n = fileInputStream.read(b)) != -1) {
-                byteArrayOutputStream.write(b, 0, n);
-            }
-
-            return byteArrayOutputStream.toByteArray();
-        } catch (Exception e) {
-            System.out.println("current file is " + file);
-            e.printStackTrace();
-        }
-
-        return new byte[0];
-    }
-
-    /**
-     * 从class文件获取className
-     *
-     * @param classFile
-     * @return
-     */
-    public static String getClassName(String prefixPath, File classFile) {
-        return classFile.getAbsolutePath()
-                .replace(prefixPath, "")
-                .replaceAll(SystemUtil.isWindowOS() ? "\\\\" : "/", ".")
-                .replace(".class", "");
-    }
 }

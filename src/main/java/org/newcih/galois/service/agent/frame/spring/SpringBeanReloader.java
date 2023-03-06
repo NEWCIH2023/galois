@@ -44,7 +44,7 @@ public final class SpringBeanReloader implements BeanReloader<Object> {
      * 待注入属性
      */
     private ClassPathBeanDefinitionScanner scanner;
-    private ApplicationContext applicationContext;
+    private ApplicationContext context;
 
     private SpringBeanReloader() {
     }
@@ -72,7 +72,7 @@ public final class SpringBeanReloader implements BeanReloader<Object> {
         for (BeanDefinition definition : beanDefinitionSet) {
             if (Objects.equals(definition.getBeanClassName(), clazz.getName())) {
                 DefaultListableBeanFactory beanFactory =
-                        (DefaultListableBeanFactory) getApplicationContext().getAutowireCapableBeanFactory();
+                        (DefaultListableBeanFactory) getContext().getAutowireCapableBeanFactory();
                 String beanName = beanFactory.getBeanNamesForType(clazz)[0];
                 beanFactory.destroySingleton(beanName);
                 beanFactory.registerSingleton(beanName, bean);
@@ -89,8 +89,16 @@ public final class SpringBeanReloader implements BeanReloader<Object> {
     @Override
     public boolean validBean(Object object) {
         Class<?> clazz = object.getClass();
-        String[] beanTypeNames = getApplicationContext().getBeanNamesForType(clazz);
+        String[] beanTypeNames = getContext().getBeanNamesForType(clazz);
         return beanTypeNames.length > 0;
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public boolean validVersion() {
+        return true;
     }
 
     public ClassPathBeanDefinitionScanner getScanner() {
@@ -101,11 +109,11 @@ public final class SpringBeanReloader implements BeanReloader<Object> {
         this.scanner = scanner;
     }
 
-    public ApplicationContext getApplicationContext() {
-        return applicationContext;
+    public ApplicationContext getContext() {
+        return context;
     }
 
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
+    public void setContext(ApplicationContext context) {
+        this.context = context;
     }
 }

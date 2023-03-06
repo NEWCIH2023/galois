@@ -26,8 +26,8 @@ package org.newcih.galois.service.watch.frame.spring;
 import org.newcih.galois.service.ProjectFileManager;
 import org.newcih.galois.service.agent.frame.spring.SpringBeanReloader;
 import org.newcih.galois.service.watch.frame.FileChangedListener;
+import org.newcih.galois.utils.FileUtils;
 import org.newcih.galois.utils.GaloisLog;
-import org.newcih.galois.utils.SystemUtil;
 
 import java.io.File;
 import java.lang.instrument.ClassDefinition;
@@ -62,7 +62,7 @@ public final class SpringBeanListener implements FileChangedListener {
             for (Class<?> clazz : classes) {
 
                 if (clazz.getName().equals(className)) {
-                    ClassDefinition newClassDef = new ClassDefinition(clazz, SystemUtil.readFile(file));
+                    ClassDefinition newClassDef = new ClassDefinition(clazz, FileUtils.readFile(file));
                     inst.redefineClasses(newClassDef);
                     Object newBean = clazz.newInstance();
                     // there should update bean in spring context if spring managed this bean
