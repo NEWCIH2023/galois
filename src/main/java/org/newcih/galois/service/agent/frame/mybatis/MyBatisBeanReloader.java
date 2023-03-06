@@ -23,6 +23,7 @@
 
 package org.newcih.galois.service.agent.frame.mybatis;
 
+import org.apache.ibatis.binding.MapperRegistry;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
 import org.apache.ibatis.executor.keygen.SelectKeyGenerator;
@@ -120,21 +121,21 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
 
     @SuppressWarnings("unchecked")
     private void clearMapperRegistry(String namespace) throws NoSuchFieldException, IllegalAccessException {
-//        Field field = MapperRegistry.class.getDeclaredField("knownMappers");
-//        field.setAccessible(true);
-//        Map<Class<?>, Object> mapConfig = (Map<Class<?>, Object>) field.get(configuration.getMapperRegistry());
-//        Class<?> refreshKey = null;
-//
-//        for (Map.Entry<Class<?>, Object> item : mapConfig.entrySet()) {
-//            if (item.getKey().getName().contains(namespace)) {
-//                refreshKey = item.getKey();
-//                break;
-//            }
-//        }
-//
-//        if (refreshKey != null) {
-//            mapConfig.remove(refreshKey);
-//        }
+        Field field = MapperRegistry.class.getDeclaredField("knownMappers");
+        field.setAccessible(true);
+        Map<Class<?>, Object> mapConfig = (Map<Class<?>, Object>) field.get(configuration.getMapperRegistry());
+        Class<?> refreshKey = null;
+
+        for (Map.Entry<Class<?>, Object> item : mapConfig.entrySet()) {
+            if (item.getKey().getName().contains(namespace)) {
+                refreshKey = item.getKey();
+                break;
+            }
+        }
+
+        if (refreshKey != null) {
+            mapConfig.remove(refreshKey);
+        }
     }
 
     @SuppressWarnings("rawtypes")

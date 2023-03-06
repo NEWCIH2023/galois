@@ -36,6 +36,7 @@ import org.newcih.galois.utils.GaloisLog;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.util.*;
@@ -70,7 +71,6 @@ public class CormBeanReloader implements BeanReloader<File> {
     public void updateBean(File newXMLFile) {
 
         try (FileInputStream fis = new FileInputStream(newXMLFile)) {
-
             XPathParser parser = new XPathParser(fis, true, configuration.getVariables(),
                     new XMLMapperEntityResolver());
             XNode context = parser.evalNode("/mapper");
@@ -108,7 +108,8 @@ public class CormBeanReloader implements BeanReloader<File> {
     }
 
     private void reloadXML(File newXMLFile) throws IOException {
-        XMLMapperBuilder builder = new XMLMapperBuilder(Files.newInputStream(newXMLFile.toPath()), configuration, newXMLFile.getName(), configuration.getSqlFragments());
+        InputStream is = Files.newInputStream(newXMLFile.toPath());
+        XMLMapperBuilder builder = new XMLMapperBuilder(is, configuration, newXMLFile.getName(), configuration.getSqlFragments());
         builder.parse();
     }
 
