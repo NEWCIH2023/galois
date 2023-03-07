@@ -21,10 +21,9 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.watch.frame.mybatis;
+package org.newcih.galois.service.agent.frame.mybatis;
 
-import org.newcih.galois.service.agent.frame.mybatis.MyBatisBeanReloader;
-import org.newcih.galois.service.watch.frame.FileChangedListener;
+import org.newcih.galois.service.agent.FileChangedListener;
 import org.newcih.galois.utils.FileUtils;
 import org.newcih.galois.utils.GaloisLog;
 import org.w3c.dom.Document;
@@ -51,7 +50,7 @@ public class MyBatisXmlListener implements FileChangedListener {
     private static final MyBatisBeanReloader reloader = MyBatisBeanReloader.getInstance();
 
     @Override
-    public boolean validFile(File file) {
+    public boolean isUseful(File file) {
         boolean fileTypeCheck = Objects.equals(FileUtils.getFileType(file), XML_FILE);
 
         if (!fileTypeCheck) {
@@ -77,17 +76,25 @@ public class MyBatisXmlListener implements FileChangedListener {
     }
 
     @Override
-    public void fileCreatedHandle(File file) {
+    public void createdHandle(File file) {
+        if (reloader == null) {
+            return;
+        }
+
         reloader.updateBean(file);
     }
 
     @Override
-    public void fileModifiedHandle(File file) {
+    public void modifiedHandle(File file) {
+        if (reloader == null) {
+            return;
+        }
+
         reloader.updateBean(file);
     }
 
     @Override
-    public void fileDeletedHandle(File file) {
+    public void deletedHandle(File file) {
         // TODO
     }
 }

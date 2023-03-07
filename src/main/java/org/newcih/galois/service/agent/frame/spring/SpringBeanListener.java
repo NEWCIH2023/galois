@@ -21,17 +21,19 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.watch.frame.spring;
+package org.newcih.galois.service.agent.frame.spring;
 
 import org.newcih.galois.service.ProjectFileManager;
-import org.newcih.galois.service.agent.frame.spring.SpringBeanReloader;
-import org.newcih.galois.service.watch.frame.FileChangedListener;
+import org.newcih.galois.service.agent.FileChangedListener;
 import org.newcih.galois.utils.FileUtils;
 import org.newcih.galois.utils.GaloisLog;
 
 import java.io.File;
 import java.lang.instrument.ClassDefinition;
 import java.lang.instrument.Instrumentation;
+import java.util.Objects;
+
+import static org.newcih.galois.constants.FileTypeConstant.CLASS_FILE;
 
 /**
  * Spring的Bean变动监听器
@@ -48,13 +50,16 @@ public final class SpringBeanListener implements FileChangedListener {
     }
 
     @Override
-    public boolean validFile(File file) {
-//        return Objects.equals(FileUtils.getFileType(file), CLASS_FILE);
-        return false;
+    public boolean isUseful(File file) {
+        return Objects.equals(FileUtils.getFileType(file), CLASS_FILE);
     }
 
     @Override
-    public void fileCreatedHandle(File file) {
+    public void createdHandle(File file) {
+        if (reloader == null) {
+            return;
+        }
+
         String className = "";
 
         try {
@@ -66,7 +71,7 @@ public final class SpringBeanListener implements FileChangedListener {
                     inst.redefineClasses(newClassDef);
                     Object newBean = clazz.newInstance();
                     // there should update bean in spring context if spring managed this bean
-                    if (reloader.validBean(newBean)) {
+                    if (reloader.isUseful(newBean)) {
                         reloader.updateBean(newBean);
                     }
                     break;
@@ -78,13 +83,24 @@ public final class SpringBeanListener implements FileChangedListener {
         }
     }
 
+    /**
+     * handler for file modifed
+     *
+     * @param file
+     */
     @Override
-    public void fileModifiedHandle(File file) {
-        // 不可以在变动时处理，此时class文件经历删除-新增，该阶段可能找不到class文件
+    public void modifiedHandle(File file) {
+
     }
 
+    /**
+     * handler for file deleted
+     *
+     * @param file
+     */
     @Override
-    public void fileDeletedHandle(File file) {
+    public void deletedHandle(File file) {
 
     }
+
 }

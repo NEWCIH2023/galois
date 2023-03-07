@@ -100,16 +100,8 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
     }
 
     @Override
-    public boolean validBean(File file) {
-        return false;
-    }
-
-    /**
-     * @return
-     */
-    @Override
-    public boolean validVersion() {
-        return false;
+    public boolean isUseful(File file) {
+        return true;
     }
 
     private void reloadXML(File xmlFile) throws IOException {

@@ -21,23 +21,16 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent;
+package org.newcih.galois.service.agent.frame.spring;
 
-public interface BeanReloader<T> {
+import org.newcih.galois.service.agent.AgentService;
+import org.newcih.galois.service.agent.BeanReloader;
+import org.newcih.galois.service.agent.FileChangedListener;
+import org.newcih.galois.service.agent.MethodAdapter;
 
-    /**
-     * update bean
-     *
-     * @param object
-     */
-    void updateBean(T object);
-
-    /**
-     * is reloader useful to this object
-     *
-     * @param object
-     * @return
-     */
-    boolean isUseful(T object);
-
+public class SpringAgentService extends AgentService {
+    public SpringAgentService(String loadedClassName, FileChangedListener listener, BeanReloader<?> reloader,
+                              MethodAdapter methodAdapter) {
+        super(loadedClassName, listener, reloader, methodAdapter);
+    }
 }

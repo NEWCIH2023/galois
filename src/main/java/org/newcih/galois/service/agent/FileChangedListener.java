@@ -21,34 +21,43 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.watch.frame.spring;
-
-import org.newcih.galois.service.watch.frame.FileChangedListener;
+package org.newcih.galois.service.agent;
 
 import java.io.File;
 
 /**
- * Spring的XML配置文件变更监听处理
+ * 文件变动监听
  */
-public class SpringXmlListener implements FileChangedListener {
+public interface FileChangedListener {
 
-    @Override
-    public boolean validFile(File file) {
-        return false;
-    }
 
-    @Override
-    public void fileCreatedHandle(File file) {
+    /**
+     * is listener useful for this file object
+     *
+     * @param file
+     * @return
+     */
+    boolean isUseful(File file);
 
-    }
+    /**
+     * handler for file created
+     *
+     * @param file
+     */
+    void createdHandle(File file);
 
-    @Override
-    public void fileModifiedHandle(File file) {
+    /**
+     * handler for file modifed
+     *
+     * @param file
+     */
+    void modifiedHandle(File file);
 
-    }
+    /**
+     * handler for file deleted
+     *
+     * @param file
+     */
+    void deletedHandle(File file);
 
-    @Override
-    public void fileDeletedHandle(File file) {
-
-    }
 }

@@ -21,57 +21,55 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.watch;
+package org.newcih.galois.service.agent.frame.spring;
+
+import org.newcih.galois.service.agent.FileChangedListener;
 
 import java.io.File;
-import java.util.function.Consumer;
 
 /**
- * 文件监听服务
+ * Spring的XML配置文件变更监听处理
  */
-public abstract class FileWatchService {
-
-    protected Consumer<File> createHandler;
-
-    protected Consumer<File> modiferHandler;
-
-    protected Consumer<File> deleteHandler;
+public class SpringXmlListener implements FileChangedListener {
 
     /**
-     * 启动文件监听
+     * is listener useful for this file object
      *
-     * @return 启动结果
+     * @param file
+     * @return
      */
-    public abstract boolean start();
+    @Override
+    public boolean isUseful(File file) {
+        return false;
+    }
 
     /**
-     * 关闭文件监听
+     * handler for file created
      *
-     * @return 关闭结果
+     * @param file
      */
-    public abstract boolean stop();
+    @Override
+    public void createdHandle(File file) {
 
-    public Consumer<File> getCreateHandler() {
-        return createHandler;
     }
 
-    public void setCreateHandler(Consumer<File> createHandler) {
-        this.createHandler = createHandler;
+    /**
+     * handler for file modifed
+     *
+     * @param file
+     */
+    @Override
+    public void modifiedHandle(File file) {
+
     }
 
-    public Consumer<File> getModiferHandler() {
-        return modiferHandler;
-    }
+    /**
+     * handler for file deleted
+     *
+     * @param file
+     */
+    @Override
+    public void deletedHandle(File file) {
 
-    public void setModiferHandler(Consumer<File> modiferHandler) {
-        this.modiferHandler = modiferHandler;
-    }
-
-    public Consumer<File> getDeleteHandler() {
-        return deleteHandler;
-    }
-
-    public void setDeleteHandler(Consumer<File> deleteHandler) {
-        this.deleteHandler = deleteHandler;
     }
 }

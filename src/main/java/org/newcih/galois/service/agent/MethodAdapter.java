@@ -36,7 +36,7 @@ import java.util.Map;
 import static org.newcih.galois.constants.FileTypeConstant.CLASS_FILE;
 import static org.objectweb.asm.Opcodes.ASM5;
 
-public class MethodAdapter extends ClassVisitor {
+public abstract class MethodAdapter extends ClassVisitor {
 
     private static final GaloisLog logger = GaloisLog.getLogger(MethodAdapter.class);
     protected static final ProjectFileManager fileManager = ProjectFileManager.getInstance();

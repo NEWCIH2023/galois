@@ -87,18 +87,10 @@ public final class SpringBeanReloader implements BeanReloader<Object> {
     }
 
     @Override
-    public boolean validBean(Object object) {
+    public boolean isUseful(Object object) {
         Class<?> clazz = object.getClass();
         String[] beanTypeNames = getContext().getBeanNamesForType(clazz);
         return beanTypeNames.length > 0;
-    }
-
-    /**
-     * @return
-     */
-    @Override
-    public boolean validVersion() {
-        return true;
     }
 
     public ClassPathBeanDefinitionScanner getScanner() {

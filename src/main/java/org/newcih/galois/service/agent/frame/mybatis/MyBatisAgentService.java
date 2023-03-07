@@ -21,43 +21,16 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.watch.frame;
+package org.newcih.galois.service.agent.frame.mybatis;
 
-import java.io.File;
+import org.newcih.galois.service.agent.AgentService;
+import org.newcih.galois.service.agent.BeanReloader;
+import org.newcih.galois.service.agent.FileChangedListener;
+import org.newcih.galois.service.agent.MethodAdapter;
 
-/**
- * 文件变动监听
- */
-public interface FileChangedListener {
-
-
-    /**
-     * 验证该文件是否适合该监听器处理
-     *
-     * @param file
-     * @return
-     */
-    boolean validFile(File file);
-
-    /**
-     * 文件新增时处理
-     *
-     * @param file
-     */
-    void fileCreatedHandle(File file);
-
-    /**
-     * 文件修改时处理
-     *
-     * @param file
-     */
-    void fileModifiedHandle(File file);
-
-    /**
-     * 文件删除时处理
-     *
-     * @param file
-     */
-    void fileDeletedHandle(File file);
-
+public class MyBatisAgentService extends AgentService {
+    public MyBatisAgentService(String loadedClassName, FileChangedListener listener, BeanReloader<?> reloader,
+                               MethodAdapter methodAdapter) {
+        super(loadedClassName, listener, reloader, methodAdapter);
+    }
 }

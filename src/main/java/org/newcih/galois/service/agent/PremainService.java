@@ -23,14 +23,13 @@
 
 package org.newcih.galois.service.agent;
 
+import org.newcih.galois.service.ApacheFileWatchService;
 import org.newcih.galois.service.BannerService;
 import org.newcih.galois.service.ProjectFileManager;
+import org.newcih.galois.service.agent.frame.mybatis.MyBatisXmlListener;
 import org.newcih.galois.service.agent.frame.spring.ApplicationContextVisitor;
 import org.newcih.galois.service.agent.frame.spring.BeanDefinitionScannerVisitor;
-import org.newcih.galois.service.watch.ApacheFileWatchService;
-import org.newcih.galois.service.watch.frame.FileChangedListener;
-import org.newcih.galois.service.watch.frame.mybatis.MyBatisXmlListener;
-import org.newcih.galois.service.watch.frame.spring.SpringBeanListener;
+import org.newcih.galois.service.agent.frame.spring.SpringBeanListener;
 import org.newcih.galois.utils.GaloisLog;
 
 import java.lang.instrument.Instrumentation;
@@ -50,12 +49,10 @@ public class PremainService {
     private static Instrumentation instrumentation;
 
     static {
-
         Arrays.asList(
                 new ApplicationContextVisitor(),
                 new BeanDefinitionScannerVisitor()
         ).forEach(visitor -> visitor.install(mac));
-
     }
 
     /**

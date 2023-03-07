@@ -21,12 +21,12 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.watch;
+package org.newcih.galois.service;
 
 import org.apache.commons.io.monitor.FileAlterationListener;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
-import org.newcih.galois.service.watch.frame.FileChangedListener;
+import org.newcih.galois.service.agent.FileChangedListener;
 import org.newcih.galois.utils.GaloisLog;
 
 import java.io.File;
@@ -111,8 +111,8 @@ public class ApacheFileWatchService implements FileAlterationListener {
         }
 
         for (FileChangedListener listener : listeners) {
-            if (listener.validFile(file)) {
-                listener.fileCreatedHandle(file);
+            if (listener.isUseful(file)) {
+                listener.createdHandle(file);
             }
         }
     }
@@ -124,8 +124,8 @@ public class ApacheFileWatchService implements FileAlterationListener {
         }
 
         for (FileChangedListener listener : listeners) {
-            if (listener.validFile(file)) {
-                listener.fileModifiedHandle(file);
+            if (listener.isUseful(file)) {
+                listener.modifiedHandle(file);
             }
         }
     }
@@ -137,8 +137,8 @@ public class ApacheFileWatchService implements FileAlterationListener {
         }
 
         for (FileChangedListener listener : listeners) {
-            if (listener.validFile(file)) {
-                listener.fileDeletedHandle(file);
+            if (listener.isUseful(file)) {
+                listener.deletedHandle(file);
             }
         }
     }
