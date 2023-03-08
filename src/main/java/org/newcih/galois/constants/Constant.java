@@ -26,8 +26,23 @@ package org.newcih.galois.constants;
 public class Constant {
 
     public static final String USER_DIR = "user.dir";
-
     public static final String ID = "id";
-
     public static final String NAMESPACE = "namespace";
+    public static final String GET_INSTANCE = "getInstance";
+    public static final String DOT = ".";
+    public static final String UNDER_LINE = "_";
+    public static final String OPEN_BRACE = "{";
+    public static final String CLOSE_BRACE = "}";
+    public static final String OPEN_PAREN = "(";
+    public static final String CLOSE_PAREN = ")";
+    public static final String OPEN_BRACKET = "[";
+    public static final String CLOSE_BRACKET = "]";
+    public static final String VERTICAL_BAR = "|";
+    public static final String POUND = "#";
+    public static final String SLASH = "/";
+    public static final String DOUBLE_SLASH = "//";
+    public static final String COLON = ":";
+    public static final String HYPHEN = "-";
+
+
 }

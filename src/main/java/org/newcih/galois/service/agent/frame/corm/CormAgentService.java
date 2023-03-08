@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent.frame.spring;
+package org.newcih.galois.service.agent.frame.corm;
 
 import org.newcih.galois.constants.ClassNameConstant;
 import org.newcih.galois.service.agent.AgentService;
@@ -34,27 +34,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SpringAgentService extends AgentService {
+public class CormAgentService extends AgentService {
 
-    private static SpringAgentService springAgent;
+    private static CormAgentService cormAgentService;
 
-    private SpringAgentService(List<FileChangedListener> listener, BeanReloader<?> beanReloader, Map<String,
+    private CormAgentService(List<FileChangedListener> listener, BeanReloader<?> beanReloader, Map<String,
             MethodAdapter> classNameToMethodMap) {
         super(listener, beanReloader, classNameToMethodMap);
     }
 
-    public static SpringAgentService getInstance() {
-        if (springAgent != null) {
-            return springAgent;
+    public static CormAgentService getInstance() {
+        if (cormAgentService != null) {
+            return cormAgentService;
         }
 
         Map<String, MethodAdapter> methodAdapterMap = new HashMap<>(8);
-        methodAdapterMap.put(ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER, new BeanDefinitionScannerVisitor());
-        methodAdapterMap.put(ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT,
-                new ApplicationContextVisitor());
-
-        springAgent = new SpringAgentService(Collections.singletonList(new SpringBeanListener()),
-                SpringBeanReloader.getInstance(), methodAdapterMap);
-        return springAgent;
+        methodAdapterMap.put(ClassNameConstant.COMTOP_SQL_SESSION_FACTORY, new ComtopSqlSessionFactoryBeanVisitor());
+        cormAgentService = new CormAgentService(Collections.singletonList(new CormXmlListener()),
+                CormBeanReloader.getInstance(), methodAdapterMap);
+        return cormAgentService;
     }
 }

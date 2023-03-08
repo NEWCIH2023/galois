@@ -24,7 +24,7 @@
 package org.newcih.galois.service.agent.frame.mybatis;
 
 import org.newcih.galois.service.agent.FileChangedListener;
-import org.newcih.galois.utils.FileUtils;
+import org.newcih.galois.utils.FileUtil;
 import org.newcih.galois.utils.GaloisLog;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
@@ -51,14 +51,13 @@ public class MyBatisXmlListener implements FileChangedListener {
 
     @Override
     public boolean isUseful(File file) {
-        boolean fileTypeCheck = Objects.equals(FileUtils.getFileType(file), XML_FILE);
+        boolean fileTypeCheck = Objects.equals(FileUtil.getFileType(file), XML_FILE);
 
         if (!fileTypeCheck) {
             return false;
         }
 
         // check xml file node contains mapper
-
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setValidating(false);
@@ -77,11 +76,7 @@ public class MyBatisXmlListener implements FileChangedListener {
 
     @Override
     public void createdHandle(File file) {
-        if (reloader == null) {
-            return;
-        }
-
-        reloader.updateBean(file);
+        // TODO
     }
 
     @Override

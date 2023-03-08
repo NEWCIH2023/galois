@@ -39,12 +39,27 @@ public abstract class AgentService {
         this.classNameToMethodMap = classNameToMethodMap;
     }
 
-    public void installAgentService(Map<String, AgentService> context) {
+    public void installAgentService(Map<String, MethodAdapter> context) {
         if (context == null) {
             return;
         }
 
-//        context.put(loadedClassName, this);
+        if (classNameToMethodMap == null) {
+            return;
+        }
+
+        context.putAll(classNameToMethodMap);
     }
 
+    public List<FileChangedListener> getListener() {
+        return listener;
+    }
+
+    public BeanReloader<?> getBeanReloader() {
+        return beanReloader;
+    }
+
+    public Map<String, MethodAdapter> getClassNameToMethodMap() {
+        return classNameToMethodMap;
+    }
 }

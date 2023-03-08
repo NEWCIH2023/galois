@@ -26,37 +26,33 @@ package org.newcih.galois.service.agent;
 import org.newcih.galois.service.ApacheFileWatchService;
 import org.newcih.galois.service.BannerService;
 import org.newcih.galois.service.ProjectFileManager;
-import org.newcih.galois.service.agent.frame.mybatis.MyBatisXmlListener;
-import org.newcih.galois.service.agent.frame.spring.ApplicationContextVisitor;
-import org.newcih.galois.service.agent.frame.spring.BeanDefinitionScannerVisitor;
-import org.newcih.galois.service.agent.frame.spring.SpringBeanListener;
+import org.newcih.galois.service.agent.frame.corm.CormAgentService;
+import org.newcih.galois.service.agent.frame.mybatis.MyBatisAgentService;
+import org.newcih.galois.service.agent.frame.spring.SpringAgentService;
 import org.newcih.galois.utils.GaloisLog;
 
 import java.lang.instrument.Instrumentation;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
- * PreMain服务类
+ *
  */
 public class PremainService {
 
     public static final GaloisLog logger = GaloisLog.getLogger(PremainService.class);
     private static final Map<String, MethodAdapter> mac = new HashMap<>(64);
+    private static final List<FileChangedListener> listeners = new ArrayList<>(16);
     private static final ProjectFileManager fileManager = ProjectFileManager.getInstance();
     private static Instrumentation instrumentation;
-
-    static {
-        Arrays.asList(
-                new ApplicationContextVisitor(),
-                new BeanDefinitionScannerVisitor()
-        ).forEach(visitor -> visitor.install(mac));
-    }
+    // adding new agent service here
+    private static final List<AgentService> agentServices = Arrays.asList(
+            SpringAgentService.getInstance(),
+            MyBatisAgentService.getInstance(),
+            CormAgentService.getInstance()
+    );
 
     /**
-     * Premain入口
+     * premain entry
      *
      * @param agentArgs
      * @param inst
@@ -67,8 +63,9 @@ public class PremainService {
         }
         instrumentation = inst;
 
-        // print galois banner
         BannerService.printBanner();
+
+        registerAgent();
 
         inst.addTransformer((loader, className, classBeingRedefined, protectionDomain, classfileBuffer) -> {
             if (className == null || className.trim().length() == 0) {
@@ -77,7 +74,7 @@ public class PremainService {
 
             String newClassName = className.replace("/", ".");
             MethodAdapter methodAdapter = mac.get(newClassName);
-            if (methodAdapter != null && methodAdapter.usable()) {
+            if (methodAdapter != null && methodAdapter.isUseful()) {
                 return methodAdapter.transform();
             }
 
@@ -85,15 +82,26 @@ public class PremainService {
         });
 
         // start file change listener service
-        List<FileChangedListener> fileChangedListeners = Arrays.asList(
-                new SpringBeanListener(inst),
-                new MyBatisXmlListener()
-        );
-
         String sourcePath = fileManager.getSourcePath();
         logger.info("begin listen file change in path [{}]", sourcePath);
 
-        new ApacheFileWatchService(sourcePath, fileChangedListeners).start();
+        new ApacheFileWatchService(sourcePath, listeners).start();
     }
 
+    /**
+     * register agent service
+     */
+    private static void registerAgent() {
+        try {
+
+            for (AgentService agentService : agentServices) {
+                if (agentService != null) {
+                    agentService.installAgentService(mac);
+                    listeners.addAll(agentService.getListener());
+                }
+            }
+        } catch (Exception e) {
+            logger.error("register agent service failed", e);
+        }
+    }
 }

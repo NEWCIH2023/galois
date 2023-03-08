@@ -102,7 +102,7 @@ public abstract class MethodAdapter extends ClassVisitor {
      *
      * @return
      */
-    public boolean usable() {
+    public boolean isUseful() {
         return true;
     }
 }

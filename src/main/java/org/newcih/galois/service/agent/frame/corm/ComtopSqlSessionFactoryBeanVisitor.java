@@ -53,11 +53,6 @@ public class ComtopSqlSessionFactoryBeanVisitor extends MethodAdapter {
         return mv;
     }
 
-    @Override
-    public boolean usable() {
-        return true;
-    }
-
     /**
      * 构造函数修改
      */

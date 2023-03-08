@@ -26,30 +26,71 @@ package org.newcih.galois.utils;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.instrument.Instrumentation;
+
+import static org.newcih.galois.constants.FileTypeConstant.CLASS_FILE;
 
 public class JavaUtil {
 
-    public static final String sourceCodePath = "C:\\Users\\liuguangsheng.SZSYY\\IdeaProjects\\galois\\src\\main" +
-            "\\java" +
-            "\\org\\newcih\\utils\\JavaUtil.java";
-
-    private static final String tempDir = System.getProperty("java.io.tmpdir");
-
+    private static final GaloisLog logger = GaloisLog.getLogger(JavaUtil.class);
+    private static final String compileDir;
     private static final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+    private static Instrumentation inst;
 
-    //TODO 这个需要后期给每种文件包装一个类，以含有足够信息后才能继续完成，目前关于编译后去哪里获取到class文件仍存在问题
-    public static File compile(File file) {
-        compiler.run(null, null, null, "-d", tempDir, file.getAbsolutePath());
-        return null;
+    static {
+        compileDir = System.getProperty("java.io.tmpdir") + File.separator + "GaloisCompile" + File.separator;
+        File directory = new File(compileDir);
+
+        if (!directory.exists()) {
+            try {
+                boolean createResult = directory.mkdir();
+                if (!createResult) {
+                    logger.error("can't create temp compile directory");
+                }
+            } catch (Exception e) {
+                logger.error("create temp compile directory failed", e);
+            }
+        }
+    }
+
+    public static void compile(File file) {
+        compiler.run(null, null, null, "-d", compileDir, file.getAbsolutePath());
+    }
+
+    public static File getClassFile(Class<?> clazz) {
+        return getClassFile(clazz.getName());
+    }
+
+    /**
+     * @param className must include package path
+     * @return
+     */
+    public static File getClassFile(String className) {
+        if (StringUtil.isBlank(className)) {
+            return null;
+        }
+
+        StringBuilder classFilePath = new StringBuilder(compileDir);
+        for (String subPath : className.split("\\.")) {
+            classFilePath.append(subPath).append(File.separator);
+        }
+        classFilePath.append(CLASS_FILE);
+
+        return new File(classFilePath.toString());
+    }
+
+    public static Instrumentation getInst() {
+        return inst;
+    }
+
+    public static void setInst(Instrumentation inst) {
+        JavaUtil.inst = inst;
     }
 
     public static void main(String[] args) throws IOException {
-        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        FileOutputStream fis = new FileOutputStream("./hui");
-        compiler.run(null, fis, null, sourceCodePath);
-        fis.flush();
-        fis.close();
+        File tmpFile = new File("C:\\Users\\liuguangsheng.SZSYY\\IdeaProjects\\galois\\src\\main\\java\\org\\newcih" +
+                "\\galois\\utils\\JavaUtil.java");
+        compile(tmpFile);
     }
 }

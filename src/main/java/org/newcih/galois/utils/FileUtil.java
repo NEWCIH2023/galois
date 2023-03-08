@@ -23,16 +23,18 @@
 
 package org.newcih.galois.utils;
 
+import org.apache.commons.io.FileUtil;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 
-public class FileUtils {
+public class FileUtil {
 
-    private FileUtils() {
+    private FileUtil() {
     }
 
-    private static final GaloisLog logger = GaloisLog.getLogger(FileUtils.class);
+    private static final GaloisLog logger = GaloisLog.getLogger(FileUtil.class);
 
     public static String getFileType(File file) {
         if (file == null) {

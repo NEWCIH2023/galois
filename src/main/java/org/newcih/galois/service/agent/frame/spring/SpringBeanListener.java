@@ -25,15 +25,15 @@ package org.newcih.galois.service.agent.frame.spring;
 
 import org.newcih.galois.service.ProjectFileManager;
 import org.newcih.galois.service.agent.FileChangedListener;
-import org.newcih.galois.utils.FileUtils;
+import org.newcih.galois.utils.FileUtil;
 import org.newcih.galois.utils.GaloisLog;
+import org.newcih.galois.utils.JavaUtil;
 
 import java.io.File;
 import java.lang.instrument.ClassDefinition;
-import java.lang.instrument.Instrumentation;
 import java.util.Objects;
 
-import static org.newcih.galois.constants.FileTypeConstant.CLASS_FILE;
+import static org.newcih.galois.constants.FileTypeConstant.JAVA_FILE;
 
 /**
  * Spring的Bean变动监听器
@@ -43,32 +43,22 @@ public final class SpringBeanListener implements FileChangedListener {
     public static final GaloisLog logger = GaloisLog.getLogger(SpringBeanListener.class);
     private final static SpringBeanReloader reloader = SpringBeanReloader.getInstance();
     private final static ProjectFileManager fileManager = ProjectFileManager.getInstance();
-    private final Instrumentation inst;
-
-    public SpringBeanListener(Instrumentation inst) {
-        this.inst = inst;
-    }
 
     @Override
     public boolean isUseful(File file) {
-        return Objects.equals(FileUtils.getFileType(file), CLASS_FILE);
+        return Objects.equals(FileUtil.getFileType(file), JAVA_FILE);
     }
 
-    @Override
-    public void createdHandle(File file) {
-        if (reloader == null) {
-            return;
-        }
-
+    private void fileChangedHandle(File file) {
         String className = "";
 
         try {
-            Class<?>[] classes = inst.getAllLoadedClasses();
+            Class<?>[] classes = JavaUtil.getInst().getAllLoadedClasses();
             for (Class<?> clazz : classes) {
 
                 if (clazz.getName().equals(className)) {
-                    ClassDefinition newClassDef = new ClassDefinition(clazz, FileUtils.readFile(file));
-                    inst.redefineClasses(newClassDef);
+                    ClassDefinition newClassDef = new ClassDefinition(clazz, FileUtil.readFile(file));
+                    JavaUtil.getInst().redefineClasses(newClassDef);
                     Object newBean = clazz.newInstance();
                     // there should update bean in spring context if spring managed this bean
                     if (reloader.isUseful(newBean)) {
@@ -83,6 +73,11 @@ public final class SpringBeanListener implements FileChangedListener {
         }
     }
 
+    @Override
+    public void createdHandle(File file) {
+        fileChangedHandle(file);
+    }
+
     /**
      * handler for file modifed
      *
@@ -90,7 +85,7 @@ public final class SpringBeanListener implements FileChangedListener {
      */
     @Override
     public void modifiedHandle(File file) {
-
+        fileChangedHandle(file);
     }
 
     /**

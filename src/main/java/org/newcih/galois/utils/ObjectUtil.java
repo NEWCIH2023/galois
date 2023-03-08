@@ -39,7 +39,18 @@ public class ObjectUtil {
             Method getMethod = clazz.getMethod(methodName);
             return getMethod.invoke(instance);
         } catch (Exception e) {
-            logger.error("{}.invokeGetMethod failed", ObjectUtil.class.getSimpleName(), e);
+            logger.error("invokeGetMethod failed", e);
+            return null;
+        }
+    }
+
+    public static Object invokeStaticMethod(String className, String methodName, Class<?>[] parameterTypes,
+                                            Object[] args) {
+        try {
+            Class<?> clazz = Class.forName(className);
+            return invokeStaticMethod(clazz, methodName, parameterTypes, args);
+        } catch (Exception e) {
+            logger.error("invokeStaticMethod faeled", e);
             return null;
         }
     }
@@ -50,7 +61,7 @@ public class ObjectUtil {
             Method method = clazz.getMethod(methodName, parameterTypes);
             return method.invoke(null, args);
         } catch (Exception e) {
-            logger.error("{}.invokeStaticMethod failed", ObjectUtil.class.getSimpleName(), e);
+            logger.error("invokeStaticMethod failed", e);
             return null;
         }
     }
@@ -61,7 +72,7 @@ public class ObjectUtil {
             Method method = clazz.getMethod(methodName, parameterTypes);
             return method.invoke(instance, args);
         } catch (Exception e) {
-            logger.error("{}.invokeMethod failed", ObjectUtil.class.getSimpleName(), e);
+            logger.error("invokeMethod failed", e);
             return null;
         }
     }
@@ -73,7 +84,7 @@ public class ObjectUtil {
             field.setAccessible(true);
             return field.get(instance);
         } catch (Exception e) {
-            logger.error("{}.accessField failed", ObjectUtil.class.getSimpleName(), e);
+            logger.error("accessField failed", e);
             return null;
         }
     }

@@ -21,55 +21,23 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent.frame.spring;
+package org.newcih.galois.utils;
 
-import org.newcih.galois.service.agent.FileChangedListener;
+public class StringUtil {
 
-import java.io.File;
-
-/**
- * Spring的XML配置文件变更监听处理
- */
-public class SpringXmlListener implements FileChangedListener {
-
-    /**
-     * is listener useful for this file object
-     *
-     * @param file
-     * @return
-     */
-    @Override
-    public boolean isUseful(File file) {
-        return false;
+    public static boolean isBlank(String str) {
+        return isEmpty(str) || "".equals(str.trim());
     }
 
-    /**
-     * handler for file created
-     *
-     * @param file
-     */
-    @Override
-    public void createdHandle(File file) {
-
+    public static boolean isEmpty(String str) {
+        return str == null || "".equals(str);
     }
 
-    /**
-     * handler for file modifed
-     *
-     * @param file
-     */
-    @Override
-    public void modifiedHandle(File file) {
-
+    public static boolean isNotBlank(String str) {
+        return !isNotBlank(str);
     }
 
-    /**
-     * handler for file deleted
-     *
-     * @param file
-     */
-    @Override
-    public void deletedHandle(File file) {
-
+    public static boolean isNotEmpty(String str) {
+        return !isEmpty(str);
     }
 }
