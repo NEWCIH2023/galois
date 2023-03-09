@@ -25,18 +25,16 @@ package org.newcih.galois.service.agent.frame.spring;
 
 import org.newcih.galois.service.agent.BeanReloader;
 import org.newcih.galois.utils.GaloisLog;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 
-import java.util.Objects;
-import java.util.Set;
+import java.lang.reflect.Modifier;
 
 /**
  * Spring的Bean重载服务
  */
-public final class SpringBeanReloader implements BeanReloader<Object> {
+public final class SpringBeanReloader implements BeanReloader<Class<?>> {
 
     private static final GaloisLog logger = GaloisLog.getLogger(SpringBeanReloader.class);
     private static final SpringBeanReloader springBeanReloader = new SpringBeanReloader();
@@ -61,34 +59,36 @@ public final class SpringBeanReloader implements BeanReloader<Object> {
     /**
      * 更新Spring管理的bean对象
      *
-     * @param bean
+     * @param clazz
      */
     @Override
-    public void updateBean(Object bean) {
-        Class<?> clazz = bean.getClass();
-        String packageName = clazz.getPackage().getName();
-        Set<BeanDefinition> beanDefinitionSet = scanner.findCandidateComponents(packageName);
+    public void updateBean(Class<?> clazz) {
+        DefaultListableBeanFactory factory = (DefaultListableBeanFactory) getContext().getAutowireCapableBeanFactory();
+        String beanName = factory.getBeanNamesForType(clazz)[0];
+        Object bean = null;
 
-        for (BeanDefinition definition : beanDefinitionSet) {
-            if (Objects.equals(definition.getBeanClassName(), clazz.getName())) {
-                DefaultListableBeanFactory beanFactory =
-                        (DefaultListableBeanFactory) getContext().getAutowireCapableBeanFactory();
-                String beanName = beanFactory.getBeanNamesForType(clazz)[0];
-                beanFactory.destroySingleton(beanName);
-                beanFactory.registerSingleton(beanName, bean);
+        try {
+            bean = clazz.newInstance();
+            factory.destroySingleton(beanName);
+            factory.registerSingleton(beanName, bean);
+        } catch (InstantiationException ie) {
+            logger.error("can't create a new object from newInstance method, ensure that's not an abstract class");
+        } catch (Exception e) {
+            logger.error("spring bean reloader update bean failed", e);
+        }
 
-                if (logger.isDebugEnabled()) {
-                    logger.debug("had reload spring bean {}", bean);
-                }
-
-                break;
-            }
+        if (logger.isDebugEnabled()) {
+            logger.debug("had reload spring bean {}", bean);
         }
     }
 
     @Override
-    public boolean isUseful(Object object) {
-        Class<?> clazz = object.getClass();
+    public boolean isUseful(Class<?> clazz) {
+        int m = clazz.getModifiers();
+        if (Modifier.isInterface(m) || Modifier.isAbstract(m) || Modifier.isPrivate(m) || Modifier.isStatic(m) || Modifier.isNative(m)) {
+            return false;
+        }
+
         String[] beanTypeNames = getContext().getBeanNamesForType(clazz);
         return beanTypeNames.length > 0;
     }

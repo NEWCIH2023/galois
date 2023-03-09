@@ -23,8 +23,12 @@
 
 package org.newcih.galois.conf;
 
+import org.newcih.galois.utils.StringUtil;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.management.ManagementFactory;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -34,6 +38,7 @@ import java.util.Properties;
 public class GlobalConfiguration {
 
     private static final Properties configuration = new Properties();
+    private static final List<String> jvmArgs;
 
     /**
      * load global configuration from galois.properties file
@@ -41,6 +46,8 @@ public class GlobalConfiguration {
     static {
         try (InputStream is = GlobalConfiguration.class.getClassLoader().getResourceAsStream("galois.properties")) {
             configuration.load(is);
+            // load configuration from jvm args
+            jvmArgs = ManagementFactory.getRuntimeMXBean().getInputArguments();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -53,8 +60,13 @@ public class GlobalConfiguration {
      * @return
      */
     public static String getString(String key) {
-        String result = configuration.getProperty(key);
-        return Optional.ofNullable(result).orElse("");
+        String result = Optional.ofNullable(configuration.getProperty(key)).orElse("");
+
+        if (StringUtil.isBlank(result)) {
+            return jvmArgs.stream().filter(args -> args.startsWith(key)).findFirst().orElse("");
+        }
+
+        return result;
     }
 
     /**

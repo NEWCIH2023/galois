@@ -23,13 +23,14 @@
 
 package org.newcih.galois.service.agent;
 
-import org.newcih.galois.service.ApacheFileWatchService;
 import org.newcih.galois.service.BannerService;
+import org.newcih.galois.service.FileWatchService;
 import org.newcih.galois.service.ProjectFileManager;
 import org.newcih.galois.service.agent.frame.corm.CormAgentService;
 import org.newcih.galois.service.agent.frame.mybatis.MyBatisAgentService;
 import org.newcih.galois.service.agent.frame.spring.SpringAgentService;
 import org.newcih.galois.utils.GaloisLog;
+import org.newcih.galois.utils.JavaUtil;
 
 import java.lang.instrument.Instrumentation;
 import java.util.*;
@@ -43,7 +44,6 @@ public class PremainService {
     private static final Map<String, MethodAdapter> mac = new HashMap<>(64);
     private static final List<FileChangedListener> listeners = new ArrayList<>(16);
     private static final ProjectFileManager fileManager = ProjectFileManager.getInstance();
-    private static Instrumentation instrumentation;
     // adding new agent service here
     private static final List<AgentService> agentServices = Arrays.asList(
             SpringAgentService.getInstance(),
@@ -58,10 +58,7 @@ public class PremainService {
      * @param inst
      */
     public static void premain(String agentArgs, Instrumentation inst) {
-        if (instrumentation != null) {
-            return;
-        }
-        instrumentation = inst;
+        JavaUtil.inst = inst;
 
         BannerService.printBanner();
 
@@ -82,10 +79,7 @@ public class PremainService {
         });
 
         // start file change listener service
-        String sourcePath = fileManager.getSourcePath();
-        logger.info("begin listen file change in path [{}]", sourcePath);
-
-        new ApacheFileWatchService(sourcePath, listeners).start();
+        new FileWatchService(fileManager.getSourcePath(), listeners).start();
     }
 
     /**

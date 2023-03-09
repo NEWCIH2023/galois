@@ -24,6 +24,7 @@
 package org.newcih.galois.service;
 
 import org.newcih.galois.utils.GaloisLog;
+import org.newcih.galois.utils.StringUtil;
 
 import static org.newcih.galois.constants.Constant.USER_DIR;
 
@@ -37,7 +38,11 @@ public class ProjectFileManager {
     private final String sourcePath;
 
     private ProjectFileManager() {
-        this.sourcePath = System.getProperty(USER_DIR);
+        sourcePath = System.getProperty(USER_DIR);
+
+        if (StringUtil.isBlank(sourcePath)) {
+            logger.error("source code path args is empty. Galois service start failed!");
+        }
     }
 
     public static ProjectFileManager getInstance() {

@@ -23,7 +23,6 @@
 
 package org.newcih.galois.service.agent;
 
-import org.apache.commons.io.IOUtils;
 import org.newcih.galois.service.ProjectFileManager;
 import org.newcih.galois.utils.GaloisLog;
 import org.objectweb.asm.ClassReader;
@@ -88,7 +87,7 @@ public abstract class MethodAdapter extends ClassVisitor {
         if (logger.isDebugEnabled()) {
             String tempClassFile = "" + getClass().getSimpleName() + CLASS_FILE;
             try (FileOutputStream fos = new FileOutputStream(tempClassFile)) {
-                IOUtils.write(result, fos);
+                fos.write(result);
             } catch (Throwable e) {
                 logger.error("dump injected class file error", e);
             }

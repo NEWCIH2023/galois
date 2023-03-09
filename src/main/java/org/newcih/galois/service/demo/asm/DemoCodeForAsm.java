@@ -23,7 +23,6 @@
 
 package org.newcih.galois.service.demo.asm;
 
-import org.apache.commons.io.IOUtils;
 import org.newcih.galois.service.agent.frame.spring.SpringBeanReloader;
 import org.objectweb.asm.*;
 import org.springframework.context.ApplicationContext;
@@ -109,7 +108,7 @@ public class DemoCodeForAsm {
         String path = Objects.requireNonNull(DemoCodeForAsm.class.getResource("")).getPath().substring(1).replace("/"
                 , File.separator) + "DemoCodeForAsmTran.class";
         System.out.println("类生成的位置" + path);
-        IOUtils.write(cw.toByteArray(), Files.newOutputStream(Paths.get(path)));
+        Files.newOutputStream(Paths.get(path)).write(cw.toByteArray());
     }
 
     public void printCode() {

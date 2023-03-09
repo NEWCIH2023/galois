@@ -23,7 +23,6 @@
 
 package org.newcih.galois.service.agent.frame.spring;
 
-import org.newcih.galois.service.ProjectFileManager;
 import org.newcih.galois.service.agent.FileChangedListener;
 import org.newcih.galois.utils.FileUtil;
 import org.newcih.galois.utils.GaloisLog;
@@ -31,45 +30,42 @@ import org.newcih.galois.utils.JavaUtil;
 
 import java.io.File;
 import java.lang.instrument.ClassDefinition;
-import java.util.Objects;
 
 import static org.newcih.galois.constants.FileTypeConstant.JAVA_FILE;
 
 /**
  * Spring的Bean变动监听器
  */
-public final class SpringBeanListener implements FileChangedListener {
+public class SpringBeanListener implements FileChangedListener {
 
     public static final GaloisLog logger = GaloisLog.getLogger(SpringBeanListener.class);
     private final static SpringBeanReloader reloader = SpringBeanReloader.getInstance();
-    private final static ProjectFileManager fileManager = ProjectFileManager.getInstance();
 
     @Override
     public boolean isUseful(File file) {
-        return Objects.equals(FileUtil.getFileType(file), JAVA_FILE);
+        return FileUtil.validFileType(file, JAVA_FILE);
     }
 
-    private void fileChangedHandle(File file) {
-        String className = "";
+    private void fileChangedHandle(File sourceFile) {
+        String className = JavaUtil.getClassNameFromSource(sourceFile);
+        if (className == null) {
+            logger.warn("can't parse className from java source file ==> {}", sourceFile);
+            return;
+        }
 
+        File classFile = JavaUtil.compileSource(sourceFile);
         try {
-            Class<?>[] classes = JavaUtil.getInst().getAllLoadedClasses();
-            for (Class<?> clazz : classes) {
+            Class<?> clazz = Class.forName(className);
+            byte[] byteArray = FileUtil.readFile(classFile);
+            ClassDefinition definition = new ClassDefinition(clazz, byteArray);
+            JavaUtil.getInst().redefineClasses(definition);
+            logger.info("had redefine class file => {}", classFile);
 
-                if (clazz.getName().equals(className)) {
-                    ClassDefinition newClassDef = new ClassDefinition(clazz, FileUtil.readFile(file));
-                    JavaUtil.getInst().redefineClasses(newClassDef);
-                    Object newBean = clazz.newInstance();
-                    // there should update bean in spring context if spring managed this bean
-                    if (reloader.isUseful(newBean)) {
-                        reloader.updateBean(newBean);
-                    }
-                    break;
-                }
-
+            if (reloader.isUseful(clazz)) {
+                reloader.updateBean(clazz);
             }
         } catch (Throwable e) {
-            logger.error("reload bean under file created event failed", e);
+            logger.error("reload bean failed", e);
         }
     }
 

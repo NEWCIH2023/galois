@@ -23,11 +23,10 @@
 
 package org.newcih.galois.utils;
 
-import org.apache.commons.io.FileUtil;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Objects;
 
 public class FileUtil {
 
@@ -35,6 +34,10 @@ public class FileUtil {
     }
 
     private static final GaloisLog logger = GaloisLog.getLogger(FileUtil.class);
+
+    public static boolean validFileType(File file, String fileType) {
+        return Objects.equals(getFileType(file), fileType);
+    }
 
     public static String getFileType(File file) {
         if (file == null) {

@@ -23,12 +23,21 @@
 
 package org.newcih.galois.utils;
 
+import com.sun.tools.javac.api.JavacTool;
+import com.sun.tools.javac.file.JavacFileManager;
+import com.sun.tools.javac.util.Context;
+
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
+import java.io.FileReader;
 import java.lang.instrument.Instrumentation;
+import java.nio.charset.Charset;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import static org.newcih.galois.constants.Constant.*;
 import static org.newcih.galois.constants.FileTypeConstant.CLASS_FILE;
 
 public class JavaUtil {
@@ -36,12 +45,18 @@ public class JavaUtil {
     private static final GaloisLog logger = GaloisLog.getLogger(JavaUtil.class);
     private static final String compileDir;
     private static final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-    private static Instrumentation inst;
+    public static Instrumentation inst;
+    private static final Context context = new Context();
+    private static final JavacFileManager manager;
+    private static final JavacTool javacTool = JavacTool.create();
+    private static final Pattern packagePattern = Pattern.compile("^package +(\\S+);");
+    private static final Pattern classNamePattern = Pattern.compile("[\\s\\S]*class +(\\S+) +[\\s\\S]*");
 
     static {
+        manager = new JavacFileManager(context, true, Charset.defaultCharset());
+
         compileDir = System.getProperty("java.io.tmpdir") + File.separator + "GaloisCompile" + File.separator;
         File directory = new File(compileDir);
-
         if (!directory.exists()) {
             try {
                 boolean createResult = directory.mkdir();
@@ -52,10 +67,56 @@ public class JavaUtil {
                 logger.error("create temp compile directory failed", e);
             }
         }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("using tmp directory ==> {}", compileDir);
+        }
     }
 
-    public static void compile(File file) {
-        compiler.run(null, null, null, "-d", compileDir, file.getAbsolutePath());
+    public static File compileSource(File sourceFile) {
+        String className = getClassNameFromSource(sourceFile);
+        compiler.run(null, null, null, "-d", compileDir, sourceFile.getAbsolutePath());
+        return getClassFile(className);
+    }
+
+    public static Instrumentation getInst() {
+        return inst;
+    }
+
+    public static String getClassNameFromSource(File javaFile) {
+        try (BufferedReader br = new BufferedReader(new FileReader(javaFile))) {
+            String tmp = "";
+            String result = "";
+
+            while ((tmp = br.readLine()) != null) {
+                if (tmp.startsWith(PACKAGE + SPACE)) {
+                    Matcher packageMatcher = packagePattern.matcher(tmp);
+                    if (packageMatcher.matches()) {
+                        result = packageMatcher.group(1);
+                    } else {
+                        logger.warn("can't get package using pattern from java source {}", javaFile);
+                        return null;
+                    }
+                }
+
+                if (tmp.contains(CLASS + SPACE)) {
+                    Matcher classNameMatcher = classNamePattern.matcher(tmp);
+                    if (classNameMatcher.matches()) {
+                        result += DOT + classNameMatcher.group(1);
+                    } else {
+                        logger.warn("can't get className using pattern from java source {}", javaFile);
+                        return null;
+                    }
+
+                    break;
+                }
+            }
+
+            return result;
+        } catch (Exception e) {
+            logger.error("parse className from java source failed", e);
+            return null;
+        }
     }
 
     public static File getClassFile(Class<?> clazz) {
@@ -71,26 +132,7 @@ public class JavaUtil {
             return null;
         }
 
-        StringBuilder classFilePath = new StringBuilder(compileDir);
-        for (String subPath : className.split("\\.")) {
-            classFilePath.append(subPath).append(File.separator);
-        }
-        classFilePath.append(CLASS_FILE);
-
-        return new File(classFilePath.toString());
+        return new File(compileDir + String.join(File.separator, className.split("\\.")) + CLASS_FILE);
     }
 
-    public static Instrumentation getInst() {
-        return inst;
-    }
-
-    public static void setInst(Instrumentation inst) {
-        JavaUtil.inst = inst;
-    }
-
-    public static void main(String[] args) throws IOException {
-        File tmpFile = new File("C:\\Users\\liuguangsheng.SZSYY\\IdeaProjects\\galois\\src\\main\\java\\org\\newcih" +
-                "\\galois\\utils\\JavaUtil.java");
-        compile(tmpFile);
-    }
 }
