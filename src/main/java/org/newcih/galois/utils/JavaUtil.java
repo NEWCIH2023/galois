@@ -131,7 +131,9 @@ public class JavaUtil {
         String sourceCode = FileUtil.readTextFile(sourceFile);
         JavaFileObject javaFileObject = manager.makeStringSource(sourceFile.getName(), sourceCode);
         List<JavaFileObject> fileObjectList = Collections.singletonList(javaFileObject);
-        JavaCompiler.CompilationTask task = compiler.getTask(null, manager, new DiagnosticCollector<>(), null, null, fileObjectList);
+        // if null then print message
+        DiagnosticCollector diagnosticCollector = null;
+        JavaCompiler.CompilationTask task = compiler.getTask(null, manager, diagnosticCollector, null, null, fileObjectList);
         Boolean result = task.call();
 
         if (result == null || !result) {
