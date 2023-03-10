@@ -1,8 +1,8 @@
 package org.newcih.galoisdemo.service.abs;
 
-public abstract class AbstractDemoService {
+public abstract class AbstractDemoService<T> {
 
-    public String getName() {
-        return "nam";
+    public T getName() {
+        return (T) "iiiia  uih   h            aaaaaaa               b ";
     }
 }

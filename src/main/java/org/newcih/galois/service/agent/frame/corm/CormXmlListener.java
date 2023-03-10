@@ -24,7 +24,6 @@
 package org.newcih.galois.service.agent.frame.corm;
 
 import org.newcih.galois.service.agent.FileChangedListener;
-import org.newcih.galois.service.agent.frame.mybatis.MyBatisBeanReloader;
 import org.newcih.galois.service.agent.frame.mybatis.MyBatisXmlListener;
 import org.newcih.galois.utils.FileUtil;
 import org.newcih.galois.utils.GaloisLog;
@@ -46,7 +45,7 @@ public class CormXmlListener implements FileChangedListener {
 
     private static final GaloisLog logger = GaloisLog.getLogger(MyBatisXmlListener.class);
 
-    private static final MyBatisBeanReloader reloader = MyBatisBeanReloader.getInstance();
+    private static final CormBeanReloader reloader = CormBeanReloader.getInstance();
 
     @Override
     public boolean isUseful(File file) {

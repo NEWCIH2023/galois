@@ -115,6 +115,10 @@ public class FileWatchService {
                         }
 
                         for (WatchEvent<?> event : watchKey.pollEvents()) {
+                            if (event.count() > 1) {
+                                continue;
+                            }
+
                             WatchEvent.Kind<?> kind = event.kind();
 
                             if (kind == OVERFLOW) {
@@ -125,6 +129,7 @@ public class FileWatchService {
                             if (file.isDirectory()) {
                                 continue;
                             }
+
 
                             if (kind == ENTRY_CREATE) {
                                 listeners.stream()

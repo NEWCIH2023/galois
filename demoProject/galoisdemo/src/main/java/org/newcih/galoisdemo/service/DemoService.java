@@ -4,11 +4,11 @@ import org.newcih.galoisdemo.service.abs.AbstractDemoService;
 import org.springframework.stereotype.Service;
 
 @Service
-public class DemoService extends AbstractDemoService {
+public class DemoService extends AbstractDemoService<String> {
 
     @Override
     public String getName() {
-        return super.getName();
+        return super.getName()+"a";
     }
 
 }

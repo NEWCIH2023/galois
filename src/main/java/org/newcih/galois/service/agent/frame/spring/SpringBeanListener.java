@@ -53,13 +53,14 @@ public class SpringBeanListener implements FileChangedListener {
             return;
         }
 
-        File classFile = JavaUtil.compileSource(sourceFile);
+        byte[] classBytes = JavaUtil.compileSource(sourceFile);
+
         try {
+
             Class<?> clazz = Class.forName(className);
-            byte[] byteArray = FileUtil.readFile(classFile);
-            ClassDefinition definition = new ClassDefinition(clazz, byteArray);
+            ClassDefinition definition = new ClassDefinition(clazz, classBytes);
             JavaUtil.getInst().redefineClasses(definition);
-            logger.info("had redefine class file => {}", classFile);
+            logger.info("had redefine class file => {}", sourceFile.getName());
 
             if (reloader.isUseful(clazz)) {
                 reloader.updateBean(clazz);
@@ -71,6 +72,10 @@ public class SpringBeanListener implements FileChangedListener {
 
     @Override
     public void createdHandle(File file) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("spring bean listener monitor java file created event ==> {}", file.getName());
+        }
+
         fileChangedHandle(file);
     }
 
@@ -81,6 +86,10 @@ public class SpringBeanListener implements FileChangedListener {
      */
     @Override
     public void modifiedHandle(File file) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("spring bean listener monitor java file modified event ==> {}", file.getName());
+        }
+
         fileChangedHandle(file);
     }
 

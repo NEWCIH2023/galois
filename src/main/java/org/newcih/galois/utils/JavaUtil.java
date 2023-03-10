@@ -23,21 +23,17 @@
 
 package org.newcih.galois.utils;
 
-import com.sun.tools.javac.api.JavacTool;
-import com.sun.tools.javac.file.JavacFileManager;
-import com.sun.tools.javac.util.Context;
-
-import javax.tools.JavaCompiler;
-import javax.tools.ToolProvider;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import javax.tools.*;
+import java.io.*;
 import java.lang.instrument.Instrumentation;
-import java.nio.charset.Charset;
+import java.net.URI;
+import java.nio.CharBuffer;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.newcih.galois.constants.Constant.*;
+import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.FileTypeConstant.CLASS_FILE;
 
 public class JavaUtil {
@@ -45,15 +41,13 @@ public class JavaUtil {
     private static final GaloisLog logger = GaloisLog.getLogger(JavaUtil.class);
     private static final String compileDir;
     private static final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+    private static final StandardJavaFileManager standardJavaFileManager;
     public static Instrumentation inst;
-    private static final Context context = new Context();
-    private static final JavacFileManager manager;
-    private static final JavacTool javacTool = JavacTool.create();
     private static final Pattern packagePattern = Pattern.compile("^package +(\\S+);");
-    private static final Pattern classNamePattern = Pattern.compile("[\\s\\S]*class +(\\S+) +[\\s\\S]*");
+    private static final Pattern classNamePattern = Pattern.compile("class +([\\S&&[^<]]+)");
 
     static {
-        manager = new JavacFileManager(context, true, Charset.defaultCharset());
+        standardJavaFileManager = compiler.getStandardFileManager(null, null, null);
 
         compileDir = System.getProperty("java.io.tmpdir") + File.separator + "GaloisCompile" + File.separator;
         File directory = new File(compileDir);
@@ -73,12 +67,6 @@ public class JavaUtil {
         }
     }
 
-    public static File compileSource(File sourceFile) {
-        String className = getClassNameFromSource(sourceFile);
-        compiler.run(null, null, null, "-d", compileDir, sourceFile.getAbsolutePath());
-        return getClassFile(className);
-    }
-
     public static Instrumentation getInst() {
         return inst;
     }
@@ -88,26 +76,18 @@ public class JavaUtil {
             String tmp = "";
             String result = "";
 
+            Matcher packageMatcher;
+            Matcher classNameMatcher;
+
             while ((tmp = br.readLine()) != null) {
-                if (tmp.startsWith(PACKAGE + SPACE)) {
-                    Matcher packageMatcher = packagePattern.matcher(tmp);
-                    if (packageMatcher.matches()) {
-                        result = packageMatcher.group(1);
-                    } else {
-                        logger.warn("can't get package using pattern from java source {}", javaFile);
-                        return null;
-                    }
+                packageMatcher = packagePattern.matcher(tmp);
+                if (packageMatcher.find()) {
+                    result = packageMatcher.group(1);
                 }
 
-                if (tmp.contains(CLASS + SPACE)) {
-                    Matcher classNameMatcher = classNamePattern.matcher(tmp);
-                    if (classNameMatcher.matches()) {
-                        result += DOT + classNameMatcher.group(1);
-                    } else {
-                        logger.warn("can't get className using pattern from java source {}", javaFile);
-                        return null;
-                    }
-
+                classNameMatcher = classNamePattern.matcher(tmp);
+                if (classNameMatcher.find()) {
+                    result += DOT + classNameMatcher.group(1);
                     break;
                 }
             }
@@ -119,6 +99,11 @@ public class JavaUtil {
         }
     }
 
+
+    /**
+     * @param clazz must include package path
+     * @return
+     */
     public static File getClassFile(Class<?> clazz) {
         return getClassFile(clazz.getName());
     }
@@ -133,6 +118,86 @@ public class JavaUtil {
         }
 
         return new File(compileDir + String.join(File.separator, className.split("\\.")) + CLASS_FILE);
+    }
+
+    /**
+     * compile java source code file to byte[] data
+     *
+     * @param sourceFile
+     * @return
+     */
+    public static byte[] compileSource(File sourceFile) {
+        MemoryJavaFileManager manager = new MemoryJavaFileManager(standardJavaFileManager);
+        String sourceCode = FileUtil.readTextFile(sourceFile);
+        JavaFileObject javaFileObject = manager.makeStringSource(sourceFile.getName(), sourceCode);
+        List<JavaFileObject> fileObjectList = Collections.singletonList(javaFileObject);
+        JavaCompiler.CompilationTask task = compiler.getTask(null, manager, new DiagnosticCollector<>(), null, null, fileObjectList);
+        Boolean result = task.call();
+
+        if (result == null || !result) {
+            logger.error("compile source file failed ==> {}", sourceFile.getName());
+        }
+
+        return manager.getClassBytes();
+    }
+
+    private static class MemoryJavaFileManager extends ForwardingJavaFileManager<JavaFileManager> {
+        byte[] classBytes = new byte[0];
+
+        protected MemoryJavaFileManager(JavaFileManager fileManager) {
+            super(fileManager);
+        }
+
+        public byte[] getClassBytes() {
+            return classBytes;
+        }
+
+        @Override
+        public JavaFileObject getJavaFileForOutput(Location location, String className, JavaFileObject.Kind kind,
+                                                   FileObject sibling) throws IOException {
+            if (kind == JavaFileObject.Kind.CLASS) {
+                return new MemoryOutputJavaFileObject(className);
+            } else {
+                return super.getJavaFileForOutput(location, className, kind, sibling);
+            }
+        }
+
+        JavaFileObject makeStringSource(String name, String code) {
+            return new MemoryInputJavaFileObject(name, code);
+        }
+
+        static class MemoryInputJavaFileObject extends SimpleJavaFileObject {
+            final String code;
+
+            protected MemoryInputJavaFileObject(String name, String code) {
+                super(URI.create("string:///" + name), Kind.SOURCE);
+                this.code = code;
+            }
+
+            @Override
+            public CharSequence getCharContent(boolean ignoreEncodingErrors) {
+                return CharBuffer.wrap(code);
+            }
+        }
+
+        class MemoryOutputJavaFileObject extends SimpleJavaFileObject {
+
+            protected MemoryOutputJavaFileObject(String name) {
+                super(URI.create("string:///" + name), Kind.CLASS);
+            }
+
+            @Override
+            public OutputStream openOutputStream() {
+                return new FilterOutputStream(new ByteArrayOutputStream()) {
+                    @Override
+                    public void close() throws IOException {
+                        out.close();
+                        ByteArrayOutputStream bos = (ByteArrayOutputStream) out;
+                        classBytes = bos.toByteArray();
+                    }
+                };
+            }
+        }
     }
 
 }

@@ -23,9 +23,7 @@
 
 package org.newcih.galois.utils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.*;
 import java.util.Objects;
 
 public class FileUtil {
@@ -55,6 +53,20 @@ public class FileUtil {
         return "";
     }
 
+    public static File writeFile(byte[] bytes, String path) {
+        if (bytes == null || bytes.length == 0) {
+            return null;
+        }
+
+        try (FileOutputStream fos = new FileOutputStream(path)) {
+            fos.write(bytes, 0, bytes.length);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return new File(path);
+    }
+
     /**
      * 将File转为byte[]数组
      *
@@ -81,6 +93,22 @@ public class FileUtil {
         }
 
         return new byte[0];
+    }
+
+    public static String readTextFile(File file) {
+        if (file == null) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            br.lines().forEach(sb::append);
+        } catch (Exception e) {
+            logger.error("readTextFile throw exception", e);
+            return "";
+        }
+
+        return sb.toString();
     }
 
 }
