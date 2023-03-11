@@ -64,7 +64,7 @@ public class PremainService {
 
         agentServices.stream().filter(AgentService::isUseful).forEach(agentService -> {
             methodAdapterMap.putAll(agentService.getClassNameToMethodMap());
-            listeners.addAll(agentService.getListener());
+            listeners.addAll(agentService.getListeners());
         });
 
         inst.addTransformer((loader, className, classBeingRedefined, protectionDomain, classfileBuffer) -> {
@@ -73,9 +73,8 @@ public class PremainService {
             }
 
             String newClassName = className.replace(SLASH, DOT);
-
             MethodAdapter methodAdapter = methodAdapterMap.get(newClassName);
-            if (methodAdapter != null) {
+            if (methodAdapter != null && methodAdapter.isUseful()) {
                 return methodAdapter.transform();
             }
 

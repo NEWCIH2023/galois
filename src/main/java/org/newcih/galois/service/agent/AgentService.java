@@ -28,13 +28,13 @@ import java.util.Map;
 
 public abstract class AgentService {
 
-    private final List<FileChangedListener> listener;
+    private final List<FileChangedListener> listeners;
     private final BeanReloader<?> beanReloader;
     private final Map<String, MethodAdapter> classNameToMethodMap;
 
-    public AgentService(List<FileChangedListener> listener, BeanReloader<?> beanReloader,
+    public AgentService(List<FileChangedListener> listeners, BeanReloader<?> beanReloader,
                         Map<String, MethodAdapter> classNameToMethodMap) {
-        this.listener = listener;
+        this.listeners = listeners;
         this.beanReloader = beanReloader;
         this.classNameToMethodMap = classNameToMethodMap;
     }
@@ -43,8 +43,8 @@ public abstract class AgentService {
         return true;
     }
 
-    public List<FileChangedListener> getListener() {
-        return listener;
+    public List<FileChangedListener> getListeners() {
+        return listeners;
     }
 
     public BeanReloader<?> getBeanReloader() {
