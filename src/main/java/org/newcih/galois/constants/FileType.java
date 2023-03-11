@@ -23,12 +23,23 @@
 
 package org.newcih.galois.constants;
 
-public class FileTypeConstant {
+public enum FileType {
 
-    public static final String CLASS_FILE = ".class";
+    CLASS_FILE(".class"), XML_FILE(".xml"), JAVA_FILE(".java");
 
-    public static final String XML_FILE = ".xml";
+    private final String fileType;
+    private final String name;
 
-    public static final String JAVA_FILE = ".java";
+    FileType(String fileType) {
+        this.fileType = fileType;
+        this.name = fileType.substring(1);
+    }
 
+    public String getFileType() {
+        return fileType;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

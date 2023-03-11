@@ -54,6 +54,8 @@ public class Constant {
     public static final String DASH = "--";
     public static final String DOTS = "...";
     public static final String PARALLEL = "||";
+    public static final String LF = "\n";
+    public static final String CR = "\r";
 
 
 }

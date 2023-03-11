@@ -8,7 +8,7 @@ public class DemoService extends AbstractDemoService<String> {
 
     @Override
     public String getName() {
-        return super.getName()+"a";
+        return super.getName() + "a";
     }
 
 }

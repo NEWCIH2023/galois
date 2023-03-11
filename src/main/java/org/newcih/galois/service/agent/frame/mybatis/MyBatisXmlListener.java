@@ -34,9 +34,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.util.Objects;
 
-import static org.newcih.galois.constants.FileTypeConstant.XML_FILE;
+import static org.newcih.galois.constants.FileType.XML_FILE;
+
 
 /**
  * MyBatis的XML文件变更监听处理
@@ -51,7 +51,7 @@ public class MyBatisXmlListener implements FileChangedListener {
 
     @Override
     public boolean isUseful(File file) {
-        boolean fileTypeCheck = Objects.equals(FileUtil.getFileType(file), XML_FILE);
+        boolean fileTypeCheck = FileUtil.validFileType(file, XML_FILE);
 
         if (!fileTypeCheck) {
             return false;
@@ -81,8 +81,8 @@ public class MyBatisXmlListener implements FileChangedListener {
 
     @Override
     public void modifiedHandle(File file) {
-        if (reloader == null) {
-            return;
+        if (logger.isDebugEnabled()) {
+            logger.debug("mybatis listener monitor file modified ==> {}", file.getName());
         }
 
         reloader.updateBean(file);
@@ -91,5 +91,10 @@ public class MyBatisXmlListener implements FileChangedListener {
     @Override
     public void deletedHandle(File file) {
         // TODO
+    }
+
+    @Override
+    public String toString() {
+        return "MyBatisXmlListener";
     }
 }

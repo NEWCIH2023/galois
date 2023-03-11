@@ -25,15 +25,18 @@ package org.newcih.galois.service.agent;
 
 import org.newcih.galois.service.BannerService;
 import org.newcih.galois.service.FileWatchService;
-import org.newcih.galois.service.ProjectFileManager;
 import org.newcih.galois.service.agent.frame.corm.CormAgentService;
 import org.newcih.galois.service.agent.frame.mybatis.MyBatisAgentService;
 import org.newcih.galois.service.agent.frame.spring.SpringAgentService;
 import org.newcih.galois.utils.GaloisLog;
 import org.newcih.galois.utils.JavaUtil;
+import org.newcih.galois.utils.StringUtil;
 
 import java.lang.instrument.Instrumentation;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.newcih.galois.constants.Constant.USER_DIR;
 
 /**
  *
@@ -41,9 +44,6 @@ import java.util.*;
 public class PremainService {
 
     public static final GaloisLog logger = GaloisLog.getLogger(PremainService.class);
-    private static final Map<String, MethodAdapter> mac = new HashMap<>(64);
-    private static final List<FileChangedListener> listeners = new ArrayList<>(16);
-    private static final ProjectFileManager fileManager = ProjectFileManager.getInstance();
     // adding new agent service here
     private static final List<AgentService> agentServices = Arrays.asList(
             SpringAgentService.getInstance(),
@@ -60,42 +60,52 @@ public class PremainService {
     public static void premain(String agentArgs, Instrumentation inst) {
         JavaUtil.inst = inst;
 
-        BannerService.printBanner();
+        Class<?>[] loadedClasses = inst.getAllLoadedClasses();
+        Map<String, MethodAdapter> methodAdapterMap = new HashMap<>(8);
 
-        registerAgent();
+        MethodAdapter adapter;
+        for (Class<?> loadedClass : loadedClasses) {
+            for (AgentService agentService : agentServices) {
+                adapter = agentService.getClassNameToMethodMap().get(loadedClass.getName());
+
+                if (adapter != null && adapter.isUseful()) {
+                    methodAdapterMap.put(loadedClass.getName(), adapter);
+                    agentService.setEnabled(true);
+                }
+            }
+        }
 
         inst.addTransformer((loader, className, classBeingRedefined, protectionDomain, classfileBuffer) -> {
-            if (className == null || className.trim().length() == 0) {
+            if (StringUtil.isBlank(className)) {
                 return null;
             }
 
             String newClassName = className.replace("/", ".");
-            MethodAdapter methodAdapter = mac.get(newClassName);
-            if (methodAdapter != null && methodAdapter.isUseful()) {
+            MethodAdapter methodAdapter = methodAdapterMap.get(newClassName);
+            if (methodAdapter != null) {
                 return methodAdapter.transform();
             }
 
             return null;
         });
 
-        // start file change listener service
-        new FileWatchService(fileManager.getSourcePath(), listeners).start();
+        List<FileChangedListener> listeners = new ArrayList<>(16);
+        agentServices.stream()
+                .filter(AgentService::isEnabled)
+                .peek(agentService -> {
+                    if (logger.isDebugEnabled()) {
+                        String listenerNames =
+                                agentService.getListener().stream().map(Objects::toString).collect(Collectors.joining(","));
+                        logger.debug("register file change monitor {}", listenerNames);
+                    }
+                })
+                .forEach(agentService -> listeners.addAll(agentService.getListener()));
+
+        String rootPath = System.getProperty(USER_DIR);
+        new FileWatchService(rootPath, listeners).start();
+
+        // banner should be printed after necessary process done
+        BannerService.printBanner();
     }
 
-    /**
-     * register agent service
-     */
-    private static void registerAgent() {
-        try {
-
-            for (AgentService agentService : agentServices) {
-                if (agentService != null) {
-                    agentService.installAgentService(mac);
-                    listeners.addAll(agentService.getListener());
-                }
-            }
-        } catch (Exception e) {
-            logger.error("register agent service failed", e);
-        }
-    }
 }

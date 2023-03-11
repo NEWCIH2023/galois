@@ -51,7 +51,12 @@ public class DemoController {
 
     @GetMapping("/getString")
     public String getString() {
-        return "1" + demoService.getName();
+        return getTest();
+    }
+
+    public String getTest() {
+        System.out.println(1);
+        return "test";
     }
 
     @GetMapping("/t7")

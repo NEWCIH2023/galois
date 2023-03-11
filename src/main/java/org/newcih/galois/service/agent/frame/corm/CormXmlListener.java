@@ -35,9 +35,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.util.Objects;
 
-import static org.newcih.galois.constants.FileTypeConstant.XML_FILE;
+import static org.newcih.galois.constants.FileType.XML_FILE;
 
 public class CormXmlListener implements FileChangedListener {
 
@@ -48,14 +47,17 @@ public class CormXmlListener implements FileChangedListener {
     private static final CormBeanReloader reloader = CormBeanReloader.getInstance();
 
     @Override
+    public String toString() {
+        return "CormXmlListener";
+    }
+
+    @Override
     public boolean isUseful(File file) {
-        boolean fileTypeCheck = Objects.equals(FileUtil.getFileType(file), XML_FILE);
+        boolean fileTypeCheck = FileUtil.validFileType(file, XML_FILE);
 
         if (!fileTypeCheck) {
             return false;
         }
-
-        // check xml file node contains mapper
 
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -75,17 +77,12 @@ public class CormXmlListener implements FileChangedListener {
 
     @Override
     public void createdHandle(File file) {
-        if (reloader == null) {
-            return;
-        }
-
-        reloader.updateBean(file);
     }
 
     @Override
     public void modifiedHandle(File file) {
-        if (reloader == null) {
-            return;
+        if (logger.isDebugEnabled()) {
+            logger.debug("corm listener monitor file modified ==> {}", file.getName());
         }
 
         reloader.updateBean(file);

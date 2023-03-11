@@ -23,8 +23,12 @@
 
 package org.newcih.galois.utils;
 
+import org.newcih.galois.constants.FileType;
+
 import java.io.*;
 import java.util.Objects;
+
+import static org.newcih.galois.constants.Constant.LF;
 
 public class FileUtil {
 
@@ -33,8 +37,8 @@ public class FileUtil {
 
     private static final GaloisLog logger = GaloisLog.getLogger(FileUtil.class);
 
-    public static boolean validFileType(File file, String fileType) {
-        return Objects.equals(getFileType(file), fileType);
+    public static boolean validFileType(File file, FileType fileType) {
+        return Objects.equals(getFileType(file), fileType.getFileType());
     }
 
     public static String getFileType(File file) {
@@ -102,7 +106,7 @@ public class FileUtil {
 
         StringBuilder sb = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            br.lines().forEach(sb::append);
+            br.lines().map(line -> line + LF).forEach(sb::append);
         } catch (Exception e) {
             logger.error("readTextFile throw exception", e);
             return "";

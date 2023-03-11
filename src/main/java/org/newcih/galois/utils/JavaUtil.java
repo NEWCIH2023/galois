@@ -23,18 +23,22 @@
 
 package org.newcih.galois.utils;
 
+import org.objectweb.asm.ClassReader;
+
 import javax.tools.*;
 import java.io.*;
 import java.lang.instrument.Instrumentation;
 import java.net.URI;
 import java.nio.CharBuffer;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.newcih.galois.constants.Constant.DOT;
-import static org.newcih.galois.constants.FileTypeConstant.CLASS_FILE;
+import static org.newcih.galois.constants.Constant.SLASH;
+import static org.newcih.galois.constants.FileType.CLASS_FILE;
 
 public class JavaUtil {
 
@@ -69,6 +73,15 @@ public class JavaUtil {
 
     public static Instrumentation getInst() {
         return inst;
+    }
+
+    public static String getClassNameFromClass(File classFile) {
+        try {
+            ClassReader classReader = new ClassReader(Files.newInputStream(classFile.toPath()));
+            return classReader.getClassName().replace(SLASH, DOT);
+        } catch (IOException e) {
+            return "";
+        }
     }
 
     public static String getClassNameFromSource(File javaFile) {
@@ -117,7 +130,7 @@ public class JavaUtil {
             return null;
         }
 
-        return new File(compileDir + String.join(File.separator, className.split("\\.")) + CLASS_FILE);
+        return new File(compileDir + String.join(File.separator, className.split("\\.")) + CLASS_FILE.getFileType());
     }
 
     /**
@@ -133,7 +146,8 @@ public class JavaUtil {
         List<JavaFileObject> fileObjectList = Collections.singletonList(javaFileObject);
         // if null then print message
         DiagnosticCollector diagnosticCollector = null;
-        JavaCompiler.CompilationTask task = compiler.getTask(null, manager, diagnosticCollector, null, null, fileObjectList);
+        JavaCompiler.CompilationTask task = compiler.getTask(null, manager, diagnosticCollector, null, null,
+                fileObjectList);
         Boolean result = task.call();
 
         if (result == null || !result) {

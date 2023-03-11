@@ -33,6 +33,8 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.sun.nio.file.SensitivityWatchEventModifier.MEDIUM;
 import static java.nio.file.StandardWatchEventKinds.*;
@@ -104,12 +106,14 @@ public class FileWatchService {
             return;
         }
 
+        String listenerNames = listeners.stream().map(Objects::toString).collect(Collectors.joining(","));
+        logger.info("{} listeners [{}] is registered!", listeners.size(), listenerNames);
+
         try {
             watchThread = new Thread(() -> {
-                try {
-                    while (true) {
+                while (true) {
+                    try {
                         WatchKey watchKey = watchService.take();
-
                         if (watchKey == null) {
                             continue;
                         }
@@ -130,29 +134,23 @@ public class FileWatchService {
                                 continue;
                             }
 
-
-                            if (kind == ENTRY_CREATE) {
-                                listeners.stream()
-                                        .filter(listener -> listener.isUseful(file))
-                                        .forEach(listener -> listener.createdHandle(file));
-                            } else if (kind == ENTRY_DELETE) {
-                                listeners.stream()
-                                        .filter(listener -> listener.isUseful(file))
-                                        .forEach(listener -> listener.deletedHandle(file));
-                            } else if (kind == ENTRY_MODIFY) {
-                                listeners.stream()
-                                        .filter(listener -> listener.isUseful(file))
-                                        .forEach(listener -> listener.modifiedHandle(file));
-                            }
+                            listeners.stream()
+                                    .filter(listener -> listener.isUseful(file))
+                                    .forEach(listener -> {
+                                        if (kind == ENTRY_CREATE) {
+                                            listener.createdHandle(file);
+                                        } else if (kind == ENTRY_DELETE) {
+                                            listener.deletedHandle(file);
+                                        } else if (kind == ENTRY_MODIFY) {
+                                            listener.modifiedHandle(file);
+                                        }
+                                    });
                         }
 
-                        boolean resetFlag = watchKey.reset();
-                        if (!resetFlag) {
-                            logger.error("file watch service key reset fail, Galois might run in fail-soft mode");
-                        }
+                        watchKey.reset();
+                    } catch (Exception e) {
+                        logger.error("file change handle failed", e);
                     }
-                } catch (Exception e) {
-                    logger.error("file change handle failed", e);
                 }
             });
             watchThread.setDaemon(true);

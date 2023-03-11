@@ -23,9 +23,13 @@
 
 package org.newcih.galois.service.agent.frame.mybatis;
 
-import org.newcih.galois.service.agent.*;
+import org.newcih.galois.service.agent.AgentService;
+import org.newcih.galois.service.agent.BeanReloader;
+import org.newcih.galois.service.agent.FileChangedListener;
+import org.newcih.galois.service.agent.MethodAdapter;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +48,7 @@ public class MyBatisAgentService extends AgentService {
         }
 
         myBatisAgentService = new MyBatisAgentService(Collections.singletonList(new MyBatisXmlListener()),
-                MyBatisBeanReloader.getInstance(), null);
+                MyBatisBeanReloader.getInstance(), new HashMap<>());
         return myBatisAgentService;
     }
 }

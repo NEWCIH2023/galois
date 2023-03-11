@@ -31,7 +31,8 @@ import org.newcih.galois.utils.JavaUtil;
 import java.io.File;
 import java.lang.instrument.ClassDefinition;
 
-import static org.newcih.galois.constants.FileTypeConstant.JAVA_FILE;
+import static org.newcih.galois.constants.FileType.CLASS_FILE;
+
 
 /**
  * Spring的Bean变动监听器
@@ -43,28 +44,22 @@ public class SpringBeanListener implements FileChangedListener {
 
     @Override
     public boolean isUseful(File file) {
-        return FileUtil.validFileType(file, JAVA_FILE);
+        return FileUtil.validFileType(file, CLASS_FILE);
     }
 
-    private void fileChangedHandle(File sourceFile) {
-        String className = JavaUtil.getClassNameFromSource(sourceFile);
-        if (className == null) {
-            logger.warn("can't parse className from java source file ==> {}", sourceFile);
-            return;
-        }
-
-        byte[] classBytes = JavaUtil.compileSource(sourceFile);
+    private void fileChangedHandle(File classFile) {
+        String className = JavaUtil.getClassNameFromClass(classFile);
+        byte[] classBytes = FileUtil.readFile(classFile);
 
         try {
-
             Class<?> clazz = Class.forName(className);
             ClassDefinition definition = new ClassDefinition(clazz, classBytes);
             JavaUtil.getInst().redefineClasses(definition);
-            logger.info("had redefine class file => {}", sourceFile.getName());
+            logger.info("had redefine class file => {}", classFile.getName());
 
-            if (reloader.isUseful(clazz)) {
-                reloader.updateBean(clazz);
-            }
+//            if (reloader.isUseful(clazz)) {
+//                reloader.updateBean(clazz);
+//            }
         } catch (Throwable e) {
             logger.error("reload bean failed", e);
         }
@@ -91,6 +86,11 @@ public class SpringBeanListener implements FileChangedListener {
         }
 
         fileChangedHandle(file);
+    }
+
+    @Override
+    public String toString() {
+        return "SpringBeanListener";
     }
 
     /**

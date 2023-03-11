@@ -30,6 +30,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Spring的Bean重载服务
@@ -38,6 +40,7 @@ public final class SpringBeanReloader implements BeanReloader<Class<?>> {
 
     private static final GaloisLog logger = GaloisLog.getLogger(SpringBeanReloader.class);
     private static final SpringBeanReloader springBeanReloader = new SpringBeanReloader();
+    public static final List<String> ignorePackages = Arrays.asList("org.springframework");
     /**
      * 待注入属性
      */
@@ -84,6 +87,12 @@ public final class SpringBeanReloader implements BeanReloader<Class<?>> {
 
     @Override
     public boolean isUseful(Class<?> clazz) {
+        String className = clazz.getName();
+        boolean isIgnoredClass = ignorePackages.stream().anyMatch(className::startsWith);
+        if (isIgnoredClass) {
+            return false;
+        }
+
         int m = clazz.getModifiers();
         if (Modifier.isInterface(m) || Modifier.isAbstract(m) || Modifier.isPrivate(m) || Modifier.isStatic(m) || Modifier.isNative(m)) {
             return false;

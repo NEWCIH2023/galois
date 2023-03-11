@@ -79,7 +79,7 @@ public class ComtopSqlSessionFactoryBeanVisitor extends MethodAdapter {
                 mv.visitEnd();
 
                 if (logger.isDebugEnabled()) {
-                    logger.debug("injected sqlSessionFactoryBean constructor by ASM success!");
+                    logger.debug("injected corm sqlSessionFactoryBean constructor by ASM success!");
                 }
 
             }

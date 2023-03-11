@@ -23,7 +23,6 @@
 
 package org.newcih.galois.service.agent;
 
-import org.newcih.galois.service.ProjectFileManager;
 import org.newcih.galois.utils.GaloisLog;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -32,13 +31,12 @@ import org.objectweb.asm.ClassWriter;
 import java.io.FileOutputStream;
 import java.util.Map;
 
-import static org.newcih.galois.constants.FileTypeConstant.CLASS_FILE;
+import static org.newcih.galois.constants.FileType.CLASS_FILE;
 import static org.objectweb.asm.Opcodes.ASM5;
 
 public abstract class MethodAdapter extends ClassVisitor {
 
     private static final GaloisLog logger = GaloisLog.getLogger(MethodAdapter.class);
-    protected static final ProjectFileManager fileManager = ProjectFileManager.getInstance();
     protected final String className;
     protected ClassReader cr;
     protected ClassWriter cw;
@@ -85,7 +83,7 @@ public abstract class MethodAdapter extends ClassVisitor {
         byte[] result = cw.toByteArray();
 
         if (logger.isDebugEnabled()) {
-            String tempClassFile = "" + getClass().getSimpleName() + CLASS_FILE;
+            String tempClassFile = "" + getClass().getSimpleName() + CLASS_FILE.getFileType();
             try (FileOutputStream fos = new FileOutputStream(tempClassFile)) {
                 fos.write(result);
             } catch (Throwable e) {
