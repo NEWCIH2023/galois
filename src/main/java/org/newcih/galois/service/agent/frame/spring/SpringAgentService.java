@@ -23,7 +23,6 @@
 
 package org.newcih.galois.service.agent.frame.spring;
 
-import org.newcih.galois.constants.ClassNameConstant;
 import org.newcih.galois.service.agent.AgentService;
 import org.newcih.galois.service.agent.BeanReloader;
 import org.newcih.galois.service.agent.FileChangedListener;
@@ -33,6 +32,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.newcih.galois.constants.ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT;
+import static org.newcih.galois.constants.ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER;
 
 public class SpringAgentService extends AgentService {
 
@@ -49,12 +51,24 @@ public class SpringAgentService extends AgentService {
         }
 
         Map<String, MethodAdapter> methodAdapterMap = new HashMap<>(8);
-        methodAdapterMap.put(ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER, new BeanDefinitionScannerVisitor());
-        methodAdapterMap.put(ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT,
+        methodAdapterMap.put(CLASS_PATH_BEAN_DEFINITION_SCANNER, new BeanDefinitionScannerVisitor());
+        methodAdapterMap.put(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT,
                 new ApplicationContextVisitor());
 
         springAgent = new SpringAgentService(Collections.singletonList(new SpringBeanListener()),
                 SpringBeanReloader.getInstance(), methodAdapterMap);
         return springAgent;
+    }
+
+    @Override
+    public boolean isUseful() {
+        try {
+            Class.forName(CLASS_PATH_BEAN_DEFINITION_SCANNER);
+            Class.forName(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT);
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+
+        return true;
     }
 }

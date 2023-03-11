@@ -31,7 +31,6 @@ public abstract class AgentService {
     private final List<FileChangedListener> listener;
     private final BeanReloader<?> beanReloader;
     private final Map<String, MethodAdapter> classNameToMethodMap;
-    private boolean enabled;
 
     public AgentService(List<FileChangedListener> listener, BeanReloader<?> beanReloader,
                         Map<String, MethodAdapter> classNameToMethodMap) {
@@ -40,12 +39,8 @@ public abstract class AgentService {
         this.classNameToMethodMap = classNameToMethodMap;
     }
 
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    public boolean isUseful() {
+        return true;
     }
 
     public List<FileChangedListener> getListener() {

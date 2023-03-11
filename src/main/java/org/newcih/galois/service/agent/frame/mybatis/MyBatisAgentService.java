@@ -33,6 +33,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.newcih.galois.constants.ClassNameConstant.SQL_SESSION_FACTORY_BEAN;
+
 public class MyBatisAgentService extends AgentService {
 
     private static MyBatisAgentService myBatisAgentService;
@@ -50,5 +52,16 @@ public class MyBatisAgentService extends AgentService {
         myBatisAgentService = new MyBatisAgentService(Collections.singletonList(new MyBatisXmlListener()),
                 MyBatisBeanReloader.getInstance(), new HashMap<>());
         return myBatisAgentService;
+    }
+
+    @Override
+    public boolean isUseful() {
+        try {
+            Class.forName(SQL_SESSION_FACTORY_BEAN);
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+
+        return true;
     }
 }

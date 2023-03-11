@@ -34,9 +34,8 @@ import org.newcih.galois.utils.StringUtil;
 
 import java.lang.instrument.Instrumentation;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static org.newcih.galois.constants.Constant.USER_DIR;
+import static org.newcih.galois.constants.Constant.*;
 
 /**
  *
@@ -60,46 +59,28 @@ public class PremainService {
     public static void premain(String agentArgs, Instrumentation inst) {
         JavaUtil.inst = inst;
 
-        Class<?>[] loadedClasses = inst.getAllLoadedClasses();
         Map<String, MethodAdapter> methodAdapterMap = new HashMap<>(8);
+        List<FileChangedListener> listeners = new ArrayList<>(16);
 
-        MethodAdapter adapter;
-        for (Class<?> loadedClass : loadedClasses) {
-            for (AgentService agentService : agentServices) {
-                adapter = agentService.getClassNameToMethodMap().get(loadedClass.getName());
-
-                if (adapter != null && adapter.isUseful()) {
-                    methodAdapterMap.put(loadedClass.getName(), adapter);
-                    agentService.setEnabled(true);
-                }
-            }
-        }
+        agentServices.stream().filter(AgentService::isUseful).forEach(agentService -> {
+            methodAdapterMap.putAll(agentService.getClassNameToMethodMap());
+            listeners.addAll(agentService.getListener());
+        });
 
         inst.addTransformer((loader, className, classBeingRedefined, protectionDomain, classfileBuffer) -> {
             if (StringUtil.isBlank(className)) {
                 return null;
             }
 
-            String newClassName = className.replace("/", ".");
+            String newClassName = className.replace(SLASH, DOT);
+
             MethodAdapter methodAdapter = methodAdapterMap.get(newClassName);
             if (methodAdapter != null) {
                 return methodAdapter.transform();
             }
 
             return null;
-        });
-
-        List<FileChangedListener> listeners = new ArrayList<>(16);
-        agentServices.stream()
-                .filter(AgentService::isEnabled)
-                .peek(agentService -> {
-                    if (logger.isDebugEnabled()) {
-                        String listenerNames =
-                                agentService.getListener().stream().map(Objects::toString).collect(Collectors.joining(","));
-                        logger.debug("register file change monitor {}", listenerNames);
-                    }
-                })
-                .forEach(agentService -> listeners.addAll(agentService.getListener()));
+        }, true);
 
         String rootPath = System.getProperty(USER_DIR);
         new FileWatchService(rootPath, listeners).start();

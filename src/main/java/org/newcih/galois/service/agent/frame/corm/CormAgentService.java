@@ -23,7 +23,6 @@
 
 package org.newcih.galois.service.agent.frame.corm;
 
-import org.newcih.galois.constants.ClassNameConstant;
 import org.newcih.galois.service.agent.AgentService;
 import org.newcih.galois.service.agent.BeanReloader;
 import org.newcih.galois.service.agent.FileChangedListener;
@@ -33,6 +32,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.newcih.galois.constants.ClassNameConstant.COMTOP_SQL_SESSION_FACTORY;
 
 public class CormAgentService extends AgentService {
 
@@ -49,9 +50,20 @@ public class CormAgentService extends AgentService {
         }
 
         Map<String, MethodAdapter> methodAdapterMap = new HashMap<>(8);
-        methodAdapterMap.put(ClassNameConstant.COMTOP_SQL_SESSION_FACTORY, new ComtopSqlSessionFactoryBeanVisitor());
+        methodAdapterMap.put(COMTOP_SQL_SESSION_FACTORY, new ComtopSqlSessionFactoryBeanVisitor());
         cormAgentService = new CormAgentService(Collections.singletonList(new CormXmlListener()),
                 CormBeanReloader.getInstance(), methodAdapterMap);
         return cormAgentService;
+    }
+
+    @Override
+    public boolean isUseful() {
+        try {
+            Class.forName(COMTOP_SQL_SESSION_FACTORY);
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+
+        return true;
     }
 }
