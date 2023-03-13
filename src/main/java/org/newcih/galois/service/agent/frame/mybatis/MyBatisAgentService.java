@@ -24,44 +24,27 @@
 package org.newcih.galois.service.agent.frame.mybatis;
 
 import org.newcih.galois.service.agent.AgentService;
-import org.newcih.galois.service.agent.BeanReloader;
-import org.newcih.galois.service.agent.FileChangedListener;
-import org.newcih.galois.service.agent.MethodAdapter;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.newcih.galois.constants.ClassNameConstant.SQL_SESSION_FACTORY_BEAN;
 
 public class MyBatisAgentService extends AgentService {
 
-    private static MyBatisAgentService myBatisAgentService;
+    private final static MyBatisAgentService myBatisAgentService = new MyBatisAgentService();
 
-    private MyBatisAgentService(List<FileChangedListener> listener, BeanReloader<?> beanReloader, Map<String,
-            MethodAdapter> classNameToMethodMap) {
-        super(listener, beanReloader, classNameToMethodMap);
+    static {
+        necessaryClasses.add(SQL_SESSION_FACTORY_BEAN);
+    }
+
+    public MyBatisAgentService() {
     }
 
     public static MyBatisAgentService getInstance() {
-        if (myBatisAgentService != null) {
-            return myBatisAgentService;
-        }
-
-        myBatisAgentService = new MyBatisAgentService(Collections.singletonList(new MyBatisXmlListener()),
-                MyBatisBeanReloader.getInstance(), new HashMap<>());
         return myBatisAgentService;
     }
 
     @Override
-    public boolean isUseful() {
-        try {
-            Class.forName(SQL_SESSION_FACTORY_BEAN);
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-
-        return true;
+    public void init() {
+        listeners.add(new MyBatisXmlListener());
+        beanReloader = MyBatisBeanReloader.getInstance();
     }
 }

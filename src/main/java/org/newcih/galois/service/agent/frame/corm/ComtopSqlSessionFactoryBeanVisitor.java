@@ -23,14 +23,14 @@
 
 package org.newcih.galois.service.agent.frame.corm;
 
+import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.newcih.galois.service.agent.MethodAdapter;
 import org.newcih.galois.utils.GaloisLog;
-import org.objectweb.asm.MethodVisitor;
 
 import java.util.Objects;
 
+import static jdk.internal.org.objectweb.asm.Opcodes.*;
 import static org.newcih.galois.constants.ClassNameConstant.COMTOP_SQL_SESSION_FACTORY;
-import static org.objectweb.asm.Opcodes.*;
 
 public class ComtopSqlSessionFactoryBeanVisitor extends MethodAdapter {
 

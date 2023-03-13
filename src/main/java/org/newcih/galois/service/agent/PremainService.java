@@ -33,7 +33,11 @@ import org.newcih.galois.utils.JavaUtil;
 import org.newcih.galois.utils.StringUtil;
 
 import java.lang.instrument.Instrumentation;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 import static org.newcih.galois.constants.Constant.*;
 
@@ -58,14 +62,7 @@ public class PremainService {
      */
     public static void premain(String agentArgs, Instrumentation inst) {
         JavaUtil.inst = inst;
-
-        Map<String, MethodAdapter> methodAdapterMap = new HashMap<>(8);
-        List<FileChangedListener> listeners = new ArrayList<>(16);
-
-        agentServices.stream().filter(AgentService::isUseful).forEach(agentService -> {
-            methodAdapterMap.putAll(agentService.getClassNameToMethodMap());
-            listeners.addAll(agentService.getListeners());
-        });
+        CopyOnWriteArrayList<FileChangedListener> listeners = new CopyOnWriteArrayList<>();
 
         inst.addTransformer((loader, className, classBeingRedefined, protectionDomain, classfileBuffer) -> {
             if (StringUtil.isBlank(className)) {
@@ -73,9 +70,25 @@ public class PremainService {
             }
 
             String newClassName = className.replace(SLASH, DOT);
-            MethodAdapter methodAdapter = methodAdapterMap.get(newClassName);
-            if (methodAdapter != null && methodAdapter.isUseful()) {
-                return methodAdapter.transform();
+
+            for (AgentService agentService : agentServices) {
+                boolean checkedClass = agentService.checkAgentEnable(newClassName);
+                if (agentService.isUseful()) {
+                    listeners.addAll(agentService.getListeners());
+                    agentService.init();
+
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("register file watch listener {}",
+                                agentService.getListeners().stream().map(Objects::toString).collect(Collectors.joining(",")));
+                    }
+                }
+
+                if (!checkedClass) {
+                    continue;
+                }
+
+                MethodAdapter adapter = agentService.getAdapterMap().get(newClassName);
+                return adapter.transform();
             }
 
             return null;
@@ -84,7 +97,7 @@ public class PremainService {
         String rootPath = System.getProperty(USER_DIR);
         new FileWatchService(rootPath, listeners).start();
 
-        // banner should be printed after necessary process done
+        // banner should be printed after necessary processes done
         BannerService.printBanner();
     }
 

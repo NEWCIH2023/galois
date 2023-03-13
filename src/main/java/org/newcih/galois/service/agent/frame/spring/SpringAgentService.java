@@ -24,51 +24,35 @@
 package org.newcih.galois.service.agent.frame.spring;
 
 import org.newcih.galois.service.agent.AgentService;
-import org.newcih.galois.service.agent.BeanReloader;
-import org.newcih.galois.service.agent.FileChangedListener;
-import org.newcih.galois.service.agent.MethodAdapter;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Arrays;
 
 import static org.newcih.galois.constants.ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT;
 import static org.newcih.galois.constants.ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER;
 
 public class SpringAgentService extends AgentService {
 
-    private static SpringAgentService springAgent;
+    private static final SpringAgentService springAgent = new SpringAgentService();
 
-    private SpringAgentService(List<FileChangedListener> listener, BeanReloader<?> beanReloader, Map<String,
-            MethodAdapter> classNameToMethodMap) {
-        super(listener, beanReloader, classNameToMethodMap);
+    static {
+        necessaryClasses = Arrays.asList(CLASS_PATH_BEAN_DEFINITION_SCANNER,
+                ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT);
+    }
+
+    public SpringAgentService() {
+        adapterMap.put(CLASS_PATH_BEAN_DEFINITION_SCANNER,
+                new BeanDefinitionScannerVisitor());
+        adapterMap.put(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT,
+                new ApplicationContextVisitor());
     }
 
     public static SpringAgentService getInstance() {
-        if (springAgent != null) {
-            return springAgent;
-        }
-
-        Map<String, MethodAdapter> methodAdapterMap = new HashMap<>(8);
-        methodAdapterMap.put(CLASS_PATH_BEAN_DEFINITION_SCANNER, new BeanDefinitionScannerVisitor());
-        methodAdapterMap.put(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT,
-                new ApplicationContextVisitor());
-
-        springAgent = new SpringAgentService(Collections.singletonList(new SpringBeanListener()),
-                SpringBeanReloader.getInstance(), methodAdapterMap);
         return springAgent;
     }
 
     @Override
-    public boolean isUseful() {
-        try {
-            Class.forName(CLASS_PATH_BEAN_DEFINITION_SCANNER);
-            Class.forName(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT);
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-
-        return true;
+    public void init() {
+        listeners.add(new SpringBeanListener());
+        beanReloader = SpringBeanReloader.getInstance();
     }
 }

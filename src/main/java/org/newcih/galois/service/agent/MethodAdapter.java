@@ -23,16 +23,15 @@
 
 package org.newcih.galois.service.agent;
 
+import jdk.internal.org.objectweb.asm.ClassReader;
+import jdk.internal.org.objectweb.asm.ClassVisitor;
+import jdk.internal.org.objectweb.asm.ClassWriter;
 import org.newcih.galois.utils.GaloisLog;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
 
 import java.io.FileOutputStream;
-import java.util.Map;
 
+import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
 import static org.newcih.galois.constants.FileType.CLASS_FILE;
-import static org.objectweb.asm.Opcodes.ASM5;
 
 public abstract class MethodAdapter extends ClassVisitor {
 
@@ -49,19 +48,6 @@ public abstract class MethodAdapter extends ClassVisitor {
         }
 
         this.className = className;
-    }
-
-    /**
-     * register this method adapter to global context
-     *
-     * @param context
-     */
-    public void install(Map<String, MethodAdapter> context) {
-        if (context == null) {
-            return;
-        }
-
-        context.put(this.className, this);
     }
 
     /**

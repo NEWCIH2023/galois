@@ -23,10 +23,10 @@
 
 package org.newcih.galois.service.demo.asm;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.util.ASMifier;
-import org.objectweb.asm.util.Printer;
-import org.objectweb.asm.util.TraceClassVisitor;
+import jdk.internal.org.objectweb.asm.ClassReader;
+import jdk.internal.org.objectweb.asm.util.ASMifier;
+import jdk.internal.org.objectweb.asm.util.Printer;
+import jdk.internal.org.objectweb.asm.util.TraceClassVisitor;
 
 import java.io.IOException;
 import java.io.PrintWriter;

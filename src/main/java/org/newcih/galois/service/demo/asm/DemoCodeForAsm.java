@@ -24,7 +24,7 @@
 package org.newcih.galois.service.demo.asm;
 
 import org.newcih.galois.service.agent.frame.spring.SpringBeanReloader;
-import org.objectweb.asm.*;
+import jdk.internal.org.objectweb.asm.*;
 import org.springframework.context.ApplicationContext;
 
 import java.io.File;
@@ -33,7 +33,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-import static org.objectweb.asm.Opcodes.*;
+import static jdk.internal.org.objectweb.asm.Opcodes.*;
 
 public class DemoCodeForAsm {
 

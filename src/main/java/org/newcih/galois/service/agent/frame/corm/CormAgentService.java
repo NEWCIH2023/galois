@@ -24,46 +24,24 @@
 package org.newcih.galois.service.agent.frame.corm;
 
 import org.newcih.galois.service.agent.AgentService;
-import org.newcih.galois.service.agent.BeanReloader;
-import org.newcih.galois.service.agent.FileChangedListener;
-import org.newcih.galois.service.agent.MethodAdapter;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.newcih.galois.constants.ClassNameConstant.COMTOP_SQL_SESSION_FACTORY;
 
 public class CormAgentService extends AgentService {
 
-    private static CormAgentService cormAgentService;
+    private final static CormAgentService cormAgentService = new CormAgentService();
 
-    private CormAgentService(List<FileChangedListener> listener, BeanReloader<?> beanReloader, Map<String,
-            MethodAdapter> classNameToMethodMap) {
-        super(listener, beanReloader, classNameToMethodMap);
+    public CormAgentService() {
+        adapterMap.put(COMTOP_SQL_SESSION_FACTORY, new ComtopSqlSessionFactoryBeanVisitor());
     }
 
     public static CormAgentService getInstance() {
-        if (cormAgentService != null) {
-            return cormAgentService;
-        }
-
-        Map<String, MethodAdapter> methodAdapterMap = new HashMap<>(8);
-        methodAdapterMap.put(COMTOP_SQL_SESSION_FACTORY, new ComtopSqlSessionFactoryBeanVisitor());
-        cormAgentService = new CormAgentService(Collections.singletonList(new CormXmlListener()),
-                CormBeanReloader.getInstance(), methodAdapterMap);
         return cormAgentService;
     }
 
     @Override
-    public boolean isUseful() {
-        try {
-            Class.forName(COMTOP_SQL_SESSION_FACTORY);
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-
-        return true;
+    public void init() {
+        listeners.add(new CormXmlListener());
+        beanReloader = CormBeanReloader.getInstance();
     }
 }

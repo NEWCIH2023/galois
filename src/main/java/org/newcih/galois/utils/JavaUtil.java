@@ -23,7 +23,7 @@
 
 package org.newcih.galois.utils;
 
-import org.objectweb.asm.ClassReader;
+import jdk.internal.org.objectweb.asm.ClassReader;
 
 import javax.tools.*;
 import java.io.*;

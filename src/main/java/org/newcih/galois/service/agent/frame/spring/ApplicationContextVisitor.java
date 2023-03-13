@@ -26,11 +26,11 @@ package org.newcih.galois.service.agent.frame.spring;
 import org.newcih.galois.constants.ClassNameConstant;
 import org.newcih.galois.service.agent.MethodAdapter;
 import org.newcih.galois.utils.GaloisLog;
-import org.objectweb.asm.MethodVisitor;
+import jdk.internal.org.objectweb.asm.MethodVisitor;
 
 import java.util.Objects;
 
-import static org.objectweb.asm.Opcodes.*;
+import static jdk.internal.org.objectweb.asm.Opcodes.*;
 
 
 public class ApplicationContextVisitor extends MethodAdapter {

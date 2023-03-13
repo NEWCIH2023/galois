@@ -23,18 +23,26 @@
 
 package org.newcih.galois.service.agent.frame.corm;
 
+import com.comtop.corm.builder.xml.XMLMapperBuilder;
 import com.comtop.corm.builder.xml.XMLMapperEntityResolver;
-import com.comtop.corm.extend.xml.XMLMapperReload;
+import com.comtop.corm.executor.keygen.SelectKeyGenerator;
+import com.comtop.corm.mapping.MappedStatement;
 import com.comtop.corm.parsing.XNode;
 import com.comtop.corm.parsing.XPathParser;
+import com.comtop.corm.resource.core.io.FileSystemResource;
 import com.comtop.corm.session.Configuration;
 import org.newcih.galois.service.agent.BeanReloader;
 import org.newcih.galois.utils.GaloisLog;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.Properties;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.util.*;
 
+import static org.newcih.galois.constants.Constant.ID;
 import static org.newcih.galois.constants.Constant.NAMESPACE;
 
 /**
@@ -61,29 +69,138 @@ public class CormBeanReloader implements BeanReloader<File> {
     /**
      * 更新bean实例
      *
-     * @param newXMLFile
+     * @param mapperFile
      */
     @Override
-    public void updateBean(File newXMLFile) {
-        try (FileInputStream fis = new FileInputStream(newXMLFile)) {
+    public void updateBean(File mapperFile) {
+        try (FileInputStream fis = new FileInputStream(mapperFile)) {
             Properties variables = configuration.getVariables();
             XPathParser parser = new XPathParser(fis, true, variables, new XMLMapperEntityResolver());
             XNode context = parser.evalNode("/mapper");
             String namespace = context.getStringAttribute(NAMESPACE);
-            // clear cache
-            XMLMapperReload.parseSqlXml(namespace);
+            // 清空Mybatis缓存
+            clearMapperRegistry(namespace);
+            clearLoadedResources(mapperFile.getName());
+            clearCachedNames(namespace);
+            clearParameterMap(context.evalNodes("/mapper/parameterMap"), namespace);
+            clearResultMap(context.evalNodes("/mapper/resultMap"), namespace);
+            clearKeyGenerators(context.evalNodes("insert|update|select|delete"), namespace);
+            clearSqlElement(context.evalNodes("/mapper/sql"), namespace);
+            // 使MyBatis重新加载xml配置的mapper对象
+            reloadXML(mapperFile);
         } catch (Exception e) {
             logger.error("reload mybatis xml throw exception", e);
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("reload mybatis xml file {} success", newXMLFile.getName());
+            logger.debug("reload mybatis xml file {} success", mapperFile.getName());
         }
     }
 
     @Override
     public boolean isUseful(File file) {
         return true;
+    }
+
+    private void reloadXML(File mapperFile) throws IOException {
+        InputStream is = Files.newInputStream(mapperFile.toPath());
+        XMLMapperBuilder builder = new XMLMapperBuilder(is, getConfiguration(), mapperFile.getName(),
+                getConfiguration().getSqlFragments(), new FileSystemResource(mapperFile));
+        builder.parse();
+    }
+
+    @SuppressWarnings("unchecked")
+    private void clearMapperRegistry(String namespace) throws NoSuchFieldException, IllegalAccessException {
+//        Field field = MapperRegistry.class.getDeclaredField("knownMappers");
+//        field.setAccessible(true);
+//        Map<Class<?>, Object> mapConfig = (Map<Class<?>, Object>) field.get(getConfiguration().getmapp());
+//        Class<?> refreshKey = null;
+//
+//        for (Map.Entry<Class<?>, Object> item : mapConfig.entrySet()) {
+//            if (item.getKey().getName().contains(namespace)) {
+//                refreshKey = item.getKey();
+//                break;
+//            }
+//        }
+//
+//        if (refreshKey != null) {
+//            mapConfig.remove(refreshKey);
+//        }
+    }
+
+    @SuppressWarnings("rawtypes")
+    private void clearLoadedResources(String fileName) throws NoSuchFieldException, IllegalAccessException {
+        Field loadedResourcesField = getConfiguration().getClass().getDeclaredField("loadedResources");
+        loadedResourcesField.setAccessible(true);
+        Set loadedResourcesSet = (Set) loadedResourcesField.get(getConfiguration());
+        loadedResourcesSet.remove(fileName);
+    }
+
+    private void clearCachedNames(String namespace) {
+        getConfiguration().getCacheNames().remove(namespace);
+    }
+
+    private void clearParameterMap(List<XNode> list, String namespace) {
+        for (XNode xNode : list) {
+            String id = xNode.getStringAttribute(ID);
+            getConfiguration().getResultMapNames().remove(namespace + "." + id);
+        }
+    }
+
+    private void clearResultMap(List<XNode> list, String namespace) {
+        for (XNode xNode : list) {
+            String id = xNode.getStringAttribute(ID, xNode.getValueBasedIdentifier());
+            getConfiguration().getResultMapNames().remove(id);
+            getConfiguration().getResultMapNames().remove(namespace + "." + id);
+            clearResultMap(xNode, namespace);
+        }
+    }
+
+    private void clearResultMap(XNode xNode, String namespace) {
+        for (XNode child : xNode.getChildren()) {
+            if (Objects.equals("association", child.getName()) || Objects.equals("collection", child.getName()) || Objects.equals("case", child.getName())) {
+                if (child.getStringAttribute("select") == null) {
+                    getConfiguration().getResultMapNames().remove(child.getStringAttribute(ID,
+                            child.getValueBasedIdentifier()));
+                    getConfiguration().getResultMapNames().remove(namespace + "." + child.getStringAttribute(ID,
+                            child.getValueBasedIdentifier()));
+
+                    if (child.getChildren() != null && !child.getChildren().isEmpty()) {
+                        clearResultMap(child, namespace);
+                    }
+                }
+
+            }
+        }
+    }
+
+    private void clearKeyGenerators(List<XNode> list, String namespace) {
+        for (XNode xNode : list) {
+            String id = xNode.getStringAttribute(ID);
+            getConfiguration().getKeyGeneratorNames().remove(id + SelectKeyGenerator.SELECT_KEY_SUFFIX);
+            getConfiguration().getKeyGeneratorNames().remove(namespace + "." + id + SelectKeyGenerator.SELECT_KEY_SUFFIX);
+
+            Collection<MappedStatement> mappedStatements = getConfiguration().getMappedStatements();
+            List<MappedStatement> tempStatements = new ArrayList<>(64);
+
+            for (MappedStatement statement : mappedStatements) {
+                if (statement != null) {
+                    if (Objects.equals(statement.getId(), namespace + "." + id)) {
+                        tempStatements.add(statement);
+                    }
+                }
+            }
+
+            mappedStatements.removeAll(tempStatements);
+        }
+    }
+
+    private void clearSqlElement(List<XNode> list, String namespace) {
+        for (XNode xNode : list) {
+            String id = xNode.getStringAttribute(ID);
+            getConfiguration().getSqlFragments().remove(id);
+            getConfiguration().getSqlFragments().remove(namespace + "." + id);
+        }
     }
 
     public Configuration getConfiguration() {

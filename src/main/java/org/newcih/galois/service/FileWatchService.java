@@ -33,8 +33,6 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static com.sun.nio.file.SensitivityWatchEventModifier.MEDIUM;
 import static java.nio.file.StandardWatchEventKinds.*;
@@ -72,13 +70,7 @@ public class FileWatchService {
      */
     private void registerWatchService(File dir) throws IOException {
         dir.toPath().register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE}, MEDIUM);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("monitor directory ==> {}", dir);
-        }
-
         File[] subDirs = dir.listFiles(File::isDirectory);
-
         if (subDirs == null) {
             return;
         }
@@ -101,14 +93,6 @@ public class FileWatchService {
     }
 
     public void start() {
-        if (listeners == null || listeners.isEmpty()) {
-            logger.warn("file change listener list is empty, do not start file watch service");
-            return;
-        }
-
-        String listenerNames = listeners.stream().map(Objects::toString).collect(Collectors.joining(","));
-        logger.info("{} listeners [{}] is registered!", listeners.size(), listenerNames);
-
         try {
             watchThread = new Thread(() -> {
                 while (true) {

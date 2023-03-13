@@ -23,24 +23,48 @@
 
 package org.newcih.galois.service.agent;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public abstract class AgentService {
-
-    private final List<FileChangedListener> listeners;
-    private final BeanReloader<?> beanReloader;
-    private final Map<String, MethodAdapter> classNameToMethodMap;
-
-    public AgentService(List<FileChangedListener> listeners, BeanReloader<?> beanReloader,
-                        Map<String, MethodAdapter> classNameToMethodMap) {
-        this.listeners = listeners;
-        this.beanReloader = beanReloader;
-        this.classNameToMethodMap = classNameToMethodMap;
-    }
+    /**
+     * 文件变更监听器列表
+     */
+    protected List<FileChangedListener> listeners = new ArrayList<>(4);
+    /**
+     * 对应的Bean重载的service
+     */
+    protected BeanReloader<?> beanReloader;
+    /**
+     * 类名到MethodAdapter的映射
+     */
+    protected Map<String, MethodAdapter> adapterMap = new HashMap<>(4);
+    /**
+     * 是否启用该AgentService，当该变量值与necessaryClasses的大小一致时，表示该AgentService启用
+     */
+    private int enabled;
+    protected static List<String> necessaryClasses = new ArrayList<>(8);
 
     public boolean isUseful() {
-        return true;
+        return enabled == necessaryClasses.size();
+    }
+
+    /**
+     * 通过getInstance获取对象时，不应该执行初始化步骤，有些特殊依赖的类此时并不会存在，因为这个AgentService
+     * 不一定会被启用，所以项目中也不一定存在对应的import的类。所以要等到isUseful为true的时候，才来执行init方法，
+     * 完成AgentService的初始化
+     */
+    public abstract void init();
+
+    public boolean checkAgentEnable(String loadedClassName) {
+        if (necessaryClasses.contains(loadedClassName)) {
+            enabled++;
+            return true;
+        }
+
+        return false;
     }
 
     public List<FileChangedListener> getListeners() {
@@ -51,7 +75,7 @@ public abstract class AgentService {
         return beanReloader;
     }
 
-    public Map<String, MethodAdapter> getClassNameToMethodMap() {
-        return classNameToMethodMap;
+    public Map<String, MethodAdapter> getAdapterMap() {
+        return adapterMap;
     }
 }
