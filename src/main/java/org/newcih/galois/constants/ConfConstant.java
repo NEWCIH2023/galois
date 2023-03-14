@@ -27,6 +27,6 @@ public class ConfConstant {
 
     public static final String LOGGING_ENABLED = "logging.enabled";
     public static final String LOGGING_LEVEL = "logging.level";
-    public static final String SOURCE_CODE_PATH = "-sourceCodePath:";
-
+    public static final String RELOADER_SPRING_ENABLED = "reloader.spring.enabled";
+    public static final String RELOADER_MYBATIS_ENABLED = "reloader.mybatis.enabled";
 }
