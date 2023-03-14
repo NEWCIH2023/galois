@@ -84,7 +84,6 @@ public class CormBeanReloader implements BeanReloader<File> {
             clearCachedNames(namespace);
             clearParameterMap(context.evalNodes("/mapper/parameterMap"), namespace);
             clearResultMap(context.evalNodes("/mapper/resultMap"), namespace);
-            clearKeyGenerators(context.evalNodes("insert|update|select|delete"), namespace);
             clearSqlElement(context.evalNodes("/mapper/sql"), namespace);
             // 使MyBatis重新加载xml配置的mapper对象
             reloadXML(mapperFile);
@@ -171,27 +170,6 @@ public class CormBeanReloader implements BeanReloader<File> {
                 }
 
             }
-        }
-    }
-
-    private void clearKeyGenerators(List<XNode> list, String namespace) {
-        for (XNode xNode : list) {
-            String id = xNode.getStringAttribute(ID);
-            getConfiguration().getKeyGeneratorNames().remove(id + SelectKeyGenerator.SELECT_KEY_SUFFIX);
-            getConfiguration().getKeyGeneratorNames().remove(namespace + "." + id + SelectKeyGenerator.SELECT_KEY_SUFFIX);
-
-            Collection<MappedStatement> mappedStatements = getConfiguration().getMappedStatements();
-            List<MappedStatement> tempStatements = new ArrayList<>(64);
-
-            for (MappedStatement statement : mappedStatements) {
-                if (statement != null) {
-                    if (Objects.equals(statement.getId(), namespace + "." + id)) {
-                        tempStatements.add(statement);
-                    }
-                }
-            }
-
-            mappedStatements.removeAll(tempStatements);
         }
     }
 
