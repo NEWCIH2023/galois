@@ -50,6 +50,13 @@
         <!--            <artifactId>tools</artifactId>-->
         <!--            <version>1.8</version>-->
         <!--        </dependency>-->
+        <dependency>
+            <groupId>groupid</groupId>
+            <artifactId>artifiactId</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${java.home}/lib/rt.jar</systemPath>
+        </dependency>
 
         <!--   打包时需要检测rt.jar的存在，因此自己通过项目lib库添加上rt.jar，让打包检测通过就行，实际运行时依赖运行时环境的rt.jar  -->
 
@@ -134,15 +141,17 @@
 
     <build>
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <compilerArguments>
-                        <bootclasspath>${java.home}/lib/rt.jar</bootclasspath>
-                    </compilerArguments>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <compilerArgs>
+                        <arg>-XDignore.symbol.file</arg>
+                    </compilerArgs>
+                    <fork>true</fork>
                 </configuration>
             </plugin>
 
@@ -164,9 +173,6 @@
                             <Premain-Class>org.newcih.galois.service.agent.PremainService</Premain-Class>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
-                            <Boot-Class-Path>
-                                ${java.home}${file.separator}jre${file.separator}lib${file.separator}rt.jar
-                            </Boot-Class-Path>
                         </manifestEntries>
                     </archive>
                 </configuration>

@@ -31,11 +31,8 @@ public class MyBatisAgentService extends AgentService {
 
     private final static MyBatisAgentService myBatisAgentService = new MyBatisAgentService();
 
-    static {
+    private MyBatisAgentService() {
         necessaryClasses.add(SQL_SESSION_FACTORY_BEAN);
-    }
-
-    public MyBatisAgentService() {
     }
 
     public static MyBatisAgentService getInstance() {
@@ -44,6 +41,7 @@ public class MyBatisAgentService extends AgentService {
 
     @Override
     public void init() {
+        super.init();
         listeners.add(new MyBatisXmlListener());
         beanReloader = MyBatisBeanReloader.getInstance();
     }

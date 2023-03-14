@@ -25,14 +25,12 @@ package org.newcih.galois.utils;
 
 import jdk.internal.org.objectweb.asm.ClassReader;
 
-import javax.tools.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.lang.instrument.Instrumentation;
-import java.net.URI;
-import java.nio.CharBuffer;
 import java.nio.file.Files;
-import java.util.Collections;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,14 +42,14 @@ public class JavaUtil {
 
     private static final GaloisLog logger = GaloisLog.getLogger(JavaUtil.class);
     private static final String compileDir;
-    private static final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-    private static final StandardJavaFileManager standardJavaFileManager;
+    //    private static final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+//    private static final StandardJavaFileManager standardJavaFileManager;
     public static Instrumentation inst;
     private static final Pattern packagePattern = Pattern.compile("^package +(\\S+);");
     private static final Pattern classNamePattern = Pattern.compile("class +([\\S&&[^<]]+)");
 
     static {
-        standardJavaFileManager = compiler.getStandardFileManager(null, null, null);
+//        standardJavaFileManager = compiler.getStandardFileManager(null, null, null);
 
         compileDir = System.getProperty("java.io.tmpdir") + File.separator + "GaloisCompile" + File.separator;
         File directory = new File(compileDir);
@@ -139,81 +137,80 @@ public class JavaUtil {
      * @param sourceFile
      * @return
      */
-    public static byte[] compileSource(File sourceFile) {
-        MemoryJavaFileManager manager = new MemoryJavaFileManager(standardJavaFileManager);
-        String sourceCode = FileUtil.readTextFile(sourceFile);
-        JavaFileObject javaFileObject = manager.makeStringSource(sourceFile.getName(), sourceCode);
-        List<JavaFileObject> fileObjectList = Collections.singletonList(javaFileObject);
-        // if null then print message
-        DiagnosticCollector diagnosticCollector = null;
-        JavaCompiler.CompilationTask task = compiler.getTask(null, manager, diagnosticCollector, null, null,
-                fileObjectList);
-        Boolean result = task.call();
+//    public static byte[] compileSource(File sourceFile) {
+//        MemoryJavaFileManager manager = new MemoryJavaFileManager(standardJavaFileManager);
+//        String sourceCode = FileUtil.readTextFile(sourceFile);
+//        JavaFileObject javaFileObject = manager.makeStringSource(sourceFile.getName(), sourceCode);
+//        List<JavaFileObject> fileObjectList = Collections.singletonList(javaFileObject);
+//        DiagnosticCollector diagnosticCollector = null;
+//        JavaCompiler.CompilationTask task = compiler.getTask(null, manager, diagnosticCollector, null, null,
+//                fileObjectList);
+//        Boolean result = task.call();
+//
+//        if (result == null || !result) {
+//            logger.error("compile source file failed ==> {}", sourceFile.getName());
+//        }
+//
+//        return manager.getClassBytes();
+//    }
 
-        if (result == null || !result) {
-            logger.error("compile source file failed ==> {}", sourceFile.getName());
-        }
-
-        return manager.getClassBytes();
-    }
-
-    private static class MemoryJavaFileManager extends ForwardingJavaFileManager<JavaFileManager> {
-        byte[] classBytes = new byte[0];
-
-        protected MemoryJavaFileManager(JavaFileManager fileManager) {
-            super(fileManager);
-        }
-
-        public byte[] getClassBytes() {
-            return classBytes;
-        }
-
-        @Override
-        public JavaFileObject getJavaFileForOutput(Location location, String className, JavaFileObject.Kind kind,
-                                                   FileObject sibling) throws IOException {
-            if (kind == JavaFileObject.Kind.CLASS) {
-                return new MemoryOutputJavaFileObject(className);
-            } else {
-                return super.getJavaFileForOutput(location, className, kind, sibling);
-            }
-        }
-
-        JavaFileObject makeStringSource(String name, String code) {
-            return new MemoryInputJavaFileObject(name, code);
-        }
-
-        static class MemoryInputJavaFileObject extends SimpleJavaFileObject {
-            final String code;
-
-            protected MemoryInputJavaFileObject(String name, String code) {
-                super(URI.create("string:///" + name), Kind.SOURCE);
-                this.code = code;
-            }
-
-            @Override
-            public CharSequence getCharContent(boolean ignoreEncodingErrors) {
-                return CharBuffer.wrap(code);
-            }
-        }
-
-        class MemoryOutputJavaFileObject extends SimpleJavaFileObject {
-
-            protected MemoryOutputJavaFileObject(String name) {
-                super(URI.create("string:///" + name), Kind.CLASS);
-            }
-
-            @Override
-            public OutputStream openOutputStream() {
-                return new FilterOutputStream(new ByteArrayOutputStream()) {
-                    @Override
-                    public void close() throws IOException {
-                        out.close();
-                        ByteArrayOutputStream bos = (ByteArrayOutputStream) out;
-                        classBytes = bos.toByteArray();
-                    }
-                };
-            }
-        }
-    }
+//    private static class MemoryJavaFileManager extends ForwardingJavaFileManager<JavaFileManager> {
+//        byte[] classBytes = new byte[0];
+//
+//        protected MemoryJavaFileManager(JavaFileManager fileManager) {
+//            super(fileManager);
+//        }
+//
+//        public byte[] getClassBytes() {
+//            return classBytes;
+//        }
+//
+//        @Override
+//        public JavaFileObject getJavaFileForOutput(Location location, String className, JavaFileObject.Kind kind,
+//                                                   FileObject sibling) throws IOException {
+//            if (kind == JavaFileObject.Kind.CLASS) {
+//                return new MemoryOutputJavaFileObject(className);
+//            } else {
+//                return super.getJavaFileForOutput(location, className, kind, sibling);
+//            }
+//        }
+//
+//        JavaFileObject makeStringSource(String name, String code) {
+//            return new MemoryInputJavaFileObject(name, code);
+//        }
+//
+//        static class MemoryInputJavaFileObject extends SimpleJavaFileObject {
+//            final String code;
+//
+//            protected MemoryInputJavaFileObject(String name, String code) {
+//                super(URI.create("string:///" + name), Kind.SOURCE);
+//                this.code = code;
+//            }
+//
+//            @Override
+//            public CharSequence getCharContent(boolean ignoreEncodingErrors) {
+//                return CharBuffer.wrap(code);
+//            }
+//        }
+//
+//        class MemoryOutputJavaFileObject extends SimpleJavaFileObject {
+//
+//            protected MemoryOutputJavaFileObject(String name) {
+//                super(URI.create("string:///" + name), Kind.CLASS);
+//            }
+//
+//            @Override
+//            public OutputStream openOutputStream() {
+//                return new FilterOutputStream(new ByteArrayOutputStream()) {
+//                    @Override
+//                    public void close() throws IOException {
+//                        out.close();
+//                        ByteArrayOutputStream bos = (ByteArrayOutputStream) out;
+//                        classBytes = bos.toByteArray();
+//                    }
+//                };
+//            }
+//        }
+//}
 
 }

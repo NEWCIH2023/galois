@@ -34,16 +34,13 @@ public class SpringAgentService extends AgentService {
 
     private static final SpringAgentService springAgent = new SpringAgentService();
 
-    static {
-        necessaryClasses = Arrays.asList(CLASS_PATH_BEAN_DEFINITION_SCANNER,
-                ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT);
-    }
-
-    public SpringAgentService() {
+    private SpringAgentService() {
         adapterMap.put(CLASS_PATH_BEAN_DEFINITION_SCANNER,
                 new BeanDefinitionScannerVisitor());
         adapterMap.put(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT,
                 new ApplicationContextVisitor());
+        necessaryClasses.addAll(Arrays.asList(CLASS_PATH_BEAN_DEFINITION_SCANNER,
+                ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT));
     }
 
     public static SpringAgentService getInstance() {
@@ -52,6 +49,7 @@ public class SpringAgentService extends AgentService {
 
     @Override
     public void init() {
+        super.init();
         listeners.add(new SpringBeanListener());
         beanReloader = SpringBeanReloader.getInstance();
     }

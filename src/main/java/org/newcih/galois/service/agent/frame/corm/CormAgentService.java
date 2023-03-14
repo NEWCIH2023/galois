@@ -31,7 +31,7 @@ public class CormAgentService extends AgentService {
 
     private final static CormAgentService cormAgentService = new CormAgentService();
 
-    public CormAgentService() {
+    private CormAgentService() {
         adapterMap.put(COMTOP_SQL_SESSION_FACTORY, new ComtopSqlSessionFactoryBeanVisitor());
     }
 
@@ -41,6 +41,7 @@ public class CormAgentService extends AgentService {
 
     @Override
     public void init() {
+        super.init();
         listeners.add(new CormXmlListener());
         beanReloader = CormBeanReloader.getInstance();
     }

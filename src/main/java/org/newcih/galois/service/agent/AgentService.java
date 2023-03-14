@@ -45,7 +45,8 @@ public abstract class AgentService {
      * 是否启用该AgentService，当该变量值与necessaryClasses的大小一致时，表示该AgentService启用
      */
     private int enabled;
-    protected static List<String> necessaryClasses = new ArrayList<>(8);
+    private boolean inited;
+    protected List<String> necessaryClasses = new ArrayList<>(8);
 
     public boolean isUseful() {
         return enabled == necessaryClasses.size();
@@ -56,8 +57,17 @@ public abstract class AgentService {
      * 不一定会被启用，所以项目中也不一定存在对应的import的类。所以要等到isUseful为true的时候，才来执行init方法，
      * 完成AgentService的初始化
      */
-    public abstract void init();
+    public void init() {
+        inited = true;
+    }
 
+    /**
+     * 检测到当前已经加载了名为loadedClassName的类时，则更新该AgentService的enabled值，使其++，当enabled值等于
+     * necessaryClasses的大小时，表示该agentService正式启用
+     *
+     * @param loadedClassName
+     * @return
+     */
     public boolean checkAgentEnable(String loadedClassName) {
         if (necessaryClasses.contains(loadedClassName)) {
             enabled++;
@@ -77,5 +87,13 @@ public abstract class AgentService {
 
     public Map<String, MethodAdapter> getAdapterMap() {
         return adapterMap;
+    }
+
+    public boolean isInited() {
+        return inited;
+    }
+
+    public void setInited(boolean inited) {
+        this.inited = inited;
     }
 }

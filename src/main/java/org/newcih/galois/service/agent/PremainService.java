@@ -37,12 +37,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.joining;
 import static org.newcih.galois.constants.Constant.*;
 
 /**
- *
+ * premain agent服务入口
  */
 public class PremainService {
 
@@ -73,16 +73,20 @@ public class PremainService {
 
             for (AgentService agentService : agentServices) {
                 boolean checkedClass = agentService.checkAgentEnable(newClassName);
-                if (agentService.isUseful()) {
-                    listeners.addAll(agentService.getListeners());
+                if (agentService.isUseful() && !agentService.isInited()) {
                     agentService.init();
+                    listeners.addAll(agentService.getListeners());
 
                     if (logger.isDebugEnabled()) {
-                        logger.debug("register file watch listener {}",
-                                agentService.getListeners().stream().map(Objects::toString).collect(Collectors.joining(",")));
+                        String listenerNames = agentService.getListeners().stream()
+                                .map(Objects::toString)
+                                .collect(joining(","));
+                        logger.debug("register file watch listener {}", listenerNames);
                     }
                 }
 
+                // checkedClass表示当前加载的类newClassName是否有对应的MethodAdapter，当为false时，表示没有对应的MethodAdapter，
+                // 这时候就直接跳过
                 if (!checkedClass) {
                     continue;
                 }
