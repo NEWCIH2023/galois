@@ -47,7 +47,7 @@ import java.util.*;
  */
 public class MyBatisBeanReloader implements BeanReloader<File> {
 
-    public static final MyBatisBeanReloader mybatisBeanReloder = new MyBatisBeanReloader();
+    private static final MyBatisBeanReloader mybatisBeanReloder = new MyBatisBeanReloader();
     private static final GaloisLog logger = GaloisLog.getLogger(MyBatisBeanReloader.class);
     protected Configuration configuration;
 
@@ -69,9 +69,9 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
      * @param newXMLFile
      */
     @Override
-    public void updateBean(File newXMLFile) {
+    public void updateBean(File xmlFile) {
 
-        try (FileInputStream fis = new FileInputStream(newXMLFile)) {
+        try (FileInputStream fis = new FileInputStream(xmlFile)) {
 
             XPathParser parser = new XPathParser(fis, true, configuration.getVariables(),
                     new XMLMapperEntityResolver());
@@ -79,20 +79,20 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
             String namespace = context.getStringAttribute("namespace");
             // clear cache
             clearMapperRegistry(namespace);
-            clearLoadedResources(newXMLFile.getName());
+            clearLoadedResources(xmlFile.getName());
             clearCachedNames(namespace);
             clearParameterMap(context.evalNodes("/mapper/parameterMap"), namespace);
             clearResultMap(context.evalNodes("/mapper/resultMap"), namespace);
             clearKeyGenerators(context.evalNodes("insert|update|select|delete"), namespace);
             clearSqlElement(context.evalNodes("/mapper/sql"), namespace);
             // reparse mybatis mapper xml file
-            reloadXML(newXMLFile);
+            reloadXML(xmlFile);
         } catch (Exception e) {
             logger.error("reload mybatis xml throw exception", e);
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("reload mybatis xml file {} success", newXMLFile.getName());
+            logger.debug("reload mybatis xml file {} success", xmlFile.getName());
         }
     }
 
