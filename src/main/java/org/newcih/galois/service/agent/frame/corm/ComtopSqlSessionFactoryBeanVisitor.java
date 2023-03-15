@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,23 +22,23 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent.frame.mybatis;
+package org.newcih.galois.service.agent.frame.corm;
 
+import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.newcih.galois.service.agent.MethodAdapter;
 import org.newcih.galois.utils.GaloisLog;
-import org.objectweb.asm.MethodVisitor;
 
 import java.util.Objects;
 
-import static org.newcih.galois.constants.ClassNameConstant.DEFAULT_SQL_SESSION_FACTORY;
-import static org.objectweb.asm.Opcodes.*;
+import static jdk.internal.org.objectweb.asm.Opcodes.*;
+import static org.newcih.galois.constants.ClassNameConstant.COMTOP_SQL_SESSION_FACTORY;
 
-public class SqlSessionFactoryBeanVisitor extends MethodAdapter {
+public class ComtopSqlSessionFactoryBeanVisitor extends MethodAdapter {
 
-    private static final GaloisLog logger = GaloisLog.getLogger(SqlSessionFactoryBeanVisitor.class);
+    private static final GaloisLog logger = GaloisLog.getLogger(ComtopSqlSessionFactoryBeanVisitor.class);
 
-    public SqlSessionFactoryBeanVisitor() {
-        super(DEFAULT_SQL_SESSION_FACTORY);
+    public ComtopSqlSessionFactoryBeanVisitor() {
+        super(COMTOP_SQL_SESSION_FACTORY);
     }
 
     @Override
@@ -47,15 +48,10 @@ public class SqlSessionFactoryBeanVisitor extends MethodAdapter {
         MethodVisitor mv = cv.visitMethod(access, name, descriptor, signature, exceptions);
 
         if (Objects.equals("<init>", name)) {
-            return new ConstructorVisitor(ASM5, mv);
+            return new ComtopSqlSessionFactoryBeanVisitor.ConstructorVisitor(ASM5, mv);
         }
 
         return mv;
-    }
-
-    @Override
-    public boolean usable() {
-        return true;
     }
 
     /**
@@ -70,7 +66,7 @@ public class SqlSessionFactoryBeanVisitor extends MethodAdapter {
         @Override
         public void visitInsn(int opcode) {
             if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-                String reloaderClassName = MyBatisBeanReloader.class.getName().replace(".", "/");
+                String reloaderClassName = CormBeanReloader.class.getName().replace(".", "/");
 
                 mv.visitCode();
                 mv.visitVarInsn(ALOAD, 0);
@@ -78,17 +74,16 @@ public class SqlSessionFactoryBeanVisitor extends MethodAdapter {
                         false);
                 mv.visitVarInsn(ALOAD, 1);
                 mv.visitMethodInsn(INVOKEVIRTUAL, reloaderClassName,
-                        "setConfiguration", "(Lorg/apache/ibatis/session/Configuration;)V", false);
+                        "setConfiguration", "(Lcom/comtop/corm/session/Configuration;)V", false);
                 mv.visitInsn(RETURN);
                 mv.visitMaxs(2, 2);
                 mv.visitEnd();
 
                 if (logger.isDebugEnabled()) {
-                    logger.debug("injected sqlSessionFactoryBean constructor by ASM success!");
+                    logger.debug("injected corm sqlSessionFactoryBean constructor by ASM success!");
                 }
 
             }
         }
     }
-
 }

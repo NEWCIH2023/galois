@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,30 +22,28 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service;
+package org.newcih.galois.service.agent.frame.corm;
 
-import org.newcih.galois.utils.GaloisLog;
+import org.newcih.galois.service.agent.AgentService;
 
-import static org.newcih.galois.constants.Constant.USER_DIR;
+import static org.newcih.galois.constants.ClassNameConstant.COMTOP_SQL_SESSION_FACTORY;
 
-/**
- * project file manager
- */
-public class ProjectFileManager {
+public class CormAgentService extends AgentService {
 
-    private static final GaloisLog logger = GaloisLog.getLogger(ProjectFileManager.class);
-    private static final ProjectFileManager manager = new ProjectFileManager();
-    private final String sourcePath;
+    private final static CormAgentService cormAgentService = new CormAgentService();
 
-    private ProjectFileManager() {
-        this.sourcePath = System.getProperty(USER_DIR);
+    private CormAgentService() {
+        adapterMap.put(COMTOP_SQL_SESSION_FACTORY, new ComtopSqlSessionFactoryBeanVisitor());
     }
 
-    public static ProjectFileManager getInstance() {
-        return manager;
+    public static CormAgentService getInstance() {
+        return cormAgentService;
     }
 
-    public String getSourcePath() {
-        return sourcePath;
+    @Override
+    public void init() {
+        super.init();
+        listeners.add(new CormXmlListener());
+        beanReloader = CormBeanReloader.getInstance();
     }
 }

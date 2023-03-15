@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,24 +24,21 @@
 
 package org.newcih.galois.utils;
 
-import java.io.File;
+public class StringUtil {
 
-public class FileUtils {
-
-    public static String getFileType(File file) {
-        if (file == null) {
-            return "";
-        }
-
-        String name = file.getName();
-        int index = name.lastIndexOf(".");
-
-        if (index != -1) {
-            String fileType = name.substring(index);
-            return fileType.toLowerCase();
-        }
-
-        return "";
+    public static boolean isBlank(String str) {
+        return isEmpty(str) || "".equals(str.trim());
     }
 
+    public static boolean isEmpty(String str) {
+        return str == null || "".equals(str);
+    }
+
+    public static boolean isNotBlank(String str) {
+        return !isNotBlank(str);
+    }
+
+    public static boolean isNotEmpty(String str) {
+        return !isEmpty(str);
+    }
 }

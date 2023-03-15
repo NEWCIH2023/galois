@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,14 +22,43 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.constants;
+package org.newcih.galois.service.agent;
 
-public class FileTypeConstant {
+import java.io.File;
 
-    public static final String CLASS_FILE = ".class";
+/**
+ * 文件变动监听
+ */
+public interface FileChangedListener {
 
-    public static final String XML_FILE = ".xml";
 
-    public static final String JAVA_FILE = ".java";
+    /**
+     * is listener useful for this file object
+     *
+     * @param file
+     * @return
+     */
+    boolean isUseful(File file);
+
+    /**
+     * handler for file created
+     *
+     * @param file
+     */
+    void createdHandle(File file);
+
+    /**
+     * handler for file modifed
+     *
+     * @param file
+     */
+    void modifiedHandle(File file);
+
+    /**
+     * handler for file deleted
+     *
+     * @param file
+     */
+    void deletedHandle(File file);
 
 }

@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,23 +24,19 @@
 
 package org.newcih.galois.service.agent;
 
-import org.apache.commons.io.IOUtils;
-import org.newcih.galois.service.ProjectFileManager;
+import jdk.internal.org.objectweb.asm.ClassReader;
+import jdk.internal.org.objectweb.asm.ClassVisitor;
+import jdk.internal.org.objectweb.asm.ClassWriter;
 import org.newcih.galois.utils.GaloisLog;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
 
 import java.io.FileOutputStream;
-import java.util.Map;
 
-import static org.newcih.galois.constants.FileTypeConstant.CLASS_FILE;
-import static org.objectweb.asm.Opcodes.ASM5;
+import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
+import static org.newcih.galois.constants.FileType.CLASS_FILE;
 
-public class MethodAdapter extends ClassVisitor {
+public abstract class MethodAdapter extends ClassVisitor {
 
     private static final GaloisLog logger = GaloisLog.getLogger(MethodAdapter.class);
-    protected static final ProjectFileManager fileManager = ProjectFileManager.getInstance();
     protected final String className;
     protected ClassReader cr;
     protected ClassWriter cw;
@@ -52,27 +49,6 @@ public class MethodAdapter extends ClassVisitor {
         }
 
         this.className = className;
-
-        try {
-            this.cr = new ClassReader(className);
-            this.cw = new ClassWriter(cr, ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
-            this.cv = this.cw;
-        } catch (Exception e) {
-            logger.error("create new methodadapter for class {} failed!", className, e);
-        }
-    }
-
-    /**
-     * register this method adapter to global context
-     *
-     * @param context
-     */
-    public void install(Map<String, MethodAdapter> context) {
-        if (context == null) {
-            return;
-        }
-
-        context.put(this.className, this);
     }
 
     /**
@@ -81,13 +57,22 @@ public class MethodAdapter extends ClassVisitor {
      * @return
      */
     public byte[] transform() {
+
+        try {
+            cr = new ClassReader(className);
+            cw = new ClassWriter(cr, ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
+            cv = this.cw;
+        } catch (Exception e) {
+            logger.error("create new methodadapter for class {} failed!", className, e);
+        }
+
         cr.accept(this, 0);
         byte[] result = cw.toByteArray();
 
         if (logger.isDebugEnabled()) {
-            String tempClassFile = "" + getClass().getSimpleName() + CLASS_FILE;
+            String tempClassFile = "" + getClass().getSimpleName() + CLASS_FILE.getFileType();
             try (FileOutputStream fos = new FileOutputStream(tempClassFile)) {
-                IOUtils.write(result, fos);
+                fos.write(result);
             } catch (Throwable e) {
                 logger.error("dump injected class file error", e);
             }
@@ -101,7 +86,7 @@ public class MethodAdapter extends ClassVisitor {
      *
      * @return
      */
-    public boolean usable() {
+    public boolean isUseful() {
         return true;
     }
 }

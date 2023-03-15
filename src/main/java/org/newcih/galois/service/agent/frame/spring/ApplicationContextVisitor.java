@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,11 +27,11 @@ package org.newcih.galois.service.agent.frame.spring;
 import org.newcih.galois.constants.ClassNameConstant;
 import org.newcih.galois.service.agent.MethodAdapter;
 import org.newcih.galois.utils.GaloisLog;
-import org.objectweb.asm.MethodVisitor;
+import jdk.internal.org.objectweb.asm.MethodVisitor;
 
 import java.util.Objects;
 
-import static org.objectweb.asm.Opcodes.*;
+import static jdk.internal.org.objectweb.asm.Opcodes.*;
 
 
 public class ApplicationContextVisitor extends MethodAdapter {
@@ -68,7 +69,7 @@ public class ApplicationContextVisitor extends MethodAdapter {
                 mv.visitVarInsn(ALOAD, 0);
                 mv.visitTypeInsn(CHECKCAST, "org/springframework/context/ApplicationContext");
                 mv.visitMethodInsn(INVOKEVIRTUAL, reloaderClassName,
-                        "setApplicationContext", "(Lorg/springframework/context/ApplicationContext;)V", false);
+                        "setContext", "(Lorg/springframework/context/ApplicationContext;)V", false);
 
                 if (logger.isDebugEnabled()) {
                     logger.debug("injected applicationContext constructor by ASM success!");

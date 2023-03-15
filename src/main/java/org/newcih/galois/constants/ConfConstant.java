@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,7 +27,7 @@ package org.newcih.galois.constants;
 public class ConfConstant {
 
     public static final String LOGGING_ENABLED = "logging.enabled";
-
     public static final String LOGGING_LEVEL = "logging.level";
-
+    public static final String RELOADER_SPRING_BOOT_ENABLED = "reloader.spring.boot.enabled";
+    public static final String RELOADER_MYBATIS_ENABLED = "reloader.mybatis.enabled";
 }

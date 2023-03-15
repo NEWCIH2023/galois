@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,34 +22,36 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.watch.frame.spring;
+package org.newcih.galois.service.agent.frame.spring;
 
-import org.newcih.galois.service.watch.frame.FileChangedListener;
+import org.newcih.galois.service.agent.AgentService;
 
-import java.io.File;
+import java.util.Arrays;
 
-/**
- * Spring的XML配置文件变更监听处理
- */
-public class SpringXmlListener implements FileChangedListener {
+import static org.newcih.galois.constants.ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT;
+import static org.newcih.galois.constants.ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER;
 
-    @Override
-    public boolean validFile(File file) {
-        return false;
+public class SpringAgentService extends AgentService {
+
+    private static final SpringAgentService springAgent = new SpringAgentService();
+
+    private SpringAgentService() {
+        adapterMap.put(CLASS_PATH_BEAN_DEFINITION_SCANNER,
+                new BeanDefinitionScannerVisitor());
+        adapterMap.put(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT,
+                new ApplicationContextVisitor());
+        necessaryClasses.addAll(Arrays.asList(CLASS_PATH_BEAN_DEFINITION_SCANNER,
+                ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT));
+    }
+
+    public static SpringAgentService getInstance() {
+        return springAgent;
     }
 
     @Override
-    public void fileCreatedHandle(File file) {
-
-    }
-
-    @Override
-    public void fileModifiedHandle(File file) {
-
-    }
-
-    @Override
-    public void fileDeletedHandle(File file) {
-
+    public void init() {
+        super.init();
+        listeners.add(new SpringBeanListener());
+        beanReloader = SpringBeanReloader.getInstance();
     }
 }

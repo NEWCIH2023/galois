@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,8 +28,10 @@ public final class ClassNameConstant {
     /**
      * SqlSessionBean管理工厂类
      */
-    public static final String DEFAULT_SQL_SESSION_FACTORY =
-            "org.apache.ibatis.session.defaults.DefaultSqlSessionFactory";
+    public static final String SQL_SESSION_FACTORY_BEAN =
+            "org.mybatis.spring.SqlSessionFactoryBean";
+
+    public static final String COMTOP_SQL_SESSION_FACTORY = "com.comtop.corm.session.defaults.DefaultSqlSessionFactory";
     /**
      * Bean扫描服务类
      */

@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,12 +26,12 @@ package org.newcih.galois.service.agent.frame.spring;
 
 import org.newcih.galois.service.agent.MethodAdapter;
 import org.newcih.galois.utils.GaloisLog;
-import org.objectweb.asm.MethodVisitor;
+import jdk.internal.org.objectweb.asm.MethodVisitor;
 
 import java.util.Objects;
 
 import static org.newcih.galois.constants.ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER;
-import static org.objectweb.asm.Opcodes.*;
+import static jdk.internal.org.objectweb.asm.Opcodes.*;
 
 public class BeanDefinitionScannerVisitor extends MethodAdapter {
 

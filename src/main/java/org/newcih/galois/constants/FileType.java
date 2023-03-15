@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,57 +22,25 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.watch;
+package org.newcih.galois.constants;
 
-import java.io.File;
-import java.util.function.Consumer;
+public enum FileType {
 
-/**
- * 文件监听服务
- */
-public abstract class FileWatchService {
+    CLASS_FILE(".class"), XML_FILE(".xml"), JAVA_FILE(".java");
 
-    protected Consumer<File> createHandler;
+    private final String fileType;
+    private final String name;
 
-    protected Consumer<File> modiferHandler;
-
-    protected Consumer<File> deleteHandler;
-
-    /**
-     * 启动文件监听
-     *
-     * @return 启动结果
-     */
-    public abstract boolean start();
-
-    /**
-     * 关闭文件监听
-     *
-     * @return 关闭结果
-     */
-    public abstract boolean stop();
-
-    public Consumer<File> getCreateHandler() {
-        return createHandler;
+    FileType(String fileType) {
+        this.fileType = fileType;
+        this.name = fileType.substring(1);
     }
 
-    public void setCreateHandler(Consumer<File> createHandler) {
-        this.createHandler = createHandler;
+    public String getFileType() {
+        return fileType;
     }
 
-    public Consumer<File> getModiferHandler() {
-        return modiferHandler;
-    }
-
-    public void setModiferHandler(Consumer<File> modiferHandler) {
-        this.modiferHandler = modiferHandler;
-    }
-
-    public Consumer<File> getDeleteHandler() {
-        return deleteHandler;
-    }
-
-    public void setDeleteHandler(Consumer<File> deleteHandler) {
-        this.deleteHandler = deleteHandler;
+    public String getName() {
+        return name;
     }
 }

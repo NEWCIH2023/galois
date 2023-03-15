@@ -1,6 +1,8 @@
 target/
 .idea
 logs/
+.DS_Store
+**/*.class
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup

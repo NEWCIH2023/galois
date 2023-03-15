@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,6 +24,9 @@
 
 package org.newcih.galois.conf;
 
+import org.newcih.galois.utils.FileUtil;
+import org.newcih.galois.utils.GaloisLog;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
@@ -34,14 +38,17 @@ import java.util.Properties;
 public class GlobalConfiguration {
 
     private static final Properties configuration = new Properties();
+    private static final GaloisLog logger = GaloisLog.getLogger(GlobalConfiguration.class);
 
     /**
      * load global configuration from galois.properties file
      */
     static {
-        try (InputStream is = GlobalConfiguration.class.getClassLoader().getResourceAsStream("galois.properties")) {
+        try (InputStream is = FileUtil.readClassPathFile("galois.properties")) {
+            // 加载配置文件中的配置，这部分参数使用完全匹配
             configuration.load(is);
         } catch (IOException e) {
+            logger.error("读取全局配置失败", e);
             throw new RuntimeException(e);
         }
     }
@@ -53,8 +60,11 @@ public class GlobalConfiguration {
      * @return
      */
     public static String getString(String key) {
-        String result = configuration.getProperty(key);
-        return Optional.ofNullable(result).orElse("");
+        return Optional.ofNullable(configuration.getProperty(key)).orElse("");
+    }
+
+    public static String getString(String key, String defaultValue) {
+        return Optional.ofNullable(configuration.getProperty(key)).orElse(defaultValue);
     }
 
     /**
@@ -64,7 +74,11 @@ public class GlobalConfiguration {
      * @return
      */
     public static boolean getBoolean(String key) {
-        String result = getString(key);
+        return getBoolean(key, false);
+    }
+
+    public static boolean getBoolean(String key, boolean defaultValue) {
+        String result = getString(key, "true");
         return "true".equalsIgnoreCase(result);
     }
 

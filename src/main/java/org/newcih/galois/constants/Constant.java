@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,5 +27,36 @@ package org.newcih.galois.constants;
 public class Constant {
 
     public static final String USER_DIR = "user.dir";
+    public static final String ID = "id";
+    public static final String NAMESPACE = "namespace";
+    public static final String GET_INSTANCE = "getInstance";
+    public static final String SRC = "src";
+    public static final String PACKAGE = "package";
+    public static final String CLASS = "class";
+    public static final String UNDER_LINE = "_";
+    public static final String OPEN_BRACE = "{";
+    public static final String CLOSE_BRACE = "}";
+    public static final String DOT = ".";
+    public static final String OPEN_PAREN = "(";
+    public static final String CLOSE_PAREN = ")";
+    public static final String OPEN_BRACKET = "[";
+    public static final String CLOSE_BRACKET = "]";
+    public static final String VERTICAL_BAR = "|";
+    public static final String POUND = "#";
+    public static final String SLASH = "/";
+    public static final String DOUBLE_SLASH = "//";
+    public static final String COLON = ":";
+    public static final String SEMICOLON = ";";
+    public static final String HYPHEN = "-";
+    public static final String SPACE = " ";
+    public static final String COMMA = ",";
+    public static final String TILDE = "~";
+    public static final String QUESTION_MARK = "?";
+    public static final String DASH = "--";
+    public static final String DOTS = "...";
+    public static final String PARALLEL = "||";
+    public static final String LF = "\n";
+    public static final String CR = "\r";
+
 
 }

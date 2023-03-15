@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,7 +26,19 @@ package org.newcih.galois.service.agent;
 
 public interface BeanReloader<T> {
 
+    /**
+     * update bean
+     *
+     * @param object
+     */
     void updateBean(T object);
 
-    boolean validBean(T object);
+    /**
+     * is reloader useful to this object
+     *
+     * @param object
+     * @return
+     */
+    boolean isUseful(T object);
+
 }

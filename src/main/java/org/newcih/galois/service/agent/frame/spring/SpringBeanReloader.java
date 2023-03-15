@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,26 +26,27 @@ package org.newcih.galois.service.agent.frame.spring;
 
 import org.newcih.galois.service.agent.BeanReloader;
 import org.newcih.galois.utils.GaloisLog;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 
-import java.util.Objects;
-import java.util.Set;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Spring的Bean重载服务
  */
-public final class SpringBeanReloader implements BeanReloader<Object> {
+public final class SpringBeanReloader implements BeanReloader<Class<?>> {
 
     private static final GaloisLog logger = GaloisLog.getLogger(SpringBeanReloader.class);
     private static final SpringBeanReloader springBeanReloader = new SpringBeanReloader();
+    public static final List<String> ignorePackages = Arrays.asList("org.springframework");
     /**
      * 待注入属性
      */
     private ClassPathBeanDefinitionScanner scanner;
-    private ApplicationContext applicationContext;
+    private ApplicationContext context;
 
     private SpringBeanReloader() {
     }
@@ -61,35 +63,43 @@ public final class SpringBeanReloader implements BeanReloader<Object> {
     /**
      * 更新Spring管理的bean对象
      *
-     * @param bean
+     * @param clazz
      */
     @Override
-    public void updateBean(Object bean) {
-        Class<?> clazz = bean.getClass();
-        String packageName = clazz.getPackage().getName();
-        Set<BeanDefinition> beanDefinitionSet = scanner.findCandidateComponents(packageName);
+    public void updateBean(Class<?> clazz) {
+        DefaultListableBeanFactory factory = (DefaultListableBeanFactory) getContext().getAutowireCapableBeanFactory();
+        String beanName = factory.getBeanNamesForType(clazz)[0];
+        Object bean = null;
 
-        for (BeanDefinition definition : beanDefinitionSet) {
-            if (Objects.equals(definition.getBeanClassName(), clazz.getName())) {
-                DefaultListableBeanFactory beanFactory =
-                        (DefaultListableBeanFactory) getApplicationContext().getAutowireCapableBeanFactory();
-                String beanName = beanFactory.getBeanNamesForType(clazz)[0];
-                beanFactory.destroySingleton(beanName);
-                beanFactory.registerSingleton(beanName, bean);
+        try {
+            bean = clazz.newInstance();
+            factory.destroySingleton(beanName);
+            factory.registerSingleton(beanName, bean);
+        } catch (InstantiationException ie) {
+            logger.error("can't create a new object from newInstance method, ensure that's not an abstract class");
+        } catch (Exception e) {
+            logger.error("spring bean reloader update bean failed", e);
+        }
 
-                if (logger.isDebugEnabled()) {
-                    logger.debug("had reload spring bean {}", bean);
-                }
-
-                break;
-            }
+        if (logger.isDebugEnabled()) {
+            logger.debug("had reload spring bean {}", bean);
         }
     }
 
     @Override
-    public boolean validBean(Object object) {
-        Class<?> clazz = object.getClass();
-        String[] beanTypeNames = getApplicationContext().getBeanNamesForType(clazz);
+    public boolean isUseful(Class<?> clazz) {
+        String className = clazz.getName();
+        boolean isIgnoredClass = ignorePackages.stream().anyMatch(className::startsWith);
+        if (isIgnoredClass) {
+            return false;
+        }
+
+        int m = clazz.getModifiers();
+        if (Modifier.isInterface(m) || Modifier.isAbstract(m) || Modifier.isPrivate(m) || Modifier.isStatic(m) || Modifier.isNative(m)) {
+            return false;
+        }
+
+        String[] beanTypeNames = getContext().getBeanNamesForType(clazz);
         return beanTypeNames.length > 0;
     }
 
@@ -101,11 +111,11 @@ public final class SpringBeanReloader implements BeanReloader<Object> {
         this.scanner = scanner;
     }
 
-    public ApplicationContext getApplicationContext() {
-        return applicationContext;
+    public ApplicationContext getContext() {
+        return context;
     }
 
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
+    public void setContext(ApplicationContext context) {
+        this.context = context;
     }
 }

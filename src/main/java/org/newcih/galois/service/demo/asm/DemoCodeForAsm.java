@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,9 +24,8 @@
 
 package org.newcih.galois.service.demo.asm;
 
-import org.apache.commons.io.IOUtils;
 import org.newcih.galois.service.agent.frame.spring.SpringBeanReloader;
-import org.objectweb.asm.*;
+import jdk.internal.org.objectweb.asm.*;
 import org.springframework.context.ApplicationContext;
 
 import java.io.File;
@@ -34,7 +34,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-import static org.objectweb.asm.Opcodes.*;
+import static jdk.internal.org.objectweb.asm.Opcodes.*;
 
 public class DemoCodeForAsm {
 
@@ -109,14 +109,14 @@ public class DemoCodeForAsm {
         String path = Objects.requireNonNull(DemoCodeForAsm.class.getResource("")).getPath().substring(1).replace("/"
                 , File.separator) + "DemoCodeForAsmTran.class";
         System.out.println("类生成的位置" + path);
-        IOUtils.write(cw.toByteArray(), Files.newOutputStream(Paths.get(path)));
+        Files.newOutputStream(Paths.get(path)).write(cw.toByteArray());
     }
 
     public void printCode() {
         {
             System.out.println("2");
         }
-        SpringBeanReloader.getInstance().setApplicationContext((ApplicationContext) this);
+        SpringBeanReloader.getInstance().setContext((ApplicationContext) this);
         {
             System.out.println(5);
         }

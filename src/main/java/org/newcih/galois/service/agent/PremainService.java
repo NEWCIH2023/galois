@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,77 +25,85 @@
 package org.newcih.galois.service.agent;
 
 import org.newcih.galois.service.BannerService;
-import org.newcih.galois.service.ProjectFileManager;
-import org.newcih.galois.service.agent.frame.mybatis.SqlSessionFactoryBeanVisitor;
-import org.newcih.galois.service.agent.frame.spring.ApplicationContextVisitor;
-import org.newcih.galois.service.agent.frame.spring.BeanDefinitionScannerVisitor;
-import org.newcih.galois.service.watch.ApacheFileWatchService;
-import org.newcih.galois.service.watch.frame.FileChangedListener;
-import org.newcih.galois.service.watch.frame.mybatis.MyBatisXmlListener;
-import org.newcih.galois.service.watch.frame.spring.SpringBeanListener;
+import org.newcih.galois.service.FileWatchService;
+import org.newcih.galois.service.agent.frame.corm.CormAgentService;
+import org.newcih.galois.service.agent.frame.mybatis.MyBatisAgentService;
+import org.newcih.galois.service.agent.frame.spring.SpringAgentService;
 import org.newcih.galois.utils.GaloisLog;
+import org.newcih.galois.utils.JavaUtil;
+import org.newcih.galois.utils.StringUtil;
 
 import java.lang.instrument.Instrumentation;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import static java.util.stream.Collectors.joining;
+import static org.newcih.galois.constants.Constant.*;
 
 /**
- * PreMain服务类
+ * premain agent服务入口
  */
 public class PremainService {
 
     public static final GaloisLog logger = GaloisLog.getLogger(PremainService.class);
-    private static final Map<String, MethodAdapter> mac = new HashMap<>(64);
-    private static final ProjectFileManager fileManager = ProjectFileManager.getInstance();
-    private static Instrumentation instrumentation;
-
-    static {
-        // register method adapter
-        Arrays.asList(new ApplicationContextVisitor(), new BeanDefinitionScannerVisitor(),
-                new SqlSessionFactoryBeanVisitor()).forEach(visit -> visit.install(mac));
-    }
+    // adding new agent service here
+    private static final List<AgentService> agentServices = Arrays.asList(
+            SpringAgentService.getInstance(),
+            MyBatisAgentService.getInstance(),
+            CormAgentService.getInstance()
+    );
 
     /**
-     * Premain入口
+     * premain entry
      *
      * @param agentArgs
      * @param inst
      */
     public static void premain(String agentArgs, Instrumentation inst) {
-        if (instrumentation != null) {
-            return;
-        }
-        instrumentation = inst;
-
-        // print galois banner
-        BannerService.printBanner();
+        JavaUtil.inst = inst;
+        CopyOnWriteArrayList<FileChangedListener> listeners = new CopyOnWriteArrayList<>();
 
         inst.addTransformer((loader, className, classBeingRedefined, protectionDomain, classfileBuffer) -> {
-            if (className == null || className.trim().length() == 0) {
+            if (StringUtil.isBlank(className)) {
                 return null;
             }
 
-            String newClassName = className.replace("/", ".");
-            MethodAdapter methodAdapter = mac.get(newClassName);
-            if (methodAdapter != null && methodAdapter.usable()) {
-                return methodAdapter.transform();
+            String newClassName = className.replace(SLASH, DOT);
+
+            for (AgentService agentService : agentServices) {
+                boolean checkedClass = agentService.checkAgentEnable(newClassName);
+                if (agentService.isUseful() && !agentService.isInited()) {
+                    agentService.init();
+                    listeners.addAll(agentService.getListeners());
+
+                    if (logger.isDebugEnabled()) {
+                        String listenerNames = agentService.getListeners().stream()
+                                .map(Objects::toString)
+                                .collect(joining(","));
+                        logger.debug("register file watch listener {}", listenerNames);
+                    }
+                }
+
+                // checkedClass表示当前加载的类newClassName是否有对应的MethodAdapter，当为false时，表示没有对应的MethodAdapter，
+                // 这时候就直接跳过
+                if (!checkedClass) {
+                    continue;
+                }
+
+                MethodAdapter adapter = agentService.getAdapterMap().get(newClassName);
+                return adapter.transform();
             }
 
             return null;
-        });
+        }, true);
 
-        // start file change listener service
-        List<FileChangedListener> fileChangedListeners = Arrays.asList(
-                new SpringBeanListener(inst),
-                new MyBatisXmlListener()
-        );
+        String rootPath = System.getProperty(USER_DIR);
+        new FileWatchService(rootPath, listeners).start();
 
-        String sourcePath = fileManager.getSourcePath();
-        logger.info("begin listen file change in path [{}]", sourcePath);
-
-        new ApacheFileWatchService(sourcePath, fileChangedListeners).start();
+        // banner should be printed after necessary processes done
+        BannerService.printBanner();
     }
 
 }

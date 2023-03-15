@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,11 +22,11 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.watch.frame.mybatis;
+package org.newcih.galois.service.agent.frame.corm;
 
-import org.newcih.galois.service.agent.frame.mybatis.MyBatisBeanReloader;
-import org.newcih.galois.service.watch.frame.FileChangedListener;
-import org.newcih.galois.utils.FileUtils;
+import org.newcih.galois.service.agent.FileChangedListener;
+import org.newcih.galois.service.agent.frame.mybatis.MyBatisXmlListener;
+import org.newcih.galois.utils.FileUtil;
 import org.newcih.galois.utils.GaloisLog;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
@@ -35,30 +36,29 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.util.Objects;
 
-import static org.newcih.galois.constants.FileTypeConstant.XML_FILE;
+import static org.newcih.galois.constants.FileType.XML_FILE;
 
-/**
- * MyBatis的XML文件变更监听处理
- */
-public class MyBatisXmlListener implements FileChangedListener {
+public class CormXmlListener implements FileChangedListener {
 
     public static final String DOC_TYPE = "mapper";
 
     private static final GaloisLog logger = GaloisLog.getLogger(MyBatisXmlListener.class);
 
-    private static final MyBatisBeanReloader reloader = MyBatisBeanReloader.getInstance();
+    private static final CormBeanReloader reloader = CormBeanReloader.getInstance();
 
     @Override
-    public boolean validFile(File file) {
-        boolean fileTypeCheck = Objects.equals(FileUtils.getFileType(file), XML_FILE);
+    public String toString() {
+        return "CormXmlListener";
+    }
+
+    @Override
+    public boolean isUseful(File file) {
+        boolean fileTypeCheck = FileUtil.validFileType(file, XML_FILE);
 
         if (!fileTypeCheck) {
             return false;
         }
-
-        // check xml file node contains mapper
 
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -77,17 +77,20 @@ public class MyBatisXmlListener implements FileChangedListener {
     }
 
     @Override
-    public void fileCreatedHandle(File file) {
+    public void createdHandle(File file) {
+    }
+
+    @Override
+    public void modifiedHandle(File file) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("corm listener monitor file modified ==> {}", file.getName());
+        }
+
         reloader.updateBean(file);
     }
 
     @Override
-    public void fileModifiedHandle(File file) {
-        reloader.updateBean(file);
-    }
-
-    @Override
-    public void fileDeletedHandle(File file) {
+    public void deletedHandle(File file) {
         // TODO
     }
 }

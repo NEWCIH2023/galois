@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,43 +22,28 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.watch.frame;
+package org.newcih.galois.service.agent.frame.mybatis;
 
-import java.io.File;
+import org.newcih.galois.service.agent.AgentService;
 
-/**
- * 文件变动监听
- */
-public interface FileChangedListener {
+import static org.newcih.galois.constants.ClassNameConstant.SQL_SESSION_FACTORY_BEAN;
 
+public class MyBatisAgentService extends AgentService {
 
-    /**
-     * 验证该文件是否适合该监听器处理
-     *
-     * @param file
-     * @return
-     */
-    boolean validFile(File file);
+    private final static MyBatisAgentService myBatisAgentService = new MyBatisAgentService();
 
-    /**
-     * 文件新增时处理
-     *
-     * @param file
-     */
-    void fileCreatedHandle(File file);
+    private MyBatisAgentService() {
+        necessaryClasses.add(SQL_SESSION_FACTORY_BEAN);
+    }
 
-    /**
-     * 文件修改时处理
-     *
-     * @param file
-     */
-    void fileModifiedHandle(File file);
+    public static MyBatisAgentService getInstance() {
+        return myBatisAgentService;
+    }
 
-    /**
-     * 文件删除时处理
-     *
-     * @param file
-     */
-    void fileDeletedHandle(File file);
-
+    @Override
+    public void init() {
+        super.init();
+        listeners.add(new MyBatisXmlListener());
+        beanReloader = MyBatisBeanReloader.getInstance();
+    }
 }

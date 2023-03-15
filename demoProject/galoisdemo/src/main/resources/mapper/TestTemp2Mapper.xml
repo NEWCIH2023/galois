@@ -54,6 +54,7 @@
             </foreach>
           </trim>
         </if>
+
       </foreach>
     </where>
   </sql>
@@ -87,7 +88,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, NAME || 'h' NAME
+    ID, NAME || 'ABHUI' NAME
   </sql>
   <select id="selectByExample" parameterType="org.newcih.galoisdemo.model.TestTemp2Example" resultMap="BaseResultMap">
     select

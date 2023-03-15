@@ -22,21 +22,18 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent.frame.mybatis;
+package org.newcih.galois.service.agent.frame.corm;
 
-import org.apache.ibatis.binding.MapperRegistry;
-import org.apache.ibatis.builder.xml.XMLMapperBuilder;
-import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
-import org.apache.ibatis.executor.keygen.SelectKeyGenerator;
-import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.parsing.XNode;
-import org.apache.ibatis.parsing.XPathParser;
-import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.session.SqlSessionFactory;
+import com.comtop.corm.builder.xml.XMLMapperBuilder;
+import com.comtop.corm.builder.xml.XMLMapperEntityResolver;
+import com.comtop.corm.executor.keygen.SelectKeyGenerator;
+import com.comtop.corm.mapping.MappedStatement;
+import com.comtop.corm.parsing.XNode;
+import com.comtop.corm.parsing.XPathParser;
+import com.comtop.corm.resource.core.io.FileSystemResource;
+import com.comtop.corm.session.Configuration;
 import org.newcih.galois.service.agent.BeanReloader;
-import org.newcih.galois.service.agent.frame.spring.SpringBeanReloader;
 import org.newcih.galois.utils.GaloisLog;
-import org.springframework.context.ApplicationContext;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,58 +47,53 @@ import static org.newcih.galois.constants.Constant.ID;
 import static org.newcih.galois.constants.Constant.NAMESPACE;
 
 /**
- * MyBatis的Mapper重新加载服务类，适用于 >= 3.2.0版本
+ * MyBatis的Mapper重新加载服务类
  */
-public class MyBatisBeanReloader implements BeanReloader<File> {
+public class CormBeanReloader implements BeanReloader<File> {
 
-    private static final MyBatisBeanReloader mybatisBeanReloder = new MyBatisBeanReloader();
-    private static final GaloisLog logger = GaloisLog.getLogger(MyBatisBeanReloader.class);
+    public static final CormBeanReloader mybatisBeanReloder = new CormBeanReloader();
+    private static final GaloisLog logger = GaloisLog.getLogger(CormBeanReloader.class);
     protected Configuration configuration;
 
-    private MyBatisBeanReloader() {
+    private CormBeanReloader() {
     }
 
     /**
      * 获取单例实例
+     *
+     * @return
      */
-    public static MyBatisBeanReloader getInstance() {
+    public static CormBeanReloader getInstance() {
         return mybatisBeanReloder;
     }
 
     /**
      * 更新bean实例
+     *
+     * @param mapperFile
      */
     @Override
-    public void updateBean(File xmlFile) {
-<<<<<<< HEAD
-
-        try (FileInputStream fis = new FileInputStream(xmlFile)) {
-
-            XPathParser parser = new XPathParser(fis, true, configuration.getVariables(),
-                    new XMLMapperEntityResolver());
-=======
-        try (FileInputStream fis = new FileInputStream(xmlFile)) {
-            Properties properties = getConfiguration().getVariables();
-            XPathParser parser = new XPathParser(fis, true, properties, new XMLMapperEntityResolver());
->>>>>>> 7ac66325d922a5493e16fb8930e1b19341a9a698
+    public void updateBean(File mapperFile) {
+        try (FileInputStream fis = new FileInputStream(mapperFile)) {
+            Properties variables = configuration.getVariables();
+            XPathParser parser = new XPathParser(fis, true, variables, new XMLMapperEntityResolver());
             XNode context = parser.evalNode("/mapper");
             String namespace = context.getStringAttribute(NAMESPACE);
-            // clear cache
+            // 清空Mybatis缓存
             clearMapperRegistry(namespace);
-            clearLoadedResources(xmlFile.getName());
+            clearLoadedResources(mapperFile.getName());
             clearCachedNames(namespace);
             clearParameterMap(context.evalNodes("/mapper/parameterMap"), namespace);
             clearResultMap(context.evalNodes("/mapper/resultMap"), namespace);
-            clearKeyGenerators(context.evalNodes("insert|update|select|delete"), namespace);
             clearSqlElement(context.evalNodes("/mapper/sql"), namespace);
-            // reparse mybatis mapper xml file
-            reloadXML(xmlFile);
+            // 使MyBatis重新加载xml配置的mapper对象
+            reloadXML(mapperFile);
         } catch (Exception e) {
             logger.error("reload mybatis xml throw exception", e);
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("reload mybatis xml file {} success", xmlFile.getName());
+            logger.debug("reload mybatis xml file {} success", mapperFile.getName());
         }
     }
 
@@ -110,34 +102,33 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
         return true;
     }
 
-    private void reloadXML(File xmlFile) throws IOException {
-        InputStream is = Files.newInputStream(xmlFile.toPath());
-        XMLMapperBuilder builder = new XMLMapperBuilder(is, getConfiguration(), xmlFile.getName(),
-                getConfiguration().getSqlFragments());
+    private void reloadXML(File mapperFile) throws IOException {
+        InputStream is = Files.newInputStream(mapperFile.toPath());
+        XMLMapperBuilder builder = new XMLMapperBuilder(is, getConfiguration(), mapperFile.getName(),
+                getConfiguration().getSqlFragments(), new FileSystemResource(mapperFile));
         builder.parse();
     }
 
     @SuppressWarnings("unchecked")
     private void clearMapperRegistry(String namespace) throws NoSuchFieldException, IllegalAccessException {
-        Field field = MapperRegistry.class.getDeclaredField("knownMappers");
-        field.setAccessible(true);
-        Map<Class<?>, Object> mapConfig = (Map<Class<?>, Object>) field.get(getConfiguration().getMapperRegistry());
-        Class<?> refreshKey = null;
-
-        for (Map.Entry<Class<?>, Object> item : mapConfig.entrySet()) {
-            if (item.getKey().getName().contains(namespace)) {
-                refreshKey = item.getKey();
-                break;
-            }
-        }
-
-        if (refreshKey != null) {
-            mapConfig.remove(refreshKey);
-        }
+//        Field field = MapperRegistry.class.getDeclaredField("knownMappers");
+//        field.setAccessible(true);
+//        Map<Class<?>, Object> mapConfig = (Map<Class<?>, Object>) field.get(getConfiguration().getmapp());
+//        Class<?> refreshKey = null;
+//
+//        for (Map.Entry<Class<?>, Object> item : mapConfig.entrySet()) {
+//            if (item.getKey().getName().contains(namespace)) {
+//                refreshKey = item.getKey();
+//                break;
+//            }
+//        }
+//
+//        if (refreshKey != null) {
+//            mapConfig.remove(refreshKey);
+//        }
     }
 
     @SuppressWarnings("rawtypes")
-    @Deprecated
     private void clearLoadedResources(String fileName) throws NoSuchFieldException, IllegalAccessException {
         Field loadedResourcesField = getConfiguration().getClass().getDeclaredField("loadedResources");
         loadedResourcesField.setAccessible(true);
@@ -178,28 +169,8 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
                         clearResultMap(child, namespace);
                     }
                 }
+
             }
-        }
-    }
-
-    private void clearKeyGenerators(List<XNode> list, String namespace) {
-        for (XNode xNode : list) {
-            String id = xNode.getStringAttribute(ID);
-            getConfiguration().getKeyGeneratorNames().remove(id + SelectKeyGenerator.SELECT_KEY_SUFFIX);
-            getConfiguration().getKeyGeneratorNames().remove(namespace + "." + id + SelectKeyGenerator.SELECT_KEY_SUFFIX);
-
-            Collection<MappedStatement> mappedStatements = getConfiguration().getMappedStatements();
-            List<MappedStatement> tempStatements = new ArrayList<>(64);
-
-            for (MappedStatement statement : mappedStatements) {
-                if (statement != null) {
-                    if (Objects.equals(statement.getId(), namespace + "." + id)) {
-                        tempStatements.add(statement);
-                    }
-                }
-            }
-
-            mappedStatements.removeAll(tempStatements);
         }
     }
 
@@ -212,15 +183,6 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
     }
 
     public Configuration getConfiguration() {
-        if (configuration == null) {
-            try {
-                ApplicationContext context = SpringBeanReloader.getInstance().getContext();
-                configuration = Objects.requireNonNull(context.getBean(SqlSessionFactory.class)).getConfiguration();
-            } catch (Exception e) {
-                logger.error("access configuration object from sqlSessionFactoryBean failed", e);
-            }
-        }
-
         return configuration;
     }
 

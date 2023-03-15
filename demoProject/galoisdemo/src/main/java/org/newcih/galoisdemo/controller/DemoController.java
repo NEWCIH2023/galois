@@ -24,8 +24,7 @@
 package org.newcih.galoisdemo.controller;
 
 import org.newcih.galoisdemo.dao.TestTemp2Mapper;
-import org.newcih.galoisdemo.model.TestTemp2;
-import org.newcih.galoisdemo.model.TestTemp2Example;
+import org.newcih.galoisdemo.service.DemoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,6 +39,9 @@ public class DemoController {
     @Autowired
     private TestTemp2Mapper mapper;
 
+    @Autowired
+    private DemoService demoService;
+
     public DemoController() {
     }
 
@@ -49,10 +51,22 @@ public class DemoController {
 
     @GetMapping("/getString")
     public String getString() {
-        TestTemp2Example example = new TestTemp2Example();
-        example.createCriteria().andIdIsNotNull();
-        TestTemp2 testTemp2 = mapper.selectByExample(example).get(0);
-        return "" + testTemp2.getName();
+        return "ABC" + demoService.getName() + "589";
+    }
+
+    public String getTest() {
+        return demoService.getName();
+    }
+
+    @GetMapping("/t7")
+    public String t2() {
+        return "t";
+    }
+
+
+    @GetMapping("/t")
+    public String t() {
+        return "t2";
     }
 
     @GetMapping("/getInt")
