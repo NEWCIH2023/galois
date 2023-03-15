@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -139,8 +140,6 @@ public class FileWatchService {
             });
             watchThread.setDaemon(true);
             watchThread.start();
-
-            Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
 
             if (logger.isDebugEnabled()) {
                 logger.debug("file watch service had already started!");

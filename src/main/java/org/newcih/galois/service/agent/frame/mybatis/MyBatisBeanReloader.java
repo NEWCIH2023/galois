@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -62,8 +63,6 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
 
     /**
      * 获取单例实例
-     *
-     * @return
      */
     public static MyBatisBeanReloader getInstance() {
         return mybatisBeanReloder;
@@ -71,8 +70,6 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
 
     /**
      * 更新bean实例
-     *
-     * @param xmlFile
      */
     @Override
     public void updateBean(File xmlFile) {
@@ -173,7 +170,6 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
                         clearResultMap(child, namespace);
                     }
                 }
-
             }
         }
     }

@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -31,16 +32,21 @@ import java.util.Objects;
 import static org.newcih.galois.constants.Constant.LF;
 
 public class FileUtil {
+    private static final GaloisLog logger = GaloisLog.getLogger(FileUtil.class);
 
     private FileUtil() {
     }
 
-    private static final GaloisLog logger = GaloisLog.getLogger(FileUtil.class);
-
+    /**
+     * 验证文件类型是否匹配
+     */
     public static boolean validFileType(File file, FileType fileType) {
         return Objects.equals(getFileType(file), fileType.getFileType());
     }
 
+    /**
+     * 获取文件类型的通用方法，带上.字符
+     */
     public static String getFileType(File file) {
         if (file == null) {
             return "";
@@ -57,6 +63,9 @@ public class FileUtil {
         return "";
     }
 
+    /**
+     * 将字节数组写入对应路径的文件
+     */
     public static File writeFile(byte[] bytes, String path) {
         if (bytes == null || bytes.length == 0) {
             return null;
@@ -73,9 +82,6 @@ public class FileUtil {
 
     /**
      * 将File转为byte[]数组
-     *
-     * @param file
-     * @return
      */
     public static byte[] readFile(File file) {
         if (file == null) {
@@ -99,6 +105,9 @@ public class FileUtil {
         return new byte[0];
     }
 
+    /**
+     * 读取字符类型文件，并返回String类型结果
+     */
     public static String readTextFile(File file) {
         if (file == null) {
             return "";
@@ -115,4 +124,16 @@ public class FileUtil {
         return sb.toString();
     }
 
+    /**
+     * 读取classpath路径下的文件
+     *
+     * @param relativePath 文件的相对路径，相对于classpath路径
+     */
+    public static InputStream readClassPathFile(String relativePath) {
+        if (StringUtil.isBlank(relativePath)) {
+            return null;
+        }
+
+        return FileUtil.class.getClassLoader().getResourceAsStream(relativePath);
+    }
 }

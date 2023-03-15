@@ -1,5 +1,6 @@
 /*
  * MIT License
+ *
  * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,6 +23,8 @@
  */
 
 package org.newcih.galois.service.agent;
+
+import org.newcih.galois.conf.GlobalConfiguration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,10 +49,11 @@ public abstract class AgentService {
      */
     private int enabled;
     private boolean inited;
+    protected String confAgentName;
     protected List<String> necessaryClasses = new ArrayList<>(8);
 
     public boolean isUseful() {
-        return enabled == necessaryClasses.size();
+        return enabled == necessaryClasses.size() && GlobalConfiguration.getBoolean(confAgentName, true);
     }
 
     /**
