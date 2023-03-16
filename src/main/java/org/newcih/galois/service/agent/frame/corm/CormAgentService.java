@@ -46,4 +46,5 @@ public class CormAgentService extends AgentService {
         listeners.add(new CormXmlListener());
         beanReloader = CormBeanReloader.getInstance();
     }
+
 }

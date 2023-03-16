@@ -51,11 +51,18 @@
         <!--            <version>1.8</version>-->
         <!--        </dependency>-->
         <dependency>
-            <groupId>groupid</groupId>
-            <artifactId>artifiactId</artifactId>
-            <version>1.0</version>
+            <groupId>java</groupId>
+            <artifactId>rt</artifactId>
+            <version>8</version>
             <scope>system</scope>
             <systemPath>${java.home}/lib/rt.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>java</groupId>
+            <artifactId>tools</artifactId>
+            <version>8</version>
+            <scope>system</scope>
+            <systemPath>${java.home}/../lib/tools.jar</systemPath>
         </dependency>
 
         <!--   打包时需要检测rt.jar的存在，因此自己通过项目lib库添加上rt.jar，让打包检测通过就行，实际运行时依赖运行时环境的rt.jar  -->
@@ -65,11 +72,12 @@
         <!--            <artifactId>commons-io</artifactId>-->
         <!--            <version>2.11.0</version>-->
         <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.ow2.asm</groupId>-->
-        <!--            <artifactId>asm</artifactId>-->
-        <!--            <version>${asm.version}</version>-->
-        <!--        </dependency>-->
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>${asm.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <!--        <dependency>-->
         <!--            <groupId>org.ow2.asm</groupId>-->
         <!--            <artifactId>asm-commons</artifactId>-->
@@ -169,8 +177,9 @@
                         </manifest>
                         <manifestEntries>
                             <Build-Time>${maven.build.timestamp}</Build-Time>
-                            <Agent-Class>org.newcih.galois.service.agent.AgentService</Agent-Class>
+                            <Agent-Class>org.newcih.galois.service.agent.debug.DebugMain</Agent-Class>
                             <Premain-Class>org.newcih.galois.service.agent.PremainService</Premain-Class>
+                            <Main-Class>org.newcih.galois.service.agent.debug.DebugMain</Main-Class>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
                         </manifestEntries>

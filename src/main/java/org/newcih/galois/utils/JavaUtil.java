@@ -40,8 +40,6 @@ import static org.newcih.galois.constants.Constant.SLASH;
 import static org.newcih.galois.constants.FileType.CLASS_FILE;
 
 public class JavaUtil {
-
-    private static final GaloisLog logger = GaloisLog.getLogger(JavaUtil.class);
     private static final String compileDir;
     //    private static final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 //    private static final StandardJavaFileManager standardJavaFileManager;
@@ -57,16 +55,8 @@ public class JavaUtil {
         if (!directory.exists()) {
             try {
                 boolean createResult = directory.mkdir();
-                if (!createResult) {
-                    logger.error("can't create temp compile directory");
-                }
-            } catch (Exception e) {
-                logger.error("create temp compile directory failed", e);
+            } catch (Exception ignored) {
             }
-        }
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("using tmp directory ==> {}", compileDir);
         }
     }
 
@@ -106,7 +96,6 @@ public class JavaUtil {
 
             return result;
         } catch (Exception e) {
-            logger.error("parse className from java source failed", e);
             return null;
         }
     }
@@ -147,10 +136,6 @@ public class JavaUtil {
 //        JavaCompiler.CompilationTask task = compiler.getTask(null, manager, diagnosticCollector, null, null,
 //                fileObjectList);
 //        Boolean result = task.call();
-//
-//        if (result == null || !result) {
-//            logger.error("compile source file failed ==> {}", sourceFile.getName());
-//        }
 //
 //        return manager.getClassBytes();
 //    }

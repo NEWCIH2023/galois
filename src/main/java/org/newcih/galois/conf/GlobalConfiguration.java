@@ -25,90 +25,89 @@
 package org.newcih.galois.conf;
 
 import org.newcih.galois.utils.FileUtil;
-import org.newcih.galois.utils.GaloisLog;
+import org.newcih.galois.utils.StringUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
 import java.util.Properties;
+
+import static org.newcih.galois.constants.Constant.*;
 
 /**
  * global configuration service
  */
 public class GlobalConfiguration {
 
+    /**
+     * 解析配置文件galois.properties的属性对象
+     */
     private static final Properties configuration = new Properties();
-    private static final GaloisLog logger = GaloisLog.getLogger(GlobalConfiguration.class);
+    private static final GlobalConfiguration globalConfiguration = new GlobalConfiguration();
 
     /**
-     * load global configuration from galois.properties file
+     * 加载galois.propertise文件并解析出配置项
      */
     static {
         try (InputStream is = FileUtil.readClassPathFile("galois.properties")) {
             // 加载配置文件中的配置，这部分参数使用完全匹配
             configuration.load(is);
         } catch (IOException e) {
-            logger.error("读取全局配置失败", e);
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
 
-    /**
-     * get string type property value
-     *
-     * @param key
-     * @return
-     */
-    public static String getString(String key) {
-        return Optional.ofNullable(configuration.getProperty(key)).orElse("");
+    private GlobalConfiguration() {
     }
 
-    public static String getString(String key, String defaultValue) {
-        return Optional.ofNullable(configuration.getProperty(key)).orElse(defaultValue);
+    public static GlobalConfiguration getInstance() {
+        return globalConfiguration;
     }
 
-    /**
-     * get boolean type property value
-     *
-     * @param key
-     * @return
-     */
-    public static boolean getBoolean(String key) {
+    public String getString(String key) {
+        return getString(key, EMPTY);
+    }
+
+    public String getString(String key, String defaultValue) {
+        if (StringUtil.isBlank(key)) {
+            return defaultValue;
+        }
+
+        return configuration.getProperty(key, defaultValue);
+    }
+
+    public boolean getBoolean(String key) {
         return getBoolean(key, false);
     }
 
-    public static boolean getBoolean(String key, boolean defaultValue) {
-        String result = getString(key, "true");
-        return "true".equalsIgnoreCase(result);
+    public boolean getBoolean(String key, boolean defaultValue) {
+        String result = getString(key, defaultValue ? TRUE : FALSE);
+        return TRUE.equalsIgnoreCase(result);
     }
 
-    /**
-     * get long type property value
-     *
-     * @param key
-     * @return
-     */
-    public static long getLong(String key) {
-        String result = getString(key);
+    public long getLong(String key) {
+        return getLong(key, 0L);
+    }
+
+    public long getLong(String key, long defaultValue) {
+        String result = getString(key, String.valueOf(defaultValue));
         try {
             return Long.parseLong(result);
         } catch (Exception e) {
-            return 0L;
+            return -1L;
         }
     }
 
-    /**
-     * get int type property value
-     *
-     * @param key
-     * @return
-     */
-    public static int getInteger(String key) {
-        String result = getString(key);
+    public int getInteger(String key) {
+        return getInteger(key, 0);
+    }
+
+    public int getInteger(String key, int defaultValue) {
+        String result = getString(key, String.valueOf(defaultValue));
         try {
             return Integer.parseInt(result);
         } catch (Exception e) {
-            return 0;
+            return -1;
         }
     }
 

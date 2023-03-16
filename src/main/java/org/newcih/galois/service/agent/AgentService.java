@@ -51,9 +51,10 @@ public abstract class AgentService {
     private boolean inited;
     protected String confAgentName;
     protected List<String> necessaryClasses = new ArrayList<>(8);
+    public static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
 
     public boolean isUseful() {
-        return enabled == necessaryClasses.size() && GlobalConfiguration.getBoolean(confAgentName, true);
+        return enabled == necessaryClasses.size() && globalConfig.getBoolean(confAgentName, true);
     }
 
     /**
@@ -99,5 +100,22 @@ public abstract class AgentService {
 
     public void setInited(boolean inited) {
         this.inited = inited;
+    }
+
+    public int getEnabled() {
+        return enabled;
+    }
+
+    public String getConfAgentName() {
+        return confAgentName;
+    }
+
+    public List<String> getNecessaryClasses() {
+        return necessaryClasses;
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName();
     }
 }

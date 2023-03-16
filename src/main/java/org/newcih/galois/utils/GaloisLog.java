@@ -30,26 +30,26 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.event.Level;
 
-import java.util.Optional;
-
+import static java.util.Optional.ofNullable;
 import static org.newcih.galois.constants.ConfConstant.LOGGING_ENABLED;
 import static org.newcih.galois.constants.ConfConstant.LOGGING_LEVEL;
+import static org.slf4j.event.Level.ERROR;
 
 public class GaloisLog implements Logger {
 
     private final static Level loggingLevel;
-
+    public static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
     public static final String logPrefix = "[Galois] ";
 
     static {
-        String level = Optional.ofNullable(GlobalConfiguration.getString(LOGGING_LEVEL))
-                .orElse(Level.ERROR.toString());
-        level = level.toUpperCase();
+        String level = ofNullable(globalConfig.getString(LOGGING_LEVEL))
+                .orElse(ERROR.toString())
+                .toUpperCase();
         loggingLevel = Level.valueOf(level);
     }
 
     private final Logger logger;
-    private final boolean loggingEnabled = GlobalConfiguration.getBoolean(LOGGING_ENABLED);
+    private final boolean loggingEnabled = globalConfig.getBoolean(LOGGING_ENABLED);
 
     public GaloisLog(Class<?> clazz) {
         this.logger = LoggerFactory.getLogger(clazz);
@@ -386,7 +386,7 @@ public class GaloisLog implements Logger {
 
     @Override
     public boolean isErrorEnabled() {
-        return loggingLevel.toInt() <= Level.ERROR.toInt() && loggingEnabled;
+        return loggingLevel.toInt() <= ERROR.toInt() && loggingEnabled;
     }
 
     @Override

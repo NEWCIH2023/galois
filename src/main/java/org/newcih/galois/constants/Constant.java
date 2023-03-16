@@ -32,6 +32,9 @@ public class Constant {
     public static final String GET_INSTANCE = "getInstance";
     public static final String SRC = "src";
     public static final String PACKAGE = "package";
+    public static final String TRUE = "true";
+    public static final String FALSE = "false";
+    public static final String EMPTY = "";
     public static final String CLASS = "class";
     public static final String UNDER_LINE = "_";
     public static final String OPEN_BRACE = "{";

@@ -73,17 +73,9 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
      */
     @Override
     public void updateBean(File xmlFile) {
-<<<<<<< HEAD
-
-        try (FileInputStream fis = new FileInputStream(xmlFile)) {
-
-            XPathParser parser = new XPathParser(fis, true, configuration.getVariables(),
-                    new XMLMapperEntityResolver());
-=======
         try (FileInputStream fis = new FileInputStream(xmlFile)) {
             Properties properties = getConfiguration().getVariables();
             XPathParser parser = new XPathParser(fis, true, properties, new XMLMapperEntityResolver());
->>>>>>> 7ac66325d922a5493e16fb8930e1b19341a9a698
             XNode context = parser.evalNode("/mapper");
             String namespace = context.getStringAttribute(NAMESPACE);
             // clear cache

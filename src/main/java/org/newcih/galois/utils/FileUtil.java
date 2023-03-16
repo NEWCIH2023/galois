@@ -32,7 +32,6 @@ import java.util.Objects;
 import static org.newcih.galois.constants.Constant.LF;
 
 public class FileUtil {
-    private static final GaloisLog logger = GaloisLog.getLogger(FileUtil.class);
 
     private FileUtil() {
     }
@@ -98,8 +97,7 @@ public class FileUtil {
             }
 
             return byteArrayOutputStream.toByteArray();
-        } catch (Exception e) {
-            logger.error("convert file to byte[] failed", e);
+        } catch (Exception ignored) {
         }
 
         return new byte[0];
@@ -117,7 +115,6 @@ public class FileUtil {
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             br.lines().map(line -> line + LF).forEach(sb::append);
         } catch (Exception e) {
-            logger.error("readTextFile throw exception", e);
             return "";
         }
 

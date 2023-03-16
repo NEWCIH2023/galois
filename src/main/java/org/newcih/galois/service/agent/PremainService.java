@@ -49,7 +49,7 @@ public class PremainService {
 
     public static final GaloisLog logger = GaloisLog.getLogger(PremainService.class);
     // adding new agent service here
-    private static final List<AgentService> agentServices = Arrays.asList(
+    public static final List<AgentService> agentServices = Arrays.asList(
             SpringAgentService.getInstance(),
             MyBatisAgentService.getInstance(),
             CormAgentService.getInstance()
@@ -82,7 +82,7 @@ public class PremainService {
                         String listenerNames = agentService.getListeners().stream()
                                 .map(Objects::toString)
                                 .collect(joining(","));
-                        logger.debug("register file watch listener {}", listenerNames);
+                        logger.debug("AgentService<{}>已启用，并配置了以下监听器 [{}]", agentService, listenerNames);
                     }
                 }
 
