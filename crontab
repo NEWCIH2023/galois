@@ -1,2 +1,2 @@
-00,10,20,30,40,50 * * * * cd /Users/cihnew/IdeaProjects/Galois/ && /Users/cihnew/IdeaProjects/Galois/autoSync.sh
+00,10,20,30,40,50 * * * * cd /Users/cihnew/IdeaProjects/Galois/ && sh /Users/cihnew/IdeaProjects/Galois/autoSync.sh
 
