@@ -22,61 +22,73 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent.frame.spring;
-
-import org.newcih.galois.constants.ClassNameConstant;
-import org.newcih.galois.service.agent.MethodAdapter;
-import org.newcih.galois.utils.GaloisLog;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
+package org.newcih.galois.service.agent.corm;
 
 import java.util.Objects;
+import jdk.internal.org.objectweb.asm.MethodVisitor;
+import org.newcih.galois.service.agent.MethodAdapter;
+import org.newcih.galois.utils.GaloisLog;
 
-import static jdk.internal.org.objectweb.asm.Opcodes.*;
+import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
+import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
+import static jdk.internal.org.objectweb.asm.Opcodes.ATHROW;
+import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
+import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
+import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
+import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
+import static org.newcih.galois.constants.ClassNameConstant.COMTOP_SQL_SESSION_FACTORY;
 
+public class ComtopSqlSessionFactoryBeanVisitor extends MethodAdapter {
 
-public class ApplicationContextVisitor extends MethodAdapter {
+    private static final GaloisLog logger = GaloisLog.getLogger(ComtopSqlSessionFactoryBeanVisitor.class);
 
-    private static final GaloisLog logger = GaloisLog.getLogger(ApplicationContextVisitor.class);
-
-    public ApplicationContextVisitor() {
-        super(ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT);
+    public ComtopSqlSessionFactoryBeanVisitor() {
+        super(COMTOP_SQL_SESSION_FACTORY);
     }
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
                                      String[] exceptions) {
-        MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
 
-        if (Objects.equals("<init>", name) && Objects.equals(descriptor, "()V")) {
-            return new ConstructorVisiter(ASM5, mv);
+        MethodVisitor mv = cv.visitMethod(access, name, descriptor, signature, exceptions);
+
+        if (Objects.equals("<init>", name)) {
+            return new ComtopSqlSessionFactoryBeanVisitor.ConstructorVisitor(ASM5, mv);
         }
 
         return mv;
     }
 
-    static class ConstructorVisiter extends MethodVisitor {
-        public ConstructorVisiter(int api, MethodVisitor methodVisitor) {
-            super(api, methodVisitor);
+    /**
+     * 构造函数修改
+     */
+    static class ConstructorVisitor extends MethodVisitor {
+
+        public ConstructorVisitor(int api, MethodVisitor mv) {
+            super(api, mv);
         }
 
         @Override
         public void visitInsn(int opcode) {
             if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-                String reloaderClassName = SpringBeanReloader.class.getName().replace(".", "/");
+                String reloaderClassName = CormBeanReloader.class.getName().replace(".", "/");
 
+                mv.visitCode();
+                mv.visitVarInsn(ALOAD, 0);
                 mv.visitMethodInsn(INVOKESTATIC, reloaderClassName, "getInstance", "()L" + reloaderClassName + ";",
                         false);
-                mv.visitVarInsn(ALOAD, 0);
-                mv.visitTypeInsn(CHECKCAST, "org/springframework/context/ApplicationContext");
+                mv.visitVarInsn(ALOAD, 1);
                 mv.visitMethodInsn(INVOKEVIRTUAL, reloaderClassName,
-                        "setContext", "(Lorg/springframework/context/ApplicationContext;)V", false);
+                        "setConfiguration", "(Lcom/comtop/corm/session/Configuration;)V", false);
+                mv.visitInsn(RETURN);
+                mv.visitMaxs(2, 2);
+                mv.visitEnd();
 
                 if (logger.isDebugEnabled()) {
-                    logger.debug("injected applicationContext constructor by ASM success!");
+                    logger.debug("injected corm sqlSessionFactoryBean constructor by ASM success!");
                 }
-            }
 
-            super.visitInsn(opcode);
+            }
         }
     }
 }

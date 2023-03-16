@@ -24,13 +24,12 @@
 
 package org.newcih.galois.service.demo.asm;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import jdk.internal.org.objectweb.asm.ClassReader;
 import jdk.internal.org.objectweb.asm.util.ASMifier;
 import jdk.internal.org.objectweb.asm.util.Printer;
 import jdk.internal.org.objectweb.asm.util.TraceClassVisitor;
-
-import java.io.IOException;
-import java.io.PrintWriter;
 
 public class PrintAsmCode {
 

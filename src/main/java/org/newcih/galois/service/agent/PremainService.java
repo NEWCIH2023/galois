@@ -24,23 +24,24 @@
 
 package org.newcih.galois.service.agent;
 
-import org.newcih.galois.service.BannerService;
-import org.newcih.galois.service.FileWatchService;
-import org.newcih.galois.service.agent.frame.corm.CormAgentService;
-import org.newcih.galois.service.agent.frame.mybatis.MyBatisAgentService;
-import org.newcih.galois.service.agent.frame.spring.SpringAgentService;
-import org.newcih.galois.utils.GaloisLog;
-import org.newcih.galois.utils.JavaUtil;
-import org.newcih.galois.utils.StringUtil;
-
 import java.lang.instrument.Instrumentation;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
+import org.newcih.galois.service.BannerService;
+import org.newcih.galois.service.FileWatchService;
+import org.newcih.galois.service.agent.corm.CormAgentService;
+import org.newcih.galois.service.agent.mybatis.MyBatisAgentService;
+import org.newcih.galois.service.agent.spring.SpringAgentService;
+import org.newcih.galois.utils.GaloisLog;
+import org.newcih.galois.utils.JavaUtil;
+import org.newcih.galois.utils.StringUtil;
 
 import static java.util.stream.Collectors.joining;
-import static org.newcih.galois.constants.Constant.*;
+import static org.newcih.galois.constants.Constant.DOT;
+import static org.newcih.galois.constants.Constant.SLASH;
+import static org.newcih.galois.constants.Constant.USER_DIR;
 
 /**
  * premain agent服务入口
@@ -49,17 +50,14 @@ public class PremainService {
 
     public static final GaloisLog logger = GaloisLog.getLogger(PremainService.class);
     // adding new agent service here
-    public static final List<AgentService> agentServices = Arrays.asList(
-            SpringAgentService.getInstance(),
-            MyBatisAgentService.getInstance(),
-            CormAgentService.getInstance()
-    );
+    public static final List<AgentService> agentServices = Arrays.asList(SpringAgentService.getInstance(),
+            MyBatisAgentService.getInstance(), CormAgentService.getInstance());
 
     /**
      * premain entry
      *
-     * @param agentArgs
-     * @param inst
+     * @param agentArgs agent args
+     * @param inst      instrument object
      */
     public static void premain(String agentArgs, Instrumentation inst) {
         JavaUtil.inst = inst;
@@ -77,11 +75,9 @@ public class PremainService {
                 if (agentService.isUseful() && !agentService.isInited()) {
                     agentService.init();
                     listeners.addAll(agentService.getListeners());
-
                     if (logger.isDebugEnabled()) {
-                        String listenerNames = agentService.getListeners().stream()
-                                .map(Objects::toString)
-                                .collect(joining(","));
+                        String listenerNames =
+                                agentService.getListeners().stream().map(Objects::toString).collect(joining(","));
                         logger.debug("AgentService<{}>已启用，并配置了以下监听器 [{}]", agentService, listenerNames);
                     }
                 }

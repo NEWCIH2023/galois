@@ -24,8 +24,6 @@
 
 package org.newcih.galois.utils;
 
-import jdk.internal.org.objectweb.asm.ClassReader;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -34,6 +32,7 @@ import java.lang.instrument.Instrumentation;
 import java.nio.file.Files;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import jdk.internal.org.objectweb.asm.ClassReader;
 
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SLASH;
@@ -41,11 +40,11 @@ import static org.newcih.galois.constants.FileType.CLASS_FILE;
 
 public class JavaUtil {
     private static final String compileDir;
+    private static final Pattern packagePattern = Pattern.compile("^package +(\\S+);");
+    private static final Pattern classNamePattern = Pattern.compile("class +([\\S&&[^<]]+)");
     //    private static final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 //    private static final StandardJavaFileManager standardJavaFileManager;
     public static Instrumentation inst;
-    private static final Pattern packagePattern = Pattern.compile("^package +(\\S+);");
-    private static final Pattern classNamePattern = Pattern.compile("class +([\\S&&[^<]]+)");
 
     static {
 //        standardJavaFileManager = compiler.getStandardFileManager(null, null, null);

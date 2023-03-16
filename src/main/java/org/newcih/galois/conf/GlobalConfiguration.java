@@ -24,14 +24,15 @@
 
 package org.newcih.galois.conf;
 
-import org.newcih.galois.utils.FileUtil;
-import org.newcih.galois.utils.StringUtil;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import org.newcih.galois.utils.FileUtil;
+import org.newcih.galois.utils.StringUtil;
 
-import static org.newcih.galois.constants.Constant.*;
+import static org.newcih.galois.constants.Constant.EMPTY;
+import static org.newcih.galois.constants.Constant.FALSE;
+import static org.newcih.galois.constants.Constant.TRUE;
 
 /**
  * global configuration service

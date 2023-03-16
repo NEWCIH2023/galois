@@ -22,20 +22,19 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent.frame.corm;
+package org.newcih.galois.service.agent.corm;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import org.newcih.galois.service.agent.FileChangedListener;
-import org.newcih.galois.service.agent.frame.mybatis.MyBatisXmlListener;
+import org.newcih.galois.service.agent.mybatis.MyBatisXmlListener;
 import org.newcih.galois.utils.FileUtil;
 import org.newcih.galois.utils.GaloisLog;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.xml.sax.InputSource;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.ByteArrayInputStream;
-import java.io.File;
 
 import static org.newcih.galois.constants.FileType.XML_FILE;
 

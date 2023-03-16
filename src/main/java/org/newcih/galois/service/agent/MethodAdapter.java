@@ -24,12 +24,11 @@
 
 package org.newcih.galois.service.agent;
 
+import java.io.FileOutputStream;
 import jdk.internal.org.objectweb.asm.ClassReader;
 import jdk.internal.org.objectweb.asm.ClassVisitor;
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import org.newcih.galois.utils.GaloisLog;
-
-import java.io.FileOutputStream;
 
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
 import static org.newcih.galois.constants.FileType.CLASS_FILE;
@@ -45,7 +44,7 @@ public abstract class MethodAdapter extends ClassVisitor {
         super(ASM5);
 
         if (className == null || className.isEmpty()) {
-            throw new NullPointerException("methodAdapter's classname cannot be null or empty");
+            throw new NullPointerException("methodAdapter's class name cannot be null or empty.");
         }
 
         this.className = className;
@@ -53,8 +52,6 @@ public abstract class MethodAdapter extends ClassVisitor {
 
     /**
      * convert byte[] of original class file
-     *
-     * @return
      */
     public byte[] transform() {
 
@@ -74,7 +71,7 @@ public abstract class MethodAdapter extends ClassVisitor {
             try (FileOutputStream fos = new FileOutputStream(tempClassFile)) {
                 fos.write(result);
             } catch (Throwable e) {
-                logger.error("dump injected class file error", e);
+                logger.error("dump injected class file error.", e);
             }
         }
 
@@ -83,8 +80,6 @@ public abstract class MethodAdapter extends ClassVisitor {
 
     /**
      * check if methodadapter can injecte this version of service
-     *
-     * @return
      */
     public boolean isUseful() {
         return true;

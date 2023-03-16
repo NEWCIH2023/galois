@@ -22,8 +22,21 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent.frame.mybatis;
+package org.newcih.galois.service.agent.mybatis;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.Set;
 import org.apache.ibatis.binding.MapperRegistry;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
@@ -34,17 +47,9 @@ import org.apache.ibatis.parsing.XPathParser;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.newcih.galois.service.agent.BeanReloader;
-import org.newcih.galois.service.agent.frame.spring.SpringBeanReloader;
+import org.newcih.galois.service.agent.spring.SpringBeanReloader;
 import org.newcih.galois.utils.GaloisLog;
 import org.springframework.context.ApplicationContext;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.util.*;
 
 import static org.newcih.galois.constants.Constant.ID;
 import static org.newcih.galois.constants.Constant.NAMESPACE;
@@ -73,6 +78,11 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
      */
     @Override
     public void updateBean(File xmlFile) {
+        if (configuration == null) {
+            logger.error("mybatisBeanReloader had not ready. configuration is null.");
+            return;
+        }
+
         try (FileInputStream fis = new FileInputStream(xmlFile)) {
             Properties properties = getConfiguration().getVariables();
             XPathParser parser = new XPathParser(fis, true, properties, new XMLMapperEntityResolver());
@@ -92,9 +102,7 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
             logger.error("reload mybatis xml throw exception", e);
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("reload mybatis xml file {} success", xmlFile.getName());
-        }
+        logger.info("reload mybatis xml file {} success", xmlFile.getName());
     }
 
     @Override

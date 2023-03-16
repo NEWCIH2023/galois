@@ -31,15 +31,15 @@ import org.slf4j.Marker;
 import org.slf4j.event.Level;
 
 import static java.util.Optional.ofNullable;
-import static org.newcih.galois.constants.ConfConstant.LOGGING_ENABLED;
+import static org.newcih.galois.constants.ConfConstant.LOGGING_ENABLE;
 import static org.newcih.galois.constants.ConfConstant.LOGGING_LEVEL;
 import static org.slf4j.event.Level.ERROR;
 
 public class GaloisLog implements Logger {
 
-    private final static Level loggingLevel;
     public static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
     public static final String logPrefix = "[Galois] ";
+    private final static Level loggingLevel;
 
     static {
         String level = ofNullable(globalConfig.getString(LOGGING_LEVEL))
@@ -49,7 +49,7 @@ public class GaloisLog implements Logger {
     }
 
     private final Logger logger;
-    private final boolean loggingEnabled = globalConfig.getBoolean(LOGGING_ENABLED);
+    private final boolean loggingEnabled = globalConfig.getBoolean(LOGGING_ENABLE);
 
     public GaloisLog(Class<?> clazz) {
         this.logger = LoggerFactory.getLogger(clazz);

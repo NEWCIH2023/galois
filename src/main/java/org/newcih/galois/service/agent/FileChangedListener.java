@@ -31,34 +31,32 @@ import java.io.File;
  */
 public interface FileChangedListener {
 
-
     /**
      * is listener useful for this file object
      *
-     * @param file
-     * @return
+     * @param file the changed file
+     * @return is the listener monitor this file change
      */
     boolean isUseful(File file);
 
     /**
      * handler for file created
      *
-     * @param file
+     * @param file the changed file
      */
     void createdHandle(File file);
 
     /**
      * handler for file modifed
      *
-     * @param file
+     * @param file the changed file
      */
     void modifiedHandle(File file);
 
     /**
      * handler for file deleted
      *
-     * @param file
+     * @param file the changed file
      */
     void deletedHandle(File file);
-
 }
