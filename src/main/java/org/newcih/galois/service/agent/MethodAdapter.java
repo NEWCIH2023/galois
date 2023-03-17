@@ -24,14 +24,12 @@
 
 package org.newcih.galois.service.agent;
 
-import java.io.FileOutputStream;
 import jdk.internal.org.objectweb.asm.ClassReader;
 import jdk.internal.org.objectweb.asm.ClassVisitor;
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import org.newcih.galois.utils.GaloisLog;
 
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
-import static org.newcih.galois.constants.FileType.CLASS_FILE;
 
 public abstract class MethodAdapter extends ClassVisitor {
 
@@ -57,6 +55,9 @@ public abstract class MethodAdapter extends ClassVisitor {
 
         try {
             cr = new ClassReader(className);
+            // COMPUTE_MAXS means automatically compute the maximum stack size and the maximum number of local variables
+            // of methods.
+            // COMPUTE_FRAMES means automatically compute the stack map frames of methods from scratch.
             cw = new ClassWriter(cr, ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
             cv = this.cw;
         } catch (Exception e) {
@@ -66,14 +67,14 @@ public abstract class MethodAdapter extends ClassVisitor {
         cr.accept(this, 0);
         byte[] result = cw.toByteArray();
 
-        if (logger.isDebugEnabled()) {
-            String tempClassFile = "" + getClass().getSimpleName() + CLASS_FILE.getFileType();
-            try (FileOutputStream fos = new FileOutputStream(tempClassFile)) {
-                fos.write(result);
-            } catch (Throwable e) {
-                logger.error("dump injected class file error.", e);
-            }
-        }
+//        if (logger.isDebugEnabled()) {
+//            String tempClassFile = "" + getClass().getSimpleName() + CLASS_FILE.getFileType();
+//            try (FileOutputStream fos = new FileOutputStream(tempClassFile)) {
+//                fos.write(result);
+//            } catch (Throwable e) {
+//                logger.error("dump injected class file error.", e);
+//            }
+//        }
 
         return result;
     }

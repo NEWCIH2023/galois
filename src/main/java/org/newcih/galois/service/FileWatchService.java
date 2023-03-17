@@ -24,6 +24,9 @@
 
 package org.newcih.galois.service;
 
+import org.newcih.galois.service.agent.FileChangedListener;
+import org.newcih.galois.utils.GaloisLog;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -31,14 +34,9 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.List;
-import org.newcih.galois.service.agent.FileChangedListener;
-import org.newcih.galois.utils.GaloisLog;
 
 import static com.sun.nio.file.SensitivityWatchEventModifier.MEDIUM;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
-import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
+import static java.nio.file.StandardWatchEventKinds.*;
 import static org.newcih.galois.constants.Constant.DOT;
 
 /**
@@ -106,18 +104,10 @@ public class FileWatchService {
                         }
 
                         for (WatchEvent<?> event : watchKey.pollEvents()) {
-                            if (event.count() > 1) {
-                                continue;
-                            }
-
                             WatchEvent.Kind<?> kind = event.kind();
-
-                            if (kind == OVERFLOW) {
-                                continue;
-                            }
-
                             File file = new File(watchKey.watchable() + File.separator + event.context());
-                            if (file.isDirectory()) {
+
+                            if (event.count() > 1 || kind == OVERFLOW || file.isDirectory()) {
                                 continue;
                             }
 
@@ -136,7 +126,7 @@ public class FileWatchService {
 
                         watchKey.reset();
                     } catch (Exception e) {
-                        logger.error("file change handle failed", e);
+                        logger.error("file change handle failed.", e);
                     }
                 }
             });
@@ -150,16 +140,6 @@ public class FileWatchService {
             logger.error("start file watch service failed!", e);
         }
 
-    }
-
-    public void stop() {
-        try {
-            if (watchThread != null) {
-                watchThread.interrupt();
-            }
-        } catch (Exception e) {
-            logger.error("close file watch service failed!", e);
-        }
     }
 
     public List<FileChangedListener> getListeners() {

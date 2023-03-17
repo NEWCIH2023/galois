@@ -24,15 +24,14 @@
 
 package org.newcih.galois.conf;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 import org.newcih.galois.utils.FileUtil;
 import org.newcih.galois.utils.StringUtil;
 
-import static org.newcih.galois.constants.Constant.EMPTY;
-import static org.newcih.galois.constants.Constant.FALSE;
-import static org.newcih.galois.constants.Constant.TRUE;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+import static org.newcih.galois.constants.Constant.*;
 
 /**
  * global configuration service
@@ -53,7 +52,6 @@ public class GlobalConfiguration {
             // 加载配置文件中的配置，这部分参数使用完全匹配
             configuration.load(is);
         } catch (IOException e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
