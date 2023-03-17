@@ -24,14 +24,14 @@
 
 package org.newcih.galois.service.agent;
 
-import org.newcih.galois.conf.GlobalConfiguration;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.newcih.galois.conf.GlobalConfiguration;
 
 public abstract class AgentService {
+    protected static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
     /**
      * 文件变更监听器列表
      */
@@ -45,14 +45,27 @@ public abstract class AgentService {
      */
     protected Map<String, MethodAdapter> adapterMap = new HashMap<>(4);
     /**
+     * 配置文件对应的AgentService名称
+     */
+    protected String confAgentName;
+    /**
+     * 必备的加载类名称列表
+     */
+    protected List<String> necessaryClasses = new ArrayList<>(8);
+    /**
      * 是否启用该AgentService，当该变量值与necessaryClasses的大小一致时，表示该AgentService启用
      */
     private int enabled;
+    /**
+     * 是否初始化完成
+     */
     private boolean inited;
-    protected String confAgentName;
-    protected List<String> necessaryClasses = new ArrayList<>(8);
-    public static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
 
+    /**
+     * 当前AgentService是否可启用
+     *
+     * @return 当项目已经加载了必须的类之后，该AgentService将成为可用状态
+     */
     public boolean isUseful() {
         return enabled == necessaryClasses.size() && globalConfig.getBoolean(confAgentName, true);
     }
@@ -70,8 +83,8 @@ public abstract class AgentService {
      * 检测到当前已经加载了名为loadedClassName的类时，则更新该AgentService的enabled值，使其++，当enabled值等于
      * necessaryClasses的大小时，表示该agentService正式启用
      *
-     * @param loadedClassName
-     * @return
+     * @param loadedClassName loaded class name
+     * @return 项目是否加载了对应的类名的类
      */
     public boolean checkAgentEnable(String loadedClassName) {
         if (necessaryClasses.contains(loadedClassName)) {

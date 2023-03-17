@@ -22,26 +22,24 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent.frame.corm;
+package org.newcih.galois.service.agent.corm;
 
-import com.comtop.corm.builder.xml.XMLMapperBuilder;
-import com.comtop.corm.builder.xml.XMLMapperEntityResolver;
-import com.comtop.corm.executor.keygen.SelectKeyGenerator;
-import com.comtop.corm.mapping.MappedStatement;
-import com.comtop.corm.parsing.XNode;
-import com.comtop.corm.parsing.XPathParser;
-import com.comtop.corm.resource.core.io.FileSystemResource;
-import com.comtop.corm.session.Configuration;
-import org.newcih.galois.service.agent.BeanReloader;
-import org.newcih.galois.utils.GaloisLog;
-
+import com.comtop.corm.builder.xml.*;
+import com.comtop.corm.parsing.*;
+import com.comtop.corm.resource.core.io.*;
+import com.comtop.corm.session.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.Set;
+import org.newcih.galois.service.agent.BeanReloader;
+import org.newcih.galois.utils.GaloisLog;
 
 import static org.newcih.galois.constants.Constant.ID;
 import static org.newcih.galois.constants.Constant.NAMESPACE;
@@ -70,10 +68,15 @@ public class CormBeanReloader implements BeanReloader<File> {
     /**
      * 更新bean实例
      *
-     * @param mapperFile
+     * @param mapperFile mapper xml file
      */
     @Override
     public void updateBean(File mapperFile) {
+        if (configuration == null) {
+            logger.error("corm had not ready. configuration is null.");
+            return;
+        }
+
         try (FileInputStream fis = new FileInputStream(mapperFile)) {
             Properties variables = configuration.getVariables();
             XPathParser parser = new XPathParser(fis, true, variables, new XMLMapperEntityResolver());

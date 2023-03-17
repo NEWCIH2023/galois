@@ -27,8 +27,12 @@ package org.newcih.galois.service;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
+import org.newcih.galois.conf.GlobalConfiguration;
+
+import static org.newcih.galois.constants.ConfConstant.BANNER_ENABLE;
 
 public class BannerService {
+    private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
 
     public static final String BANNER =
             "  ____       _       _     \n" +
@@ -41,12 +45,16 @@ public class BannerService {
     }
 
     public static void printBanner() {
+        if (!globalConfig.getBoolean(BANNER_ENABLE, true)) {
+            return;
+        }
+
         System.out.println(BANNER);
         System.out.printf(" :: SpringBoot :: (%s) :: Spring :: (%s) :: MyBatis :: (%s) ::%n%n",
                 springBootVersion(), springVersion(), mybatisVersion());
     }
 
-    public static String springBootVersion() {
+    private static String springBootVersion() {
         try {
             Class<?> springBootVersion = Class.forName("org.springframework.boot.SpringBootVersion");
             Method getVersion = springBootVersion.getDeclaredMethod("getVersion");
@@ -56,7 +64,7 @@ public class BannerService {
         }
     }
 
-    public static String springVersion() {
+    private static String springVersion() {
         try {
             Class<?> springVersion = Class.forName("org.springframework.core.SpringVersion");
             Method getVersion = springVersion.getDeclaredMethod("getVersion");
@@ -66,7 +74,7 @@ public class BannerService {
         }
     }
 
-    public static String mybatisVersion() {
+    private static String mybatisVersion() {
         try {
             Class<?> mapperRegistry = Class.forName("org.apache.ibatis.binding.MapperRegistry");
             Field knownMappers = mapperRegistry.getDeclaredField("knownMappers");

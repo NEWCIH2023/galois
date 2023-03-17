@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent.frame.corm;
+package org.newcih.galois.service.agent.corm;
 
 import org.newcih.galois.service.agent.AgentService;
 

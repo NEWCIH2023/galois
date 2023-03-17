@@ -22,39 +22,32 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent.frame.spring;
+package org.newcih.galois.service.agent.spring;
 
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.List;
 import org.newcih.galois.service.agent.BeanReloader;
 import org.newcih.galois.utils.GaloisLog;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.List;
-
 /**
  * Spring的Bean重载服务
  */
-public final class SpringBeanReloader implements BeanReloader<Class<?>> {
-
+public class SpringBeanReloader implements BeanReloader<Class<?>> {
+    public static final List<String> ignorePackages = Arrays.asList("org.springframework", "org.apache");
     private static final GaloisLog logger = GaloisLog.getLogger(SpringBeanReloader.class);
     private static final SpringBeanReloader springBeanReloader = new SpringBeanReloader();
-    public static final List<String> ignorePackages = Arrays.asList("org.springframework");
-    /**
-     * 待注入属性
-     */
-    private ClassPathBeanDefinitionScanner scanner;
-    private ApplicationContext context;
+    protected ClassPathBeanDefinitionScanner scanner;
+    protected ApplicationContext context;
 
     private SpringBeanReloader() {
     }
 
     /**
      * 获取单例实例
-     *
-     * @return
      */
     public static SpringBeanReloader getInstance() {
         return springBeanReloader;
@@ -63,27 +56,29 @@ public final class SpringBeanReloader implements BeanReloader<Class<?>> {
     /**
      * 更新Spring管理的bean对象
      *
-     * @param clazz
+     * @param clazz 待更新实例的类对象类型
      */
     @Override
     public void updateBean(Class<?> clazz) {
+        if (scanner == null || context == null) {
+            logger.error("springBeanReloader had not ready. scanner or context is null.");
+            return;
+        }
+
         DefaultListableBeanFactory factory = (DefaultListableBeanFactory) getContext().getAutowireCapableBeanFactory();
         String beanName = factory.getBeanNamesForType(clazz)[0];
-        Object bean = null;
 
         try {
-            bean = clazz.newInstance();
+            Object bean = clazz.newInstance();
             factory.destroySingleton(beanName);
             factory.registerSingleton(beanName, bean);
         } catch (InstantiationException ie) {
-            logger.error("can't create a new object from newInstance method, ensure that's not an abstract class");
+            logger.error("can't create a new object from newInstance method, ensure that's not an abstract class.");
         } catch (Exception e) {
-            logger.error("spring bean reloader update bean failed", e);
+            logger.error("spring bean reloader update bean failed.", e);
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("had reload spring bean {}", bean);
-        }
+        logger.info("reload spring bean type {} success.", clazz.getName());
     }
 
     @Override

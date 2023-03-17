@@ -24,9 +24,6 @@
 
 package org.newcih.galois.service;
 
-import org.newcih.galois.service.agent.FileChangedListener;
-import org.newcih.galois.utils.GaloisLog;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -34,9 +31,14 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.List;
+import org.newcih.galois.service.agent.FileChangedListener;
+import org.newcih.galois.utils.GaloisLog;
 
 import static com.sun.nio.file.SensitivityWatchEventModifier.MEDIUM;
-import static java.nio.file.StandardWatchEventKinds.*;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 import static org.newcih.galois.constants.Constant.DOT;
 
 /**
@@ -64,6 +66,14 @@ public class FileWatchService {
     }
 
     /**
+     * @param rootPath 监听路径
+     */
+    public FileWatchService(String rootPath, List<FileChangedListener> listeners) {
+        this(rootPath);
+        this.listeners = listeners;
+    }
+
+    /**
      * register each child directory to monitor file changed
      *
      * @param dir
@@ -83,14 +93,6 @@ public class FileWatchService {
                 registerWatchService(subDir);
             }
         }
-    }
-
-    /**
-     * @param rootPath 监听路径
-     */
-    public FileWatchService(String rootPath, List<FileChangedListener> listeners) {
-        this(rootPath);
-        this.listeners = listeners;
     }
 
     public void start() {

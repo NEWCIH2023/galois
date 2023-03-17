@@ -22,16 +22,21 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent.frame.spring;
-
-import org.newcih.galois.service.agent.MethodAdapter;
-import org.newcih.galois.utils.GaloisLog;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
+package org.newcih.galois.service.agent.spring;
 
 import java.util.Objects;
+import jdk.internal.org.objectweb.asm.MethodVisitor;
+import org.newcih.galois.service.agent.MethodAdapter;
+import org.newcih.galois.utils.GaloisLog;
 
+import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
+import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
+import static jdk.internal.org.objectweb.asm.Opcodes.ATHROW;
+import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
+import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
+import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
+import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
 import static org.newcih.galois.constants.ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER;
-import static jdk.internal.org.objectweb.asm.Opcodes.*;
 
 public class BeanDefinitionScannerVisitor extends MethodAdapter {
 

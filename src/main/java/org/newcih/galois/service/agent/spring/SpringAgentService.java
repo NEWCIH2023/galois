@@ -22,28 +22,34 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent.frame.mybatis;
+package org.newcih.galois.service.agent.spring;
 
+import java.util.Arrays;
 import org.newcih.galois.service.agent.AgentService;
 
-import static org.newcih.galois.constants.ClassNameConstant.SQL_SESSION_FACTORY_BEAN;
+import static org.newcih.galois.constants.ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT;
+import static org.newcih.galois.constants.ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER;
 
-public class MyBatisAgentService extends AgentService {
+public class SpringAgentService extends AgentService {
 
-    private final static MyBatisAgentService myBatisAgentService = new MyBatisAgentService();
+    private static final SpringAgentService springAgent = new SpringAgentService();
 
-    private MyBatisAgentService() {
-        necessaryClasses.add(SQL_SESSION_FACTORY_BEAN);
+    private SpringAgentService() {
+        adapterMap.put(CLASS_PATH_BEAN_DEFINITION_SCANNER, new BeanDefinitionScannerVisitor());
+        adapterMap.put(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT, new ApplicationContextVisitor());
+
+        necessaryClasses.addAll(Arrays.asList(CLASS_PATH_BEAN_DEFINITION_SCANNER,
+                ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT));
     }
 
-    public static MyBatisAgentService getInstance() {
-        return myBatisAgentService;
+    public static SpringAgentService getInstance() {
+        return springAgent;
     }
 
     @Override
     public void init() {
         super.init();
-        listeners.add(new MyBatisXmlListener());
-        beanReloader = MyBatisBeanReloader.getInstance();
+        listeners.add(new SpringBeanListener());
+        beanReloader = SpringBeanReloader.getInstance();
     }
 }
