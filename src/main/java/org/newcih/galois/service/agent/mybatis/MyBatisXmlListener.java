@@ -82,7 +82,7 @@ public class MyBatisXmlListener implements FileChangedListener {
     @Override
     public void modifiedHandle(File file) {
         if (logger.isDebugEnabled()) {
-            logger.debug("mybatis listener monitor file modified ==> {}", file.getName());
+            logger.debug("mybatis listener monitor file modified ==> {}.", file.getName());
         }
 
         reloader.updateBean(file);

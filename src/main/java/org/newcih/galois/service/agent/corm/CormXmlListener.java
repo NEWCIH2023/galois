@@ -24,10 +24,6 @@
 
 package org.newcih.galois.service.agent.corm;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.newcih.galois.service.agent.FileChangedListener;
 import org.newcih.galois.service.agent.mybatis.MyBatisXmlListener;
 import org.newcih.galois.utils.FileUtil;
@@ -36,14 +32,17 @@ import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.xml.sax.InputSource;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+
 import static org.newcih.galois.constants.FileType.XML_FILE;
 
 public class CormXmlListener implements FileChangedListener {
 
     public static final String DOC_TYPE = "mapper";
-
     private static final GaloisLog logger = GaloisLog.getLogger(MyBatisXmlListener.class);
-
     private static final CormBeanReloader reloader = CormBeanReloader.getInstance();
 
     @Override
@@ -82,7 +81,7 @@ public class CormXmlListener implements FileChangedListener {
     @Override
     public void modifiedHandle(File file) {
         if (logger.isDebugEnabled()) {
-            logger.debug("corm listener monitor file modified ==> {}", file.getName());
+            logger.debug("corm listener monitor file modified ==> {}.", file.getName());
         }
 
         reloader.updateBean(file);

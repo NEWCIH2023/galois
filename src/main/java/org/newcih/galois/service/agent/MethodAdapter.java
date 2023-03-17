@@ -27,13 +27,19 @@ package org.newcih.galois.service.agent;
 import jdk.internal.org.objectweb.asm.ClassReader;
 import jdk.internal.org.objectweb.asm.ClassVisitor;
 import jdk.internal.org.objectweb.asm.ClassWriter;
+import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.utils.GaloisLog;
 
+import java.io.FileOutputStream;
+
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
+import static org.newcih.galois.constants.ConfConstant.PRINT_ASM_CODE_ENABLE;
+import static org.newcih.galois.constants.FileType.CLASS_FILE;
 
 public abstract class MethodAdapter extends ClassVisitor {
 
     private static final GaloisLog logger = GaloisLog.getLogger(MethodAdapter.class);
+    private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
     protected final String className;
     protected ClassReader cr;
     protected ClassWriter cw;
@@ -67,14 +73,15 @@ public abstract class MethodAdapter extends ClassVisitor {
         cr.accept(this, 0);
         byte[] result = cw.toByteArray();
 
-//        if (logger.isDebugEnabled()) {
-//            String tempClassFile = "" + getClass().getSimpleName() + CLASS_FILE.getFileType();
-//            try (FileOutputStream fos = new FileOutputStream(tempClassFile)) {
-//                fos.write(result);
-//            } catch (Throwable e) {
-//                logger.error("dump injected class file error.", e);
-//            }
-//        }
+        if (globalConfig.getBoolean(PRINT_ASM_CODE_ENABLE, false)) {
+            String tempClassFile = "" + getClass().getSimpleName() + CLASS_FILE.getFileType();
+            try (FileOutputStream fos = new FileOutputStream(tempClassFile)) {
+                fos.write(result);
+            } catch (Throwable e) {
+                logger.error("dump injected class file error.", e);
+            }
+            logger.info("had dump asm code to {}.", tempClassFile);
+        }
 
         return result;
     }

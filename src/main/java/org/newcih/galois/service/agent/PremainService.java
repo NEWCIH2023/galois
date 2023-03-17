@@ -24,11 +24,6 @@
 
 package org.newcih.galois.service.agent;
 
-import java.lang.instrument.Instrumentation;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArrayList;
 import org.newcih.galois.service.BannerService;
 import org.newcih.galois.service.FileWatchService;
 import org.newcih.galois.service.agent.corm.CormAgentService;
@@ -38,10 +33,14 @@ import org.newcih.galois.utils.GaloisLog;
 import org.newcih.galois.utils.JavaUtil;
 import org.newcih.galois.utils.StringUtil;
 
+import java.lang.instrument.Instrumentation;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
+
 import static java.util.stream.Collectors.joining;
-import static org.newcih.galois.constants.Constant.DOT;
-import static org.newcih.galois.constants.Constant.SLASH;
-import static org.newcih.galois.constants.Constant.USER_DIR;
+import static org.newcih.galois.constants.Constant.*;
 
 /**
  * premain agent服务入口
@@ -75,11 +74,18 @@ public class PremainService {
                 if (agentService.isUseful() && !agentService.isInited()) {
                     agentService.init();
                     listeners.addAll(agentService.getListeners());
-                    if (logger.isDebugEnabled()) {
-                        String listenerNames =
-                                agentService.getListeners().stream().map(Objects::toString).collect(joining(","));
-                        logger.debug("AgentService<{}>已启用，并配置了以下监听器 [{}]", agentService, listenerNames);
-                    }
+
+                    List<AgentService> enabledAgents = agentServices.stream()
+                            .filter(AgentService::isInited)
+                            .collect(Collectors.toList());
+                    String enableAgentNames = enabledAgents.stream()
+                            .map(Object::toString)
+                            .collect(joining(","));
+                    String listenerNames = enabledAgents.stream()
+                            .flatMap(agent -> agent.getListeners().stream())
+                            .map(Object::toString)
+                            .collect(joining(","));
+                    logger.info("当前共启用[{}]，并配置了以下监听器 [{}]", enableAgentNames, listenerNames);
                 }
 
                 // checkedClass表示当前加载的类newClassName是否有对应的MethodAdapter，当为false时，表示没有对应的MethodAdapter，

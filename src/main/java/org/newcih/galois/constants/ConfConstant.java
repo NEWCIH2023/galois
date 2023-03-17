@@ -30,5 +30,6 @@ public class ConfConstant {
     public static final String LOGGING_LEVEL = "logging.level";
     public static final String BANNER_ENABLE = "banner.enable";
     public static final String RELOADER_SPRING_BOOT_ENABLE = "reloader.spring.boot.enable";
+    public static final String PRINT_ASM_CODE_ENABLE = "print-asm-code.enable";
     public static final String RELOADER_MYBATIS_ENABLE = "reloader.mybatis.enable";
 }

@@ -78,7 +78,7 @@ public class FileWatchService {
      * @throws IOException
      */
     private void registerWatchService(File dir) throws IOException {
-        dir.toPath().register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE}, MEDIUM);
+        dir.toPath().register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY}, MEDIUM);
         File[] subDirs = dir.listFiles(File::isDirectory);
         if (subDirs == null) {
             return;
@@ -94,52 +94,50 @@ public class FileWatchService {
     }
 
     public void start() {
-        try {
-            watchThread = new Thread(() -> {
-                while (true) {
-                    try {
-                        WatchKey watchKey = watchService.take();
-                        if (watchKey == null) {
+        watchThread = new Thread(() -> {
+            try {
+                Thread.sleep(2 * 60 * 1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            logger.info("file change handle service started.");
+
+            while (true) {
+                try {
+                    WatchKey watchKey = watchService.take();
+                    if (watchKey == null) {
+                        continue;
+                    }
+
+                    for (WatchEvent<?> event : watchKey.pollEvents()) {
+                        WatchEvent.Kind<?> kind = event.kind();
+                        File file = new File(watchKey.watchable() + File.separator + event.context());
+
+                        if (event.count() > 1 || kind == OVERFLOW || file.isDirectory()) {
                             continue;
                         }
 
-                        for (WatchEvent<?> event : watchKey.pollEvents()) {
-                            WatchEvent.Kind<?> kind = event.kind();
-                            File file = new File(watchKey.watchable() + File.separator + event.context());
-
-                            if (event.count() > 1 || kind == OVERFLOW || file.isDirectory()) {
-                                continue;
-                            }
-
-                            listeners.stream()
-                                    .filter(listener -> listener.isUseful(file))
-                                    .forEach(listener -> {
-                                        if (kind == ENTRY_CREATE) {
-                                            listener.createdHandle(file);
-                                        } else if (kind == ENTRY_DELETE) {
-                                            listener.deletedHandle(file);
-                                        } else if (kind == ENTRY_MODIFY) {
-                                            listener.modifiedHandle(file);
-                                        }
-                                    });
-                        }
-
-                        watchKey.reset();
-                    } catch (Exception e) {
-                        logger.error("file change handle failed.", e);
+                        listeners.stream()
+                                .filter(listener -> listener.isUseful(file))
+                                .forEach(listener -> {
+                                    if (kind == ENTRY_CREATE) {
+                                        listener.createdHandle(file);
+                                    } else if (kind == ENTRY_MODIFY) {
+                                        listener.modifiedHandle(file);
+                                    }
+                                });
                     }
+
+                    watchKey.reset();
+                } catch (Exception e) {
+                    logger.error("file change handle failed.", e);
                 }
-            });
-            watchThread.setDaemon(true);
-            watchThread.start();
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("file watch service had already started!");
             }
-        } catch (Exception e) {
-            logger.error("start file watch service failed!", e);
-        }
+        });
 
+        watchThread.setDaemon(true);
+        watchThread.start();
     }
 
     public List<FileChangedListener> getListeners() {

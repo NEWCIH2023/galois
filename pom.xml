@@ -168,6 +168,9 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
+                    <excludes>
+                        <exclude>libs/*.jar</exclude>
+                    </excludes>
                     <finalName>${artifactId}</finalName>
                     <archive>
                         <index>true</index>
