@@ -30,7 +30,9 @@ import java.nio.file.FileSystems;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.ArrayList;
 import java.util.List;
+import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.service.agent.FileChangedListener;
 import org.newcih.galois.utils.GaloisLog;
 
@@ -39,6 +41,7 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 import static org.newcih.galois.constants.Constant.DOT;
+import static org.newcih.galois.constants.Constant.USER_DIR;
 
 /**
  * 基于Apache Common IO的文件变更监听工具
@@ -46,13 +49,14 @@ import static org.newcih.galois.constants.Constant.DOT;
 public class FileWatchService {
 
     private final static GaloisLog logger = GaloisLog.getLogger(FileWatchService.class);
-    private List<FileChangedListener> listeners;
+    private static List<FileChangedListener> listeners = new ArrayList<>(16);
     private WatchService watchService;
     private static final SpringBootLifeCycle lifeCycle = SpringBootLifeCycle.getInstance();
+    private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
 
     static {
-        String rootPath = System.getenv():
-        lifeCycle.addRunner();
+        String rootPath = globalConfig.getString(USER_DIR);
+        lifeCycle.addRunner((context) -> new FileWatchService(rootPath).start());
     }
 
     public FileWatchService(String rootPath) {
@@ -67,14 +71,6 @@ public class FileWatchService {
             logger.error("start file watchService failed", e);
             System.exit(0);
         }
-    }
-
-    /**
-     * @param rootPath 监听路径
-     */
-    public FileWatchService(String rootPath, List<FileChangedListener> listeners) {
-        this(rootPath);
-        this.listeners = listeners;
     }
 
     /**
@@ -98,6 +94,9 @@ public class FileWatchService {
         }
     }
 
+    /**
+     * begin file monitor service
+     */
     public void start() {
         Thread watchThread = new Thread(() -> {
             logger.info("file change handle service started.");
@@ -143,7 +142,10 @@ public class FileWatchService {
         return listeners;
     }
 
-    public void setListeners(List<FileChangedListener> listeners) {
-        this.listeners = listeners;
+    public void registerListeners(FileChangedListener listener) {
+        if (listener != null) {
+            listeners.add(listener);
+        }
     }
+
 }

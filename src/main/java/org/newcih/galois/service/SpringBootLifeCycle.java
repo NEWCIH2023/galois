@@ -3,13 +3,15 @@ package org.newcih.galois.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import org.newcih.galois.service.agent.spring.SpringBeanReloader;
+import org.springframework.context.ApplicationContext;
 
 /**
  * SpringBoot运行周期管理
  */
 public class SpringBootLifeCycle {
 
-    private final List<Consumer<?>> runners = new ArrayList<>(8);
+    private final List<Consumer<ApplicationContext>> runners = new ArrayList<>(8);
     private int started;
 
     private static final SpringBootLifeCycle instance = new SpringBootLifeCycle();
@@ -26,13 +28,13 @@ public class SpringBootLifeCycle {
      *
      * @param runner runner
      */
-    public void addRunner(Consumer<?> runner) {
+    public void addRunner(Consumer<ApplicationContext> runner) {
         if (runner != null) {
             this.runners.add(runner);
         }
     }
 
-    public List<Consumer<?>> getRunners() {
+    public List<Consumer<ApplicationContext>> getRunners() {
         return runners;
     }
 
@@ -52,7 +54,8 @@ public class SpringBootLifeCycle {
         this.started++;
 
         if (started == 1) {
-            getRunners().forEach(action -> action.accept(null));
+            ApplicationContext context = SpringBeanReloader.getInstance().getContext();
+            getRunners().forEach(action -> action.accept(context));
         }
     }
 }
