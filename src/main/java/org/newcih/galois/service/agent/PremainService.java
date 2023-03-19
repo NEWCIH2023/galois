@@ -71,7 +71,7 @@ public class PremainService {
         JavaUtil.inst = inst;
         inst.addTransformer(new InjectClassFile(), true);
         // load custom class to jvm
-        loadCustomClasses();
+        loadCustomClasses(inst);
         // banner should be printed after necessary processes done
         BannerService.printBanner();
     }
@@ -125,10 +125,10 @@ public class PremainService {
     /**
      * load custom class
      */
-    public static void loadCustomClasses() {
+    public static void loadCustomClasses(Instrumentation inst) {
         try {
             for (Class<?> customClass : customClasses) {
-                Class.forName(customClass.getName());
+                PremainService.class.getClassLoader().loadClass(customClass.getName());
                 logger.info("had load custom class <{}>.", customClass.getName());
             }
         } catch (ClassNotFoundException e) {
