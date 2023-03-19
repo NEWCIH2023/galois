@@ -38,9 +38,11 @@ import org.newcih.galois.service.SpringBootLifeCycle;
 import org.newcih.galois.service.agent.corm.CormAgentService;
 import org.newcih.galois.service.agent.mybatis.MyBatisAgentService;
 import org.newcih.galois.service.agent.spring.SpringAgentService;
+import org.newcih.galois.service.agent.spring.SpringBeanReloader;
 import org.newcih.galois.utils.GaloisLog;
 import org.newcih.galois.utils.JavaUtil;
 import org.newcih.galois.utils.StringUtil;
+import org.springframework.context.ApplicationContext;
 
 import static java.util.stream.Collectors.joining;
 import static org.newcih.galois.constants.Constant.DOT;
@@ -126,9 +128,11 @@ public class PremainService {
      * load custom class
      */
     public static void loadCustomClasses(Instrumentation inst) {
+        ClassLoader classLoader = ApplicationContext.class.getClassLoader();
         try {
             for (Class<?> customClass : customClasses) {
-                PremainService.class.getClassLoader().loadClass(customClass.getName());
+                Class<?> custom = classLoader.loadClass(customClass.getName());
+                SpringBeanReloader.getInstance().updateBean(custom);
                 logger.info("had load custom class <{}>.", customClass.getName());
             }
         } catch (ClassNotFoundException e) {
