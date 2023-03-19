@@ -9,7 +9,16 @@ import java.util.function.Consumer;
 public class SpringBootLifeCycle {
 
     private List<Consumer<?>> runner;
-    private int runState;
+    /**
+     * the following value of program running state
+     * <p>
+     * -1: default
+     * 0: starting
+     * 1: started
+     */
+    private int runState = -1;
+    public static final int STARTING = 0;
+    public static final int STARTED = 1;
 
     private static final SpringBootLifeCycle instance = new SpringBootLifeCycle();
 

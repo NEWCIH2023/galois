@@ -24,23 +24,27 @@
 
 package org.newcih.galois.service.agent;
 
+import java.lang.instrument.ClassFileTransformer;
+import java.lang.instrument.Instrumentation;
+import java.security.ProtectionDomain;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 import org.newcih.galois.service.BannerService;
 import org.newcih.galois.service.FileWatchService;
 import org.newcih.galois.service.agent.corm.CormAgentService;
 import org.newcih.galois.service.agent.mybatis.MyBatisAgentService;
 import org.newcih.galois.service.agent.spring.SpringAgentService;
+import org.newcih.galois.service.asmcode.AfterSpringBootStarted;
 import org.newcih.galois.utils.GaloisLog;
 import org.newcih.galois.utils.JavaUtil;
 import org.newcih.galois.utils.StringUtil;
 
-import java.lang.instrument.Instrumentation;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
-
 import static java.util.stream.Collectors.joining;
-import static org.newcih.galois.constants.Constant.*;
+import static org.newcih.galois.constants.Constant.DOT;
+import static org.newcih.galois.constants.Constant.SLASH;
+import static org.newcih.galois.constants.Constant.USER_DIR;
 
 /**
  * premain agent服务入口
@@ -51,6 +55,7 @@ public class PremainService {
     // adding new agent service here
     public static final List<AgentService> agentServices = Arrays.asList(SpringAgentService.getInstance(),
             MyBatisAgentService.getInstance(), CormAgentService.getInstance());
+    public static final List<Class<?>> customClasses = Arrays.asList(AfterSpringBootStarted.class);
 
     /**
      * premain entry
@@ -62,44 +67,8 @@ public class PremainService {
         JavaUtil.inst = inst;
         CopyOnWriteArrayList<FileChangedListener> listeners = new CopyOnWriteArrayList<>();
 
-        inst.addTransformer((loader, className, classBeingRedefined, protectionDomain, classfileBuffer) -> {
-            if (StringUtil.isBlank(className)) {
-                return null;
-            }
-
-            String newClassName = className.replace(SLASH, DOT);
-
-            for (AgentService agentService : agentServices) {
-                boolean checkedClass = agentService.checkAgentEnable(newClassName);
-                if (agentService.isUseful() && !agentService.isInited()) {
-                    agentService.init();
-                    listeners.addAll(agentService.getListeners());
-
-                    List<AgentService> enabledAgents = agentServices.stream()
-                            .filter(AgentService::isInited)
-                            .collect(Collectors.toList());
-                    String enableAgentNames = enabledAgents.stream()
-                            .map(Object::toString)
-                            .collect(joining(","));
-                    String listenerNames = enabledAgents.stream()
-                            .flatMap(agent -> agent.getListeners().stream())
-                            .map(Object::toString)
-                            .collect(joining(","));
-                    logger.info("当前共启用[{}]，并配置了以下监听器 [{}]", enableAgentNames, listenerNames);
-                }
-
-                // checkedClass表示当前加载的类newClassName是否有对应的MethodAdapter，当为false时，表示没有对应的MethodAdapter，
-                // 这时候就直接跳过
-                if (!checkedClass) {
-                    continue;
-                }
-
-                MethodAdapter adapter = agentService.getAdapterMap().get(newClassName);
-                return adapter.transform();
-            }
-
-            return null;
-        }, true);
+        inst.addTransformer(new InjectClassFile(), true);
+        loadCustomClasses();
 
         String rootPath = System.getProperty(USER_DIR);
         new FileWatchService(rootPath, listeners).start();
@@ -108,4 +77,59 @@ public class PremainService {
         BannerService.printBanner();
     }
 
+    static class InjectClassFile implements ClassFileTransformer {
+        @Override
+        public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
+                                ProtectionDomain protectionDomain, byte[] classfileBuffer) {
+            if (StringUtil.isBlank(className)) {
+                return null;
+            }
+
+            String newClassName = className.replace(SLASH, DOT);
+            for (AgentService agentService : agentServices) {
+                boolean checkedClass = agentService.checkAgentEnable(newClassName);
+                if (agentService.isUseful() && !agentService.isInited()) {
+                    agentService.init();
+                    listeners.addAll(agentService.getListeners());
+                    printAgentState();
+                }
+
+                // checkedClass表示当前加载的类newClassName是否有对应的MethodAdapter，当为false时，表示没有对应的MethodAdapter，
+                // 这时候就直接跳过
+                if (!checkedClass) {
+                    continue;
+                }
+                MethodAdapter adapter = agentService.getAdapterMap().get(newClassName);
+                return adapter.transform();
+            }
+            return null;
+        }
+    }
+
+    /**
+     * print current loading state of agent service
+     */
+    public static void printAgentState() {
+        List<AgentService> enabledAgents = agentServices.stream().filter(AgentService::isInited)
+                .collect(Collectors.toList());
+        String enableAgentNames = enabledAgents.stream().map(Object::toString)
+                .collect(joining(","));
+        String listenerNames = enabledAgents.stream().flatMap(agent -> agent.getListeners().stream())
+                .map(Object::toString)
+                .collect(joining(","));
+        logger.info("当前共启用[{}]，并配置了以下监听器 [{}]", enableAgentNames, listenerNames);
+    }
+
+    /**
+     * load custom class
+     */
+    public static void loadCustomClasses() {
+        try {
+            for (Class<?> customClass : customClasses) {
+                Class.forName(customClass.getName());
+            }
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
