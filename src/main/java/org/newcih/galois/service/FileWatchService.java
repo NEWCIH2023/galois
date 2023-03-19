@@ -48,7 +48,12 @@ public class FileWatchService {
     private final static GaloisLog logger = GaloisLog.getLogger(FileWatchService.class);
     private List<FileChangedListener> listeners;
     private WatchService watchService;
-    private Thread watchThread;
+    private static final SpringBootLifeCycle lifeCycle = SpringBootLifeCycle.getInstance();
+
+    static {
+        String rootPath = System.getenv():
+        lifeCycle.addRunner();
+    }
 
     public FileWatchService(String rootPath) {
         if (rootPath == null || rootPath.isEmpty()) {
@@ -75,8 +80,7 @@ public class FileWatchService {
     /**
      * register each child directory to monitor file changed
      *
-     * @param dir
-     * @throws IOException
+     * @param dir root dir
      */
     private void registerWatchService(File dir) throws IOException {
         dir.toPath().register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY}, MEDIUM);
@@ -95,7 +99,7 @@ public class FileWatchService {
     }
 
     public void start() {
-        watchThread = new Thread(() -> {
+        Thread watchThread = new Thread(() -> {
             logger.info("file change handle service started.");
 
             while (true) {

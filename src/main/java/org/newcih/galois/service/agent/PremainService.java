@@ -32,12 +32,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
+import org.newcih.galois.service.AfterSpringBootStarted;
 import org.newcih.galois.service.BannerService;
 import org.newcih.galois.service.FileWatchService;
+import org.newcih.galois.service.SpringBootLifeCycle;
 import org.newcih.galois.service.agent.corm.CormAgentService;
 import org.newcih.galois.service.agent.mybatis.MyBatisAgentService;
 import org.newcih.galois.service.agent.spring.SpringAgentService;
-import org.newcih.galois.service.AfterSpringBootStarted;
 import org.newcih.galois.utils.GaloisLog;
 import org.newcih.galois.utils.JavaUtil;
 import org.newcih.galois.utils.StringUtil;
@@ -60,6 +61,7 @@ public class PremainService {
             MyBatisAgentService.getInstance(), CormAgentService.getInstance());
     public static final List<Class<?>> customClasses = Collections.singletonList(AfterSpringBootStarted.class);
     public static final CopyOnWriteArrayList<FileChangedListener> listeners = new CopyOnWriteArrayList<>();
+    public static final SpringBootLifeCycle lifeCycle = SpringBootLifeCycle.getInstance();
 
     /**
      * premain entry
@@ -80,6 +82,9 @@ public class PremainService {
         BannerService.printBanner();
     }
 
+    /**
+     * custom class file transformer
+     */
     static class InjectClassFile implements ClassFileTransformer {
         @Override
         public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,

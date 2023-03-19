@@ -1,5 +1,6 @@
 package org.newcih.galois.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -8,8 +9,8 @@ import java.util.function.Consumer;
  */
 public class SpringBootLifeCycle {
 
-    private List<Consumer<?>> runners;
-    private boolean started;
+    private final List<Consumer<?>> runners = new ArrayList<>(8);
+    private int started;
 
     private static final SpringBootLifeCycle instance = new SpringBootLifeCycle();
 
@@ -20,23 +21,38 @@ public class SpringBootLifeCycle {
         return instance;
     }
 
+    /**
+     * add a new runner
+     *
+     * @param runner runner
+     */
+    public void addRunner(Consumer<?> runner) {
+        if (runner != null) {
+            this.runners.add(runner);
+        }
+    }
+
     public List<Consumer<?>> getRunners() {
         return runners;
     }
 
-    public void setRunners(List<Consumer<?>> runners) {
-        this.runners = runners;
-    }
-
+    /**
+     * if spring boot started
+     *
+     * @return start state
+     */
     public boolean isStarted() {
-        return started;
+        return started >= 1;
     }
 
-    public void setStarted(boolean started) {
-        this.started = started;
+    /**
+     * mark spring boot program started
+     */
+    public void markStarted() {
+        this.started++;
 
-        if (started) {
-            getRunners().forEach(Consumer::accept);
+        if (started == 1) {
+            getRunners().forEach(action -> action.accept(null));
         }
     }
 }
