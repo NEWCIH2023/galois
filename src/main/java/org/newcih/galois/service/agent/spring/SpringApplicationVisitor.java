@@ -7,7 +7,6 @@ import org.newcih.galois.service.SpringBootLifeCycle;
 import org.newcih.galois.service.agent.MethodAdapter;
 
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
-import static jdk.internal.org.objectweb.asm.Opcodes.ATHROW;
 import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
@@ -27,7 +26,7 @@ public class SpringApplicationVisitor extends MethodAdapter {
 
         if (Objects.equals(s, "run") && Objects.equals(s1, "([Ljava/lang/String;)" +
                 "Lorg/springframework/context/ConfigurableApplicationContext;")) {
-            return new SpringApplicationVisitor.RunMethod(ASM5, mv);
+            return new RunMethod(ASM5, mv);
         }
 
         return mv;
@@ -41,7 +40,7 @@ public class SpringApplicationVisitor extends MethodAdapter {
 
         @Override
         public void visitInsn(int opcode) {
-            if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
+            if (opcode >= IRETURN && opcode <= RETURN) {
                 String className = SpringBootLifeCycle.class.getName();
                 mv.visitCode();
                 mv.visitMethodInsn(INVOKESTATIC, className, "getInstance",
@@ -50,6 +49,8 @@ public class SpringApplicationVisitor extends MethodAdapter {
                 mv.visitInsn(RETURN);
                 mv.visitEnd();
             }
+
+            super.visitInsn(opcode);
         }
     }
 }
