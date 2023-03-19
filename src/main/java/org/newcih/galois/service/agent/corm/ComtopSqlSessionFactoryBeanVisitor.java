@@ -24,13 +24,18 @@
 
 package org.newcih.galois.service.agent.corm;
 
+import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.newcih.galois.service.agent.MethodAdapter;
 import org.newcih.galois.utils.GaloisLog;
 
-import java.util.Objects;
-
-import static jdk.internal.org.objectweb.asm.Opcodes.*;
+import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
+import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
+import static jdk.internal.org.objectweb.asm.Opcodes.ATHROW;
+import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
+import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
+import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
+import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
 import static org.newcih.galois.constants.ClassNameConstant.COMTOP_SQL_SESSION_FACTORY;
 
 public class ComtopSqlSessionFactoryBeanVisitor extends MethodAdapter {
@@ -80,9 +85,8 @@ public class ComtopSqlSessionFactoryBeanVisitor extends MethodAdapter {
                 mv.visitEnd();
 
                 if (logger.isDebugEnabled()) {
-                    logger.debug("injected corm sqlSessionFactoryBean constructor by ASM success!");
+                    logger.debug("injected corm sqlsessionfactorybean constructor success!");
                 }
-
             }
         }
     }
