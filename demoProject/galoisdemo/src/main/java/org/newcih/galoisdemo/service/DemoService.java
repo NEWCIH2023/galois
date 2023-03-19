@@ -14,13 +14,10 @@ public class DemoService extends AbstractDemoService<String> {
 
     static {
         try {
-            Class.forName(com.comtop.corm.session.Configuration.class.getName());
+//            Class.forName(com.comtop.corm.session.Configuration.class.getName());
         } catch (Exception ignored) {
 
         }
-
-        System.out.println("加载corm驱动完成!");
-
     }
 
     public String getName() {

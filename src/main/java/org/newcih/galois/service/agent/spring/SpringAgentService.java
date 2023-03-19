@@ -24,11 +24,11 @@
 
 package org.newcih.galois.service.agent.spring;
 
-import java.util.Arrays;
 import org.newcih.galois.service.agent.AgentService;
 
 import static org.newcih.galois.constants.ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT;
 import static org.newcih.galois.constants.ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER;
+import static org.newcih.galois.constants.ClassNameConstant.SPRING_APPLICATION;
 
 public class SpringAgentService extends AgentService {
 
@@ -37,9 +37,8 @@ public class SpringAgentService extends AgentService {
     private SpringAgentService() {
         adapterMap.put(CLASS_PATH_BEAN_DEFINITION_SCANNER, new BeanDefinitionScannerVisitor());
         adapterMap.put(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT, new ApplicationContextVisitor());
-
-        necessaryClasses.addAll(Arrays.asList(CLASS_PATH_BEAN_DEFINITION_SCANNER,
-                ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT));
+        adapterMap.put(SPRING_APPLICATION, new SpringApplicationVisitor());
+        necessaryClasses.addAll(adapterMap.keySet());
     }
 
     public static SpringAgentService getInstance() {

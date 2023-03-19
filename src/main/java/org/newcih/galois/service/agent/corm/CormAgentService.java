@@ -34,6 +34,7 @@ public class CormAgentService extends AgentService {
 
     private CormAgentService() {
         adapterMap.put(COMTOP_CONFIGURATION, new ComtopConfigurationVisitor());
+        necessaryClasses.addAll(adapterMap.keySet());
     }
 
     public static CormAgentService getInstance() {

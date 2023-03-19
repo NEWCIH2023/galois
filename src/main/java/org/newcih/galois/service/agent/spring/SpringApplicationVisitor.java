@@ -3,6 +3,7 @@ package org.newcih.galois.service.agent.spring;
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.newcih.galois.constants.ClassNameConstant;
+import org.newcih.galois.service.SpringBootLifeCycle;
 import org.newcih.galois.service.agent.MethodAdapter;
 
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
@@ -11,6 +12,9 @@ import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
 import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
+import static org.newcih.galois.constants.Constant.DOT;
+import static org.newcih.galois.constants.Constant.SEMICOLON;
+import static org.newcih.galois.constants.Constant.SLASH;
 
 public class SpringApplicationVisitor extends MethodAdapter {
     public SpringApplicationVisitor() {
@@ -21,7 +25,8 @@ public class SpringApplicationVisitor extends MethodAdapter {
     public MethodVisitor visitMethod(int i, String s, String s1, String s2, String[] strings) {
         MethodVisitor mv = super.visitMethod(i, s, s1, s2, strings);
 
-        if (Objects.equals(s, "run")) {
+        if (Objects.equals(s, "run") && Objects.equals(s1, "([Ljava/lang/String;)" +
+                "Lorg/springframework/context/ConfigurableApplicationContext;")) {
             return new SpringApplicationVisitor.RunMethod(ASM5, mv);
         }
 
@@ -37,11 +42,11 @@ public class SpringApplicationVisitor extends MethodAdapter {
         @Override
         public void visitInsn(int opcode) {
             if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
+                String className = SpringBootLifeCycle.class.getName();
                 mv.visitCode();
-                mv.visitMethodInsn(INVOKESTATIC, "org/newcih/galois/service/SpringBootLifeCycle", "getInstance", "()" +
-                        "Lorg/newcih/galois/service/SpringBootLifeCycle;", false);
-                mv.visitMethodInsn(INVOKEVIRTUAL, "org/newcih/galois/service/SpringBootLifeCycle", "markStarted", "()" +
-                        "V", false);
+                mv.visitMethodInsn(INVOKESTATIC, className, "getInstance",
+                        "()L" + (className.replace(DOT, SLASH)) + SEMICOLON, false);
+                mv.visitMethodInsn(INVOKEVIRTUAL, className.replace(DOT, SLASH), "markStarted", "()V", false);
                 mv.visitInsn(RETURN);
                 mv.visitEnd();
             }
