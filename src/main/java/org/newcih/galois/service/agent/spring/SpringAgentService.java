@@ -24,6 +24,7 @@
 
 package org.newcih.galois.service.agent.spring;
 
+import org.newcih.galois.service.SpringBootLifeCycle;
 import org.newcih.galois.service.agent.AgentService;
 
 import static org.newcih.galois.constants.ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT;
@@ -39,6 +40,12 @@ public class SpringAgentService extends AgentService {
         adapterMap.put(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT, new ApplicationContextVisitor());
         adapterMap.put(SPRING_APPLICATION, new SpringApplicationVisitor());
         necessaryClasses.addAll(adapterMap.keySet());
+
+        try {
+            Class.forName(SpringBootLifeCycle.class.getName());
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static SpringAgentService getInstance() {

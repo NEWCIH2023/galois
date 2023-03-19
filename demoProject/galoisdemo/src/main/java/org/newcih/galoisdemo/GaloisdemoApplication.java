@@ -32,6 +32,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class GaloisdemoApplication {
 
     public static void main(String[] args) {
+        App
+
         SpringApplication.run(GaloisdemoApplication.class, args);
     }
 

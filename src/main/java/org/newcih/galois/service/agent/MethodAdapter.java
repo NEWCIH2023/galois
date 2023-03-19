@@ -33,6 +33,7 @@ import org.newcih.galois.utils.GaloisLog;
 
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
 import static org.newcih.galois.constants.ConfConstant.PRINT_ASM_CODE_ENABLE;
+import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.FileType.CLASS_FILE;
 
 public abstract class MethodAdapter extends ClassVisitor {
@@ -73,7 +74,7 @@ public abstract class MethodAdapter extends ClassVisitor {
         byte[] result = cw.toByteArray();
 
         if (globalConfig.getBoolean(PRINT_ASM_CODE_ENABLE, false)) {
-            String tempClassFile = "" + className + CLASS_FILE.getFileType();
+            String tempClassFile = "" + className.substring(className.lastIndexOf(DOT)) + CLASS_FILE.getFileType();
             try (FileOutputStream fos = new FileOutputStream(tempClassFile)) {
                 fos.write(result);
             } catch (Throwable e) {
