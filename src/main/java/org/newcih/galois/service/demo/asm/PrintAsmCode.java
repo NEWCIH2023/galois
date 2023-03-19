@@ -31,12 +31,12 @@ import jdk.internal.org.objectweb.asm.util.ASMifier;
 import jdk.internal.org.objectweb.asm.util.Printer;
 import jdk.internal.org.objectweb.asm.util.Textifier;
 import jdk.internal.org.objectweb.asm.util.TraceClassVisitor;
+import org.newcih.galois.service.SpringBootLifeCycle;
 
 public class PrintAsmCode {
 
     public void getTest() {
-        System.out.println(23);
-        return;
+        SpringBootLifeCycle.getInstance().markStarted();
     }
 
     public static void main(String[] args) throws IOException {

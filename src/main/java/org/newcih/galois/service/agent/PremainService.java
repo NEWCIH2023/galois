@@ -28,21 +28,17 @@ import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
-import org.newcih.galois.service.AfterSpringBootStarted;
 import org.newcih.galois.service.BannerService;
 import org.newcih.galois.service.SpringBootLifeCycle;
 import org.newcih.galois.service.agent.corm.CormAgentService;
 import org.newcih.galois.service.agent.mybatis.MyBatisAgentService;
 import org.newcih.galois.service.agent.spring.SpringAgentService;
-import org.newcih.galois.service.agent.spring.SpringBeanReloader;
 import org.newcih.galois.utils.GaloisLog;
 import org.newcih.galois.utils.JavaUtil;
 import org.newcih.galois.utils.StringUtil;
-import org.springframework.context.ApplicationContext;
 
 import static java.util.stream.Collectors.joining;
 import static org.newcih.galois.constants.Constant.DOT;
@@ -59,7 +55,6 @@ public class PremainService {
      */
     public static final List<AgentService> agentServices = Arrays.asList(SpringAgentService.getInstance(),
             MyBatisAgentService.getInstance(), CormAgentService.getInstance());
-    public static final List<Class<?>> customClasses = Collections.singletonList(AfterSpringBootStarted.class);
     public static final CopyOnWriteArrayList<FileChangedListener> listeners = new CopyOnWriteArrayList<>();
     public static final SpringBootLifeCycle lifeCycle = SpringBootLifeCycle.getInstance();
 
@@ -72,8 +67,6 @@ public class PremainService {
     public static void premain(String agentArgs, Instrumentation inst) {
         JavaUtil.inst = inst;
         inst.addTransformer(new InjectClassFile(), true);
-        // load custom class to jvm
-        loadCustomClasses(inst);
         // banner should be printed after necessary processes done
         BannerService.printBanner();
     }
@@ -124,19 +117,4 @@ public class PremainService {
         logger.info("当前共启用[{}]，并配置了以下监听器 [{}]", enableAgentNames, listenerNames);
     }
 
-    /**
-     * load custom class
-     */
-    public static void loadCustomClasses(Instrumentation inst) {
-        ClassLoader classLoader = ApplicationContext.class.getClassLoader();
-        try {
-            for (Class<?> customClass : customClasses) {
-                Class<?> custom = classLoader.loadClass(customClass.getName());
-                SpringBeanReloader.getInstance().updateBean(custom);
-                logger.info("had load custom class <{}>.", customClass.getName());
-            }
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }
