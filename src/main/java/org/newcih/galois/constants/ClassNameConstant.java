@@ -32,6 +32,7 @@ public final class ClassNameConstant {
             "org.mybatis.spring.SqlSessionFactoryBean";
 
     public static final String COMTOP_SQL_SESSION_FACTORY = "com.comtop.corm.session.defaults.DefaultSqlSessionFactory";
+    public static final String COMTOP_CONFIGURATION = "com.comtop.corm.session.Configuration";
     /**
      * Bean扫描服务类
      */

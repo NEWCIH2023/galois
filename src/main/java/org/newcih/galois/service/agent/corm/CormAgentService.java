@@ -26,14 +26,14 @@ package org.newcih.galois.service.agent.corm;
 
 import org.newcih.galois.service.agent.AgentService;
 
-import static org.newcih.galois.constants.ClassNameConstant.COMTOP_SQL_SESSION_FACTORY;
+import static org.newcih.galois.constants.ClassNameConstant.COMTOP_CONFIGURATION;
 
 public class CormAgentService extends AgentService {
 
     private final static CormAgentService cormAgentService = new CormAgentService();
 
     private CormAgentService() {
-        adapterMap.put(COMTOP_SQL_SESSION_FACTORY, new ComtopSqlSessionFactoryBeanVisitor());
+        adapterMap.put(COMTOP_CONFIGURATION, new ComtopConfigurationVisitor());
     }
 
     public static CormAgentService getInstance() {
