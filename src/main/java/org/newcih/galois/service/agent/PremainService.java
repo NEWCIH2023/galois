@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import org.newcih.galois.service.BannerService;
-import org.newcih.galois.service.SpringBootLifeCycle;
 import org.newcih.galois.service.agent.corm.CormAgentService;
 import org.newcih.galois.service.agent.mybatis.MyBatisAgentService;
 import org.newcih.galois.service.agent.spring.SpringAgentService;
@@ -56,7 +55,6 @@ public class PremainService {
     public static final List<AgentService> agentServices = Arrays.asList(SpringAgentService.getInstance(),
             MyBatisAgentService.getInstance(), CormAgentService.getInstance());
     public static final CopyOnWriteArrayList<FileChangedListener> listeners = new CopyOnWriteArrayList<>();
-    public static final SpringBootLifeCycle lifeCycle = SpringBootLifeCycle.getInstance();
 
     /**
      * premain entry

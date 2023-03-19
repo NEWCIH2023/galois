@@ -24,28 +24,25 @@
 
 package org.newcih.galois.service.agent.spring;
 
-import org.newcih.galois.service.SpringBootLifeCycle;
+import java.util.ArrayList;
+import java.util.List;
 import org.newcih.galois.service.agent.AgentService;
+import org.springframework.boot.SpringApplicationRunListener;
 
 import static org.newcih.galois.constants.ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT;
 import static org.newcih.galois.constants.ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER;
-import static org.newcih.galois.constants.ClassNameConstant.SPRING_APPLICATION;
+import static org.newcih.galois.constants.ClassNameConstant.SPRING_APPLICATION_RUN_LISTENERS;
 
 public class SpringAgentService extends AgentService {
 
     private static final SpringAgentService springAgent = new SpringAgentService();
+    private final List<SpringApplicationRunListener> runners = new ArrayList<>(16);
 
     private SpringAgentService() {
         adapterMap.put(CLASS_PATH_BEAN_DEFINITION_SCANNER, new BeanDefinitionScannerVisitor());
         adapterMap.put(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT, new ApplicationContextVisitor());
-        adapterMap.put(SPRING_APPLICATION, new SpringApplicationVisitor());
+        adapterMap.put(SPRING_APPLICATION_RUN_LISTENERS, new SpringApplicationRunListenersVisitor());
         necessaryClasses.addAll(adapterMap.keySet());
-
-        try {
-            Class.forName(SpringBootLifeCycle.class.getName());
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public static SpringAgentService getInstance() {
@@ -57,5 +54,26 @@ public class SpringAgentService extends AgentService {
         super.init();
         listeners.add(new SpringBeanListener());
         beanReloader = SpringBeanReloader.getInstance();
+    }
+
+    /**
+     * add runner
+     *
+     * @param runner
+     */
+    public void addRunner(SpringApplicationRunListener runner) {
+        if (runner != null) {
+            runners.add(runner);
+        }
+    }
+
+    public void addRunners(List<SpringApplicationRunListener> runners) {
+        if (runners != null && runners.isEmpty()) {
+            this.runners.addAll(runners);
+        }
+    }
+
+    public List<SpringApplicationRunListener> getRunners() {
+        return runners;
     }
 }

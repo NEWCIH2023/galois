@@ -43,5 +43,6 @@ public final class ClassNameConstant {
      */
     public static final String ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT =
             "org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext";
-    public static final String SPRING_APPLICATION = "org.springframework.boot.SpringApplication";
+    public static final String SPRING_APPLICATION_RUN_LISTENERS = "org.springframework.boot" +
+            ".SpringApplicationRunListeners";
 }

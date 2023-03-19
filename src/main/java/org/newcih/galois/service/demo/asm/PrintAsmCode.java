@@ -26,17 +26,22 @@ package org.newcih.galois.service.demo.asm;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import jdk.internal.org.objectweb.asm.ClassReader;
 import jdk.internal.org.objectweb.asm.util.ASMifier;
 import jdk.internal.org.objectweb.asm.util.Printer;
 import jdk.internal.org.objectweb.asm.util.Textifier;
 import jdk.internal.org.objectweb.asm.util.TraceClassVisitor;
-import org.newcih.galois.service.SpringBootLifeCycle;
+import org.newcih.galois.service.agent.spring.SpringAgentService;
+import org.springframework.boot.SpringApplicationRunListener;
 
 public class PrintAsmCode {
 
+    private List<SpringApplicationRunListener> listeners;
+
     public void getTest() {
-        SpringBootLifeCycle.getInstance().markStarted();
+        List<SpringApplicationRunListener> runners = SpringAgentService.getInstance().getRunners();
+        this.listeners.addAll(runners);
     }
 
     public static void main(String[] args) throws IOException {

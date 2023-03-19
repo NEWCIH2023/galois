@@ -3,7 +3,6 @@ package org.newcih.galois.service.agent.spring;
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.newcih.galois.constants.ClassNameConstant;
-import org.newcih.galois.service.SpringBootLifeCycle;
 import org.newcih.galois.service.agent.MethodAdapter;
 
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
@@ -15,9 +14,9 @@ import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SEMICOLON;
 import static org.newcih.galois.constants.Constant.SLASH;
 
-public class SpringApplicationVisitor extends MethodAdapter {
-    public SpringApplicationVisitor() {
-        super(ClassNameConstant.SPRING_APPLICATION);
+public class SpringApplicationRunListenersVisitor extends MethodAdapter {
+    public SpringApplicationRunListenersVisitor() {
+        super(ClassNameConstant.SPRING_APPLICATION_RUN_LISTENERS);
     }
 
     @Override
@@ -41,7 +40,7 @@ public class SpringApplicationVisitor extends MethodAdapter {
         @Override
         public void visitInsn(int opcode) {
             if (opcode >= IRETURN && opcode <= RETURN) {
-                String className = SpringBootLifeCycle.class.getName();
+                String className = "";
                 mv.visitCode();
                 mv.visitMethodInsn(INVOKESTATIC, className, "getInstance",
                         "()L" + (className.replace(DOT, SLASH)) + SEMICOLON, false);

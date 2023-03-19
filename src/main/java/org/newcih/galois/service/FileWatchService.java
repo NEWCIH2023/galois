@@ -34,7 +34,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.service.agent.FileChangedListener;
+import org.newcih.galois.service.agent.spring.SpringAgentService;
 import org.newcih.galois.utils.GaloisLog;
+import org.springframework.boot.SpringApplicationRunListener;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import static com.sun.nio.file.SensitivityWatchEventModifier.MEDIUM;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
@@ -51,12 +54,17 @@ public class FileWatchService {
     private final static GaloisLog logger = GaloisLog.getLogger(FileWatchService.class);
     private static final List<FileChangedListener> listeners = new ArrayList<>(16);
     private WatchService watchService;
-    private static final SpringBootLifeCycle lifeCycle = SpringBootLifeCycle.getInstance();
+    private static final SpringAgentService springAgentService = SpringAgentService.getInstance();
     private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
 
     static {
         String rootPath = globalConfig.getString(USER_DIR);
-        lifeCycle.addRunner((context) -> new FileWatchService(rootPath).start());
+        springAgentService.addRunner(new SpringApplicationRunListener() {
+            @Override
+            public void started(ConfigurableApplicationContext context) {
+                new FileWatchService(rootPath).start();
+            }
+        });
     }
 
     public FileWatchService(String rootPath) {
