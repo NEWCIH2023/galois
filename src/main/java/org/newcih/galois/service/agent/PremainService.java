@@ -28,6 +28,7 @@ import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -36,7 +37,7 @@ import org.newcih.galois.service.FileWatchService;
 import org.newcih.galois.service.agent.corm.CormAgentService;
 import org.newcih.galois.service.agent.mybatis.MyBatisAgentService;
 import org.newcih.galois.service.agent.spring.SpringAgentService;
-import org.newcih.galois.service.asmcode.AfterSpringBootStarted;
+import org.newcih.galois.service.AfterSpringBootStarted;
 import org.newcih.galois.utils.GaloisLog;
 import org.newcih.galois.utils.JavaUtil;
 import org.newcih.galois.utils.StringUtil;
@@ -52,10 +53,13 @@ import static org.newcih.galois.constants.Constant.USER_DIR;
 public class PremainService {
 
     public static final GaloisLog logger = GaloisLog.getLogger(PremainService.class);
-    // adding new agent service here
+    /**
+     * adding your custom agent service
+     */
     public static final List<AgentService> agentServices = Arrays.asList(SpringAgentService.getInstance(),
             MyBatisAgentService.getInstance(), CormAgentService.getInstance());
-    public static final List<Class<?>> customClasses = Arrays.asList(AfterSpringBootStarted.class);
+    public static final List<Class<?>> customClasses = Collections.singletonList(AfterSpringBootStarted.class);
+    public static final CopyOnWriteArrayList<FileChangedListener> listeners = new CopyOnWriteArrayList<>();
 
     /**
      * premain entry
@@ -65,9 +69,8 @@ public class PremainService {
      */
     public static void premain(String agentArgs, Instrumentation inst) {
         JavaUtil.inst = inst;
-        CopyOnWriteArrayList<FileChangedListener> listeners = new CopyOnWriteArrayList<>();
-
         inst.addTransformer(new InjectClassFile(), true);
+
         loadCustomClasses();
 
         String rootPath = System.getProperty(USER_DIR);

@@ -8,17 +8,8 @@ import java.util.function.Consumer;
  */
 public class SpringBootLifeCycle {
 
-    private List<Consumer<?>> runner;
-    /**
-     * the following value of program running state
-     * <p>
-     * -1: default
-     * 0: starting
-     * 1: started
-     */
-    private int runState = -1;
-    public static final int STARTING = 0;
-    public static final int STARTED = 1;
+    private List<Consumer<?>> runners;
+    private boolean started;
 
     private static final SpringBootLifeCycle instance = new SpringBootLifeCycle();
 
@@ -29,19 +20,23 @@ public class SpringBootLifeCycle {
         return instance;
     }
 
-    public List<Consumer<?>> getRunner() {
-        return runner;
+    public List<Consumer<?>> getRunners() {
+        return runners;
     }
 
-    public void setRunner(List<Consumer<?>> runner) {
-        this.runner = runner;
+    public void setRunners(List<Consumer<?>> runners) {
+        this.runners = runners;
     }
 
-    public int getRunState() {
-        return runState;
+    public boolean isStarted() {
+        return started;
     }
 
-    public void setRunState(int runState) {
-        this.runState = runState;
+    public void setStarted(boolean started) {
+        this.started = started;
+
+        if (started) {
+            getRunners().forEach(Consumer::accept);
+        }
     }
 }
