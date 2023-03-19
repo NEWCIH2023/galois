@@ -49,7 +49,7 @@ import static org.newcih.galois.constants.Constant.USER_DIR;
 public class FileWatchService {
 
     private final static GaloisLog logger = GaloisLog.getLogger(FileWatchService.class);
-    private static List<FileChangedListener> listeners = new ArrayList<>(16);
+    private static final List<FileChangedListener> listeners = new ArrayList<>(16);
     private WatchService watchService;
     private static final SpringBootLifeCycle lifeCycle = SpringBootLifeCycle.getInstance();
     private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
@@ -142,9 +142,25 @@ public class FileWatchService {
         return listeners;
     }
 
-    public void registerListeners(FileChangedListener listener) {
+    /**
+     * add a new listener
+     *
+     * @param listener listener
+     */
+    public void registerListener(FileChangedListener listener) {
         if (listener != null) {
             listeners.add(listener);
+        }
+    }
+
+    /**
+     * add listener list
+     *
+     * @param listeners listeners
+     */
+    public void registerListeners(List<FileChangedListener> listeners) {
+        if (listeners != null && !listeners.isEmpty()) {
+            FileWatchService.listeners.addAll(listeners);
         }
     }
 

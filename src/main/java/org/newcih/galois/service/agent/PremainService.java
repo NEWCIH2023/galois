@@ -34,7 +34,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import org.newcih.galois.service.AfterSpringBootStarted;
 import org.newcih.galois.service.BannerService;
-import org.newcih.galois.service.FileWatchService;
 import org.newcih.galois.service.SpringBootLifeCycle;
 import org.newcih.galois.service.agent.corm.CormAgentService;
 import org.newcih.galois.service.agent.mybatis.MyBatisAgentService;
@@ -46,7 +45,6 @@ import org.newcih.galois.utils.StringUtil;
 import static java.util.stream.Collectors.joining;
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SLASH;
-import static org.newcih.galois.constants.Constant.USER_DIR;
 
 /**
  * premain agent服务入口
@@ -72,12 +70,8 @@ public class PremainService {
     public static void premain(String agentArgs, Instrumentation inst) {
         JavaUtil.inst = inst;
         inst.addTransformer(new InjectClassFile(), true);
-
+        // load custom class to jvm
         loadCustomClasses();
-
-        String rootPath = System.getProperty(USER_DIR);
-        new FileWatchService(rootPath, listeners).start();
-
         // banner should be printed after necessary processes done
         BannerService.printBanner();
     }
@@ -135,6 +129,7 @@ public class PremainService {
         try {
             for (Class<?> customClass : customClasses) {
                 Class.forName(customClass.getName());
+                logger.info("had load custom class <{}>.", customClass.getName());
             }
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
