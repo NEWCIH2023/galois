@@ -38,6 +38,7 @@ import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
 import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
 import static org.newcih.galois.constants.ClassNameConstant.COMTOP_SQL_SESSION_FACTORY;
 
+@Deprecated
 public class ComtopSqlSessionFactoryBeanVisitor extends MethodAdapter {
 
     private static final GaloisLog logger = GaloisLog.getLogger(ComtopSqlSessionFactoryBeanVisitor.class);

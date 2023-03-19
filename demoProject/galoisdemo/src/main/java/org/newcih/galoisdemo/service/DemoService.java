@@ -12,6 +12,17 @@ public class DemoService extends AbstractDemoService<String> {
     @Autowired
     private TestTemp2Mapper testTemp2Mapper;
 
+    static {
+        try {
+            Class.forName(com.comtop.corm.session.Configuration.class.getName());
+        } catch (Exception ignored) {
+
+        }
+
+        System.out.println("加载corm驱动完成!");
+
+    }
+
     public String getName() {
         TestTemp2Example example = new TestTemp2Example();
         example.createCriteria().andIdIsNotNull();
