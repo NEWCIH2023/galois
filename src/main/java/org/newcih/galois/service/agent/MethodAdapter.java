@@ -74,7 +74,7 @@ public abstract class MethodAdapter extends ClassVisitor {
         byte[] result = cw.toByteArray();
 
         if (globalConfig.getBoolean(PRINT_ASM_CODE_ENABLE, false)) {
-            String tempClassFile = "" + className.substring(className.lastIndexOf(DOT)) + CLASS_FILE.getFileType();
+            String tempClassFile = "" + className.substring(className.lastIndexOf(DOT) + 1) + CLASS_FILE.getFileType();
             try (FileOutputStream fos = new FileOutputStream(tempClassFile)) {
                 fos.write(result);
             } catch (Throwable e) {
