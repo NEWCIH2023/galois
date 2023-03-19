@@ -24,13 +24,12 @@
 
 package org.newcih.galois.service.agent;
 
+import java.io.FileOutputStream;
 import jdk.internal.org.objectweb.asm.ClassReader;
 import jdk.internal.org.objectweb.asm.ClassVisitor;
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.utils.GaloisLog;
-
-import java.io.FileOutputStream;
 
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
 import static org.newcih.galois.constants.ConfConstant.PRINT_ASM_CODE_ENABLE;
@@ -74,7 +73,7 @@ public abstract class MethodAdapter extends ClassVisitor {
         byte[] result = cw.toByteArray();
 
         if (globalConfig.getBoolean(PRINT_ASM_CODE_ENABLE, false)) {
-            String tempClassFile = "" + getClass().getSimpleName() + CLASS_FILE.getFileType();
+            String tempClassFile = "" + className + CLASS_FILE.getFileType();
             try (FileOutputStream fos = new FileOutputStream(tempClassFile)) {
                 fos.write(result);
             } catch (Throwable e) {

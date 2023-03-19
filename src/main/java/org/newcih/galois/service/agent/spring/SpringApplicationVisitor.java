@@ -46,7 +46,6 @@ public class SpringApplicationVisitor extends MethodAdapter {
                 mv.visitMethodInsn(INVOKESTATIC, className, "getInstance",
                         "()L" + (className.replace(DOT, SLASH)) + SEMICOLON, false);
                 mv.visitMethodInsn(INVOKEVIRTUAL, className.replace(DOT, SLASH), "markStarted", "()V", false);
-                mv.visitInsn(RETURN);
                 mv.visitEnd();
             }
 
