@@ -52,6 +52,12 @@ public class SpringAgentService extends AgentService {
     necessaryClasses.addAll(adapterMap.keySet());
   }
 
+  /**
+   * get instance
+   *
+   * @return {@link SpringAgentService}
+   * @see SpringAgentService
+   */
   public static SpringAgentService getInstance() {
     return springAgent;
   }
@@ -75,6 +81,11 @@ public class SpringAgentService extends AgentService {
     }
   }
 
+  /**
+   * add runners
+   *
+   * @param runners runners
+   */
   public void addRunners(List<SpringApplicationRunListener> runners) {
     if (runners != null && runners.isEmpty()) {
       this.runners.addAll(runners);

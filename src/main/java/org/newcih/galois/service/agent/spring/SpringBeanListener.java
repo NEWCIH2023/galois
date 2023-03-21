@@ -50,6 +50,11 @@ public class SpringBeanListener implements FileChangedListener {
     return FileUtil.validFileType(file, CLASS_FILE);
   }
 
+  /**
+   * file changed handle
+   *
+   * @param classFile classFile
+   */
   private void fileChangedHandle(File classFile) {
     String className = JavaUtil.getClassNameFromClass(classFile);
     byte[] classBytes = FileUtil.readFile(classFile);

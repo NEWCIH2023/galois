@@ -41,6 +41,12 @@ public class CormAgentService extends AgentService {
     necessaryClasses.addAll(adapterMap.keySet());
   }
 
+  /**
+   * get instance
+   *
+   * @return {@link CormAgentService}
+   * @see CormAgentService
+   */
   public static CormAgentService getInstance() {
     return cormAgentService;
   }

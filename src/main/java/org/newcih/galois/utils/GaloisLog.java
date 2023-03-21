@@ -61,6 +61,13 @@ public class GaloisLog implements Logger {
     this.logger = LoggerFactory.getLogger(clazz);
   }
 
+  /**
+   * get logger
+   *
+   * @param clazz clazz
+   * @return {@link GaloisLog}
+   * @see GaloisLog
+   */
   public static GaloisLog getLogger(Class<?> clazz) {
     return new GaloisLog(clazz);
   }

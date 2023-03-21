@@ -41,6 +41,12 @@ public class MyBatisAgentService extends AgentService {
     necessaryClasses.addAll(adapterMap.keySet());
   }
 
+  /**
+   * get instance
+   *
+   * @return {@link MyBatisAgentService}
+   * @see MyBatisAgentService
+   */
   public static MyBatisAgentService getInstance() {
     return myBatisAgentService;
   }

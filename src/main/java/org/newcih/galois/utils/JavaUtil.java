@@ -65,10 +65,23 @@ public class JavaUtil {
     }
   }
 
+  /**
+   * get inst
+   *
+   * @return {@link Instrumentation}
+   * @see Instrumentation
+   */
   public static Instrumentation getInst() {
     return inst;
   }
 
+  /**
+   * get class name from class
+   *
+   * @param classFile classFile
+   * @return {@link String}
+   * @see String
+   */
   public static String getClassNameFromClass(File classFile) {
     try {
       ClassReader classReader = new ClassReader(Files.newInputStream(classFile.toPath()));
@@ -78,6 +91,13 @@ public class JavaUtil {
     }
   }
 
+  /**
+   * get class name from source
+   *
+   * @param javaFile javaFile
+   * @return {@link String}
+   * @see String
+   */
   public static String getClassNameFromSource(File javaFile) {
     try (BufferedReader br = new BufferedReader(new FileReader(javaFile))) {
       String tmp = "";

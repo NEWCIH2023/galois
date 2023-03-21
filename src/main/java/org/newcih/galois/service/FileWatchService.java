@@ -56,10 +56,21 @@ public class FileWatchService {
   private FileWatchService() {
   }
 
+  /**
+   * get instance
+   *
+   * @return {@link FileWatchService}
+   * @see FileWatchService
+   */
   public static FileWatchService getInstance() {
     return instance;
   }
 
+  /**
+   * init
+   *
+   * @param rootPath rootPath
+   */
   public void init(String rootPath) {
     if (rootPath == null || rootPath.isEmpty()) {
       throw new NullPointerException("empty path for galois listener.");

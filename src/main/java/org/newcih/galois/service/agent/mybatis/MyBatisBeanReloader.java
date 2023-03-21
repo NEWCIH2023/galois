@@ -113,6 +113,12 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
     return true;
   }
 
+  /**
+   * reload xml
+   *
+   * @param xmlFile xmlFile
+   * @throws IOException java.io. i o exception
+   */
   private void reloadXML(File xmlFile) throws IOException {
     InputStream is = Files.newInputStream(xmlFile.toPath());
     XMLMapperBuilder builder = new XMLMapperBuilder(is, getConfiguration(), xmlFile.getName(),
@@ -120,6 +126,13 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
     builder.parse();
   }
 
+  /**
+   * clear mapper registry
+   *
+   * @param namespace namespace
+   * @throws NoSuchFieldException   java.lang. no such field exception
+   * @throws IllegalAccessException java.lang. illegal access exception
+   */
   @SuppressWarnings("unchecked")
   private void clearMapperRegistry(String namespace)
       throws NoSuchFieldException, IllegalAccessException {
@@ -141,6 +154,13 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
     }
   }
 
+  /**
+   * clear loaded resources
+   *
+   * @param fileName fileName
+   * @throws NoSuchFieldException   java.lang. no such field exception
+   * @throws IllegalAccessException java.lang. illegal access exception
+   */
   @SuppressWarnings("rawtypes")
   @Deprecated
   private void clearLoadedResources(String fileName)
@@ -151,10 +171,21 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
     loadedResourcesSet.remove(fileName);
   }
 
+  /**
+   * clear cached names
+   *
+   * @param namespace namespace
+   */
   private void clearCachedNames(String namespace) {
     getConfiguration().getCacheNames().remove(namespace);
   }
 
+  /**
+   * clear parameter map
+   *
+   * @param list      list
+   * @param namespace namespace
+   */
   private void clearParameterMap(List<XNode> list, String namespace) {
     for (XNode xNode : list) {
       String id = xNode.getStringAttribute(ID);
@@ -162,6 +193,12 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
     }
   }
 
+  /**
+   * clear result map
+   *
+   * @param list      list
+   * @param namespace namespace
+   */
   private void clearResultMap(List<XNode> list, String namespace) {
     for (XNode xNode : list) {
       String id = xNode.getStringAttribute(ID, xNode.getValueBasedIdentifier());
@@ -171,6 +208,12 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
     }
   }
 
+  /**
+   * clear result map
+   *
+   * @param xNode     xNode
+   * @param namespace namespace
+   */
   private void clearResultMap(XNode xNode, String namespace) {
     for (XNode child : xNode.getChildren()) {
       if (Objects.equals("association", child.getName()) || Objects.equals("collection",
@@ -190,6 +233,12 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
     }
   }
 
+  /**
+   * clear key generators
+   *
+   * @param list      list
+   * @param namespace namespace
+   */
   private void clearKeyGenerators(List<XNode> list, String namespace) {
     for (XNode xNode : list) {
       String id = xNode.getStringAttribute(ID);
@@ -212,6 +261,12 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
     }
   }
 
+  /**
+   * clear sql element
+   *
+   * @param list      list
+   * @param namespace namespace
+   */
   private void clearSqlElement(List<XNode> list, String namespace) {
     for (XNode xNode : list) {
       String id = xNode.getStringAttribute(ID);
@@ -220,6 +275,12 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
     }
   }
 
+  /**
+   * get configuration
+   *
+   * @return {@link Configuration}
+   * @see Configuration
+   */
   public Configuration getConfiguration() {
     if (configuration == null) {
       try {

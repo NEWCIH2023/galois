@@ -59,14 +59,35 @@ public class GlobalConfiguration {
   private GlobalConfiguration() {
   }
 
+  /**
+   * get instance
+   *
+   * @return {@link GlobalConfiguration}
+   * @see GlobalConfiguration
+   */
   public static GlobalConfiguration getInstance() {
     return globalConfiguration;
   }
 
+  /**
+   * get string
+   *
+   * @param key key
+   * @return {@link String}
+   * @see String
+   */
   public String getString(String key) {
     return getString(key, EMPTY);
   }
 
+  /**
+   * get string
+   *
+   * @param key          key
+   * @param defaultValue defaultValue
+   * @return {@link String}
+   * @see String
+   */
   public String getString(String key, String defaultValue) {
     if (StringUtil.isBlank(key)) {
       return defaultValue;
@@ -81,19 +102,45 @@ public class GlobalConfiguration {
     return result;
   }
 
+  /**
+   * get boolean
+   *
+   * @param key key
+   * @return {@link boolean}
+   */
   public boolean getBoolean(String key) {
     return getBoolean(key, false);
   }
 
+  /**
+   * get boolean
+   *
+   * @param key          key
+   * @param defaultValue defaultValue
+   * @return {@link boolean}
+   */
   public boolean getBoolean(String key, boolean defaultValue) {
     String result = getString(key, defaultValue ? TRUE : FALSE);
     return TRUE.equalsIgnoreCase(result);
   }
 
+  /**
+   * get long
+   *
+   * @param key key
+   * @return {@link long}
+   */
   public long getLong(String key) {
     return getLong(key, 0L);
   }
 
+  /**
+   * get long
+   *
+   * @param key          key
+   * @param defaultValue defaultValue
+   * @return {@link long}
+   */
   public long getLong(String key, long defaultValue) {
     String result = getString(key, String.valueOf(defaultValue));
     try {
@@ -103,10 +150,23 @@ public class GlobalConfiguration {
     }
   }
 
+  /**
+   * get integer
+   *
+   * @param key key
+   * @return {@link int}
+   */
   public int getInteger(String key) {
     return getInteger(key, 0);
   }
 
+  /**
+   * get integer
+   *
+   * @param key          key
+   * @param defaultValue defaultValue
+   * @return {@link int}
+   */
   public int getInteger(String key, int defaultValue) {
     String result = getString(key, String.valueOf(defaultValue));
     try {

@@ -30,18 +30,42 @@ package org.newcih.galois.utils;
  */
 public class StringUtil {
 
+  /**
+   * is blank
+   *
+   * @param str str
+   * @return {@link boolean}
+   */
   public static boolean isBlank(String str) {
     return isEmpty(str) || "".equals(str.trim());
   }
 
+  /**
+   * is empty
+   *
+   * @param str str
+   * @return {@link boolean}
+   */
   public static boolean isEmpty(String str) {
     return str == null || "".equals(str);
   }
 
+  /**
+   * is not blank
+   *
+   * @param str str
+   * @return {@link boolean}
+   */
   public static boolean isNotBlank(String str) {
     return !isBlank(str);
   }
 
+  /**
+   * is not empty
+   *
+   * @param str str
+   * @return {@link boolean}
+   */
   public static boolean isNotEmpty(String str) {
     return !isEmpty(str);
   }
