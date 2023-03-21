@@ -103,7 +103,7 @@ public class PremainService {
         .map(Object::toString)
         .collect(joining(","));
 
-    logger.info("Now enable Plugins [{}]，and start there FileWatchListeners [{}]", enableAgentNames,
+    logger.info("Now enable Plugins [{}]，and start FileWatchListeners [{}]", enableAgentNames,
         listenerNames);
   }
 
