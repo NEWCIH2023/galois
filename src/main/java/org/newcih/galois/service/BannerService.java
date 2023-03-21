@@ -31,9 +31,11 @@ import org.newcih.galois.conf.GlobalConfiguration;
 
 import static org.newcih.galois.constants.ConfConstant.BANNER_ENABLE;
 
+/**
+ * print banner when galois starting
+ */
 public class BannerService {
     private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
-
     public static final String BANNER =
             "  ____       _       _     \n" +
                     " / ___| __ _| | ___ (_)___ \n" +
@@ -44,18 +46,21 @@ public class BannerService {
     private BannerService() {
     }
 
+    /**
+     * print banner entry
+     */
     public static void printBanner() {
         if (!globalConfig.getBoolean(BANNER_ENABLE, true)) {
             return;
         }
 
         System.out.println(BANNER);
-        System.out.printf(" :: SpringBoot :: (%s) :: Spring :: (%s) :: MyBatis :: (%s) :: JDK :: (%s)%n%n",
+        System.out.printf(" :: SpringBoot (%s) :: Spring (%s) :: MyBatis (%s)%n :: JDK (%s)%n%n",
                 springBootVersion(), springVersion(), mybatisVersion(), jdkVersion());
     }
 
     /**
-     * print spring boot version
+     * get spring boot version
      */
     private static String springBootVersion() {
         try {
@@ -68,7 +73,7 @@ public class BannerService {
     }
 
     /**
-     * print spring version
+     * get spring version
      */
     private static String springVersion() {
         try {
@@ -81,18 +86,18 @@ public class BannerService {
     }
 
     /**
-     * print jdk version
+     * get jdk version
      */
     private static String jdkVersion() {
         try {
-            return System.getProperty("java.version");
+            return System.getProperty("java.version") + " " + System.getProperty("java.vm.name");
         } catch (Exception e) {
             return "-";
         }
     }
 
     /**
-     * print mybatis version
+     * get mybatis version
      */
     private static String mybatisVersion() {
         try {

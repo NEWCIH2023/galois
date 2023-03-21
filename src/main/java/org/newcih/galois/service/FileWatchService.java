@@ -32,7 +32,6 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.List;
-import org.newcih.galois.service.agent.FileChangedListener;
 import org.newcih.galois.utils.GaloisLog;
 
 import static com.sun.nio.file.SensitivityWatchEventModifier.MEDIUM;

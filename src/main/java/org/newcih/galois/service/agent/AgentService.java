@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.newcih.galois.conf.GlobalConfiguration;
+import org.newcih.galois.service.FileChangedListener;
 
 public abstract class AgentService {
     protected static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();

@@ -175,15 +175,12 @@
                 <version>3.3.0</version>
                 <configuration>
                     <excludes>
-                        <exclude>libs/*.jar</exclude>
+                        <exclude>libs/*</exclude>
                     </excludes>
                     <finalName>${artifactId}</finalName>
                     <archive>
                         <index>true</index>
-                        <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                        </manifest>
+                        <addMavenDescriptor>false</addMavenDescriptor>
                         <manifestEntries>
                             <Build-Time>${maven.build.timestamp}</Build-Time>
                             <Agent-Class>org.newcih.galois.service.agent.debug.DebugMain</Agent-Class>

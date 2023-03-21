@@ -28,7 +28,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import org.newcih.galois.service.agent.FileChangedListener;
+import org.newcih.galois.service.FileChangedListener;
 import org.newcih.galois.utils.FileUtil;
 import org.newcih.galois.utils.GaloisLog;
 import org.w3c.dom.Document;

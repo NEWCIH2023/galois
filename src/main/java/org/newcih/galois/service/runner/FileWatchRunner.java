@@ -35,7 +35,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
  */
 public class FileWatchRunner implements SpringApplicationRunListener {
 
-    private String rootPath;
+    private final String rootPath;
 
     public FileWatchRunner(String rootPath) {
         this.rootPath = rootPath;
@@ -43,32 +43,34 @@ public class FileWatchRunner implements SpringApplicationRunListener {
 
     @Override
     public void starting(ConfigurableBootstrapContext bootstrapContext) {
-
+        // TODO
     }
 
     @Override
     public void starting() {
-
+        // TODO
     }
 
     @Override
     public void environmentPrepared(ConfigurableBootstrapContext bootstrapContext,
                                     ConfigurableEnvironment environment) {
-
+        // TODO
     }
 
     @Override
     public void environmentPrepared(ConfigurableEnvironment environment) {
-
+        // TODO
     }
 
     @Override
     public void contextPrepared(ConfigurableApplicationContext context) {
+        // TODO
 
     }
 
     @Override
     public void contextLoaded(ConfigurableApplicationContext context) {
+        // TODO
 
     }
 
@@ -79,11 +81,13 @@ public class FileWatchRunner implements SpringApplicationRunListener {
 
     @Override
     public void running(ConfigurableApplicationContext context) {
+        // TODO
 
     }
 
     @Override
     public void failed(ConfigurableApplicationContext context, Throwable exception) {
+        // TODO
 
     }
 }

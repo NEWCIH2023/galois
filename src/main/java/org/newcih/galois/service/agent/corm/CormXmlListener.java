@@ -24,7 +24,7 @@
 
 package org.newcih.galois.service.agent.corm;
 
-import org.newcih.galois.service.agent.FileChangedListener;
+import org.newcih.galois.service.FileChangedListener;
 import org.newcih.galois.service.agent.mybatis.MyBatisXmlListener;
 import org.newcih.galois.utils.FileUtil;
 import org.newcih.galois.utils.GaloisLog;

@@ -26,7 +26,7 @@ package org.newcih.galois.service.agent.spring;
 
 import java.io.File;
 import java.lang.instrument.ClassDefinition;
-import org.newcih.galois.service.agent.FileChangedListener;
+import org.newcih.galois.service.FileChangedListener;
 import org.newcih.galois.utils.FileUtil;
 import org.newcih.galois.utils.GaloisLog;
 import org.newcih.galois.utils.JavaUtil;

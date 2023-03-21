@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent;
+package org.newcih.galois.service;
 
 import java.io.File;
 

@@ -33,6 +33,7 @@ import jdk.internal.org.objectweb.asm.util.Printer;
 import jdk.internal.org.objectweb.asm.util.Textifier;
 import jdk.internal.org.objectweb.asm.util.TraceClassVisitor;
 import org.newcih.galois.service.agent.spring.SpringAgentService;
+import org.newcih.galois.utils.StringUtil;
 import org.springframework.boot.SpringApplicationRunListener;
 
 public class PrintAsmCode {
@@ -40,16 +41,22 @@ public class PrintAsmCode {
     private String log;
     private List<SpringApplicationRunListener> listeners;
 
+    public PrintAsmCode() {
+    }
+
     public void getTest(String log) {
         this.listeners.addAll(SpringAgentService.getInstance().getRunners());
     }
 
     public static void main(String[] args) throws IOException {
-        printCode(true);
+        printCode(null, false);
     }
 
-    public static void printCode(boolean asmCode) throws IOException {
-        String className = PrintAsmCode.class.getName();
+    public static void printCode(String className, boolean asmCode) throws IOException {
+        if (StringUtil.isBlank(className)) {
+            className = PrintAsmCode.class.getName();
+        }
+
         int parsingOptions = ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG;
         Printer printer = asmCode ? new ASMifier() : new Textifier();
         PrintWriter printWriter = new PrintWriter(System.out, true);

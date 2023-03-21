@@ -56,7 +56,11 @@
             <artifactId>dm.jdbc.driver</artifactId>
             <version>8.0.0</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.comtop</groupId>
+            <artifactId>corm</artifactId>
+            <version>3.1.2</version>
+        </dependency>
     </dependencies>
 
     <build>

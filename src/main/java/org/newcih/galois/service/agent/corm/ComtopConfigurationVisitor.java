@@ -14,7 +14,6 @@ import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
 import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
 import static org.newcih.galois.constants.Constant.DOT;
-import static org.newcih.galois.constants.Constant.SEMICOLON;
 import static org.newcih.galois.constants.Constant.SLASH;
 
 public class ComtopConfigurationVisitor extends MethodAdapter {
@@ -29,7 +28,7 @@ public class ComtopConfigurationVisitor extends MethodAdapter {
                                      String[] exceptions) {
         MethodVisitor mv = cv.visitMethod(access, name, descriptor, signature, exceptions);
 
-        if (Objects.equals(name, "<init>")) {
+        if (Objects.equals(name, "<init>") && Objects.equals(descriptor, "()V")) {
             return new ComtopConfigurationVisitor.ConstructorVisitor(ASM5, mv);
         }
 
@@ -47,14 +46,14 @@ public class ComtopConfigurationVisitor extends MethodAdapter {
                 String className = CormBeanReloader.class.getName().replace(DOT, SLASH);
 
                 mv.visitCode();
+                mv.visitMethodInsn(INVOKESTATIC, className, "getInstance", "()L" + className + ";", false);
                 mv.visitVarInsn(ALOAD, 0);
-                mv.visitMethodInsn(INVOKESTATIC, className, "getInstance", "()L" + className + SEMICOLON, false);
-                mv.visitVarInsn(ALOAD, 1);
                 mv.visitMethodInsn(INVOKEVIRTUAL, className, "setConfiguration", "(Lcom/comtop/corm/session" +
                         "/Configuration;)V", false);
-                mv.visitInsn(RETURN);
                 mv.visitEnd();
             }
+
+            super.visitInsn(opcode);
         }
     }
 }
