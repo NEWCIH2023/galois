@@ -14,7 +14,6 @@ import static org.newcih.galois.constants.Constant.SLASH;
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.newcih.galois.service.agent.MethodAdapter;
-import org.newcih.galois.utils.GaloisLog;
 
 /**
  * mybatis configuration visitor
@@ -23,8 +22,6 @@ import org.newcih.galois.utils.GaloisLog;
  * @since 1.0.0
  */
 public class MyBatisConfigurationVisitor extends MethodAdapter {
-
-  private static final GaloisLog logger = GaloisLog.getLogger(MyBatisConfigurationVisitor.class);
 
   public MyBatisConfigurationVisitor() {
     super(MYBATIS_CONFIGURATION);

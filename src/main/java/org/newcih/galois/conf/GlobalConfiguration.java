@@ -42,21 +42,18 @@ import org.newcih.galois.utils.StringUtil;
  */
 public class GlobalConfiguration {
 
+  private static final GlobalConfiguration globalConfiguration = new GlobalConfiguration();
   /**
    * parse config key-value entry in galois.properties
    */
-  private static final Properties configuration = new Properties();
-  private static final GlobalConfiguration globalConfiguration = new GlobalConfiguration();
+  private final Properties configuration = new Properties();
 
-  static {
+  private GlobalConfiguration() {
     try (InputStream is = FileUtil.readClassPathFile("galois.properties")) {
       configuration.load(is);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  private GlobalConfiguration() {
   }
 
   /**

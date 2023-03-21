@@ -122,6 +122,10 @@ public abstract class AgentService {
     this.inited = inited;
   }
 
+  public void setEnabled(int enabled) {
+    this.enabled = enabled;
+  }
+
   public int getEnabled() {
     return enabled;
   }

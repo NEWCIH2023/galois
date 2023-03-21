@@ -34,7 +34,8 @@ import jdk.internal.org.objectweb.asm.ClassReader;
 import jdk.internal.org.objectweb.asm.ClassVisitor;
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import org.newcih.galois.conf.GlobalConfiguration;
-import org.newcih.galois.utils.GaloisLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * method adapter
@@ -44,7 +45,7 @@ import org.newcih.galois.utils.GaloisLog;
  */
 public abstract class MethodAdapter extends ClassVisitor {
 
-  private static final GaloisLog logger = GaloisLog.getLogger(MethodAdapter.class);
+  private static final Logger logger = LoggerFactory.getLogger(MethodAdapter.class);
   private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
   protected final String className;
   protected ClassReader cr;
@@ -54,7 +55,7 @@ public abstract class MethodAdapter extends ClassVisitor {
     super(ASM5);
 
     if (className == null || className.isEmpty()) {
-      throw new NullPointerException("methodAdapter's class name cannot be null or empty.");
+      throw new NullPointerException("MethodAdapter's class name cannot be null or empty.");
     }
 
     this.className = className;
@@ -73,7 +74,7 @@ public abstract class MethodAdapter extends ClassVisitor {
       cw = new ClassWriter(cr, ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
       cv = this.cw;
     } catch (Exception e) {
-      logger.error("create new methodadapter for class {} failed!", className, e);
+      logger.error("Create new methodAdapter for class {} fail.", className, e);
     }
 
     cr.accept(this, 0);
@@ -81,13 +82,13 @@ public abstract class MethodAdapter extends ClassVisitor {
 
     if (globalConfig.getBoolean(PRINT_ASM_CODE_ENABLE, false)) {
       String tempClassFile =
-          "" + className.substring(className.lastIndexOf(DOT) + 1) + CLASS_FILE.getFileType();
+          className.substring(className.lastIndexOf(DOT) + 1) + CLASS_FILE.getFileType();
       try (FileOutputStream fos = new FileOutputStream(tempClassFile)) {
         fos.write(result);
       } catch (Throwable e) {
-        logger.error("dump injected class file error.", e);
+        logger.error("Dump class file error.", e);
       }
-      logger.info("had dump asm code to {}.", tempClassFile);
+      logger.info("Had dump class file to {}.", tempClassFile);
     }
 
     return result;

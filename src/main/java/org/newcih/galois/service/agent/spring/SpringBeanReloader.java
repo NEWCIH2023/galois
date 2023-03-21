@@ -25,9 +25,9 @@
 package org.newcih.galois.service.agent.spring;
 
 import java.lang.reflect.Modifier;
-import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.service.agent.BeanReloader;
-import org.newcih.galois.utils.GaloisLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
@@ -40,8 +40,7 @@ import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
  */
 public class SpringBeanReloader implements BeanReloader<Class<?>> {
 
-  public static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
-  private static final GaloisLog logger = GaloisLog.getLogger(SpringBeanReloader.class);
+  private static final Logger logger = LoggerFactory.getLogger(SpringBeanReloader.class);
   private static final SpringBeanReloader springBeanReloader = new SpringBeanReloader();
   protected ClassPathBeanDefinitionScanner scanner;
   protected AnnotationConfigServletWebServerApplicationContext context;
@@ -64,7 +63,8 @@ public class SpringBeanReloader implements BeanReloader<Class<?>> {
   @Override
   public void updateBean(Class<?> clazz) {
     if (scanner == null || context == null) {
-      logger.error("springBeanReloader had not ready. scanner or context is null.");
+      logger.error(
+          "SpringBeanReloader not prepare ready. BeanDefinitionScanner or ApplicationContext object is null.");
       return;
     }
 
@@ -77,12 +77,12 @@ public class SpringBeanReloader implements BeanReloader<Class<?>> {
       factory.registerSingleton(beanName, bean);
     } catch (InstantiationException ie) {
       logger.error(
-          "can't create a new object from newInstance method, ensure that's not an abstract class.");
+          "Can't create a new object by newInstance method, ensure that's not an abstract class.");
     } catch (Exception e) {
-      logger.error("spring bean reloader update bean failed.", e);
+      logger.error("SpringBeanReloader update bean fail.", e);
     }
 
-    logger.info("reload spring bean type {} success.", clazz.getName());
+    logger.info("SpringBeanReloader reload class {} success.", clazz.getSimpleName());
   }
 
   @Override

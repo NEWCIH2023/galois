@@ -42,10 +42,10 @@ import org.newcih.galois.service.agent.corm.CormAgentService;
 import org.newcih.galois.service.agent.mybatis.MyBatisAgentService;
 import org.newcih.galois.service.agent.spring.SpringAgentService;
 import org.newcih.galois.service.runner.FileWatchRunner;
-import org.newcih.galois.utils.GaloisLog;
 import org.newcih.galois.utils.JavaUtil;
 import org.newcih.galois.utils.StringUtil;
-import org.springframework.boot.SpringApplication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * premain agent服务入口
@@ -55,19 +55,18 @@ import org.springframework.boot.SpringApplication;
  */
 public class PremainService {
 
-  public static final GaloisLog logger = GaloisLog.getLogger(PremainService.class);
-  /**
-   * adding your custom agent service
-   */
-  public static final List<AgentService> agentServices = Arrays.asList(
-      SpringAgentService.getInstance(),
-      MyBatisAgentService.getInstance(), CormAgentService.getInstance());
-  public static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
-  public static final FileWatchService fileWatchService = FileWatchService.getInstance();
+  private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
+  private static final FileWatchService fileWatchService = FileWatchService.getInstance();
+  private static final Logger logger = LoggerFactory.getLogger(PremainService.class);
+  private static final SpringAgentService springAgentService = SpringAgentService.getInstance();
+  private static final MyBatisAgentService mybatisAgentService = MyBatisAgentService.getInstance();
+  private static final CormAgentService cormAgentService = CormAgentService.getInstance();
+  private static final List<AgentService> agentServices = Arrays.asList(mybatisAgentService,
+      cormAgentService, springAgentService);
 
   static {
     String rootPath = globalConfig.getString(USER_DIR);
-    SpringAgentService.getInstance().addRunner(new FileWatchRunner(rootPath));
+    springAgentService.addRunner(new FileWatchRunner(rootPath));
   }
 
   /**
@@ -78,7 +77,7 @@ public class PremainService {
    */
   public static void premain(String agentArgs, Instrumentation inst) {
     if (inst == null) {
-      logger.error("your program do not support instrumentation.");
+      logger.error("Your program do not support instrumentation.");
       System.exit(0);
     }
 
@@ -104,7 +103,8 @@ public class PremainService {
         .map(Object::toString)
         .collect(joining(","));
 
-    logger.info("当前共启用[{}]，并配置了以下监听器 [{}]", enableAgentNames, listenerNames);
+    logger.info("Now enable Plugins [{}]，and start there FileWatchListeners [{}]", enableAgentNames,
+        listenerNames);
   }
 
   /**
@@ -123,11 +123,6 @@ public class PremainService {
       }
 
       String newClassName = className.replace(SLASH, DOT);
-
-      if (Arrays.asList(SpringAgentService.class.getName(), SpringApplication.class.getName())
-          .contains(newClassName)) {
-        logger.info("use {} load {}", loader, newClassName);
-      }
 
       for (AgentService agentService : agentServices) {
         boolean checkedClass = agentService.checkAgentEnable(newClassName);

@@ -33,7 +33,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.newcih.galois.service.FileChangedListener;
 import org.newcih.galois.service.agent.mybatis.MyBatisXmlListener;
 import org.newcih.galois.utils.FileUtil;
-import org.newcih.galois.utils.GaloisLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.xml.sax.InputSource;
@@ -46,8 +47,8 @@ import org.xml.sax.InputSource;
  */
 public class CormXmlListener implements FileChangedListener {
 
-  public static final String DOC_TYPE = "mapper";
-  private static final GaloisLog logger = GaloisLog.getLogger(MyBatisXmlListener.class);
+  private static final String DOC_TYPE = "mapper";
+  private static final Logger logger = LoggerFactory.getLogger(MyBatisXmlListener.class);
   private static final CormBeanReloader reloader = CormBeanReloader.getInstance();
 
   @Override
@@ -74,10 +75,9 @@ public class CormXmlListener implements FileChangedListener {
       DocumentType documentType = document.getDoctype();
       return documentType != null && documentType.toString().contains(DOC_TYPE);
     } catch (Exception e) {
-      logger.error("parse xml file failed", e);
+      logger.error("Parse xml file fail. Check it's file type.", e);
       return false;
     }
-
   }
 
   @Override
@@ -87,7 +87,7 @@ public class CormXmlListener implements FileChangedListener {
   @Override
   public void modifiedHandle(File file) {
     if (logger.isDebugEnabled()) {
-      logger.debug("corm listener monitor file modified ==> {}.", file.getName());
+      logger.debug("CormXmlListener detect file modified: {}.", file.getName());
     }
 
     reloader.updateBean(file);

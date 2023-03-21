@@ -30,8 +30,9 @@ import java.io.File;
 import java.lang.instrument.ClassDefinition;
 import org.newcih.galois.service.FileChangedListener;
 import org.newcih.galois.utils.FileUtil;
-import org.newcih.galois.utils.GaloisLog;
 import org.newcih.galois.utils.JavaUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -42,8 +43,7 @@ import org.newcih.galois.utils.JavaUtil;
  */
 public class SpringBeanListener implements FileChangedListener {
 
-  public static final GaloisLog logger = GaloisLog.getLogger(SpringBeanListener.class);
-  private final static SpringBeanReloader reloader = SpringBeanReloader.getInstance();
+  private static final Logger logger = LoggerFactory.getLogger(SpringBeanListener.class);
 
   @Override
   public boolean isUseful(File file) {
@@ -63,20 +63,20 @@ public class SpringBeanListener implements FileChangedListener {
       Class<?> clazz = Class.forName(className);
       ClassDefinition definition = new ClassDefinition(clazz, classBytes);
       JavaUtil.getInst().redefineClasses(definition);
-      logger.info("had redefine class file => {}", classFile.getName());
+      logger.info("Redefine class file {} success.", classFile.getName());
 
 //      if (reloader.isUseful(clazz)) {
 //        reloader.updateBean(clazz);
 //      }
     } catch (Throwable e) {
-      logger.error("reload bean failed", e);
+      logger.error("Reload Spring Bean fail.", e);
     }
   }
 
   @Override
   public void createdHandle(File file) {
     if (logger.isDebugEnabled()) {
-      logger.debug("spring bean listener monitor java file created event ==> {}", file.getName());
+      logger.debug("SpringBeanListener detect class file created: {}", file.getName());
     }
 
     fileChangedHandle(file);
@@ -90,7 +90,7 @@ public class SpringBeanListener implements FileChangedListener {
   @Override
   public void modifiedHandle(File file) {
     if (logger.isDebugEnabled()) {
-      logger.debug("spring bean listener monitor java file modified event ==> {}", file.getName());
+      logger.debug("SpringBeanListener detect class file modified: {}", file.getName());
     }
 
     fileChangedHandle(file);

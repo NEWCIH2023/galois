@@ -44,10 +44,11 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import org.newcih.galois.service.agent.BeanReloader;
-import org.newcih.galois.utils.GaloisLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * MyBatis的Mapper重新加载服务类
+ * Corm Bean Reloader Service
  *
  * @author liuguangsheng
  * @since 1.0.0
@@ -55,16 +56,17 @@ import org.newcih.galois.utils.GaloisLog;
 public class CormBeanReloader implements BeanReloader<File> {
 
   public static final CormBeanReloader mybatisBeanReloder = new CormBeanReloader();
-  private static final GaloisLog logger = GaloisLog.getLogger(CormBeanReloader.class);
+  private static final Logger logger = LoggerFactory.getLogger(CormBeanReloader.class);
   protected Configuration configuration;
 
   private CormBeanReloader() {
   }
 
   /**
-   * 获取单例实例
+   * get instance
    *
-   * @return
+   * @return {@link CormBeanReloader}
+   * @see CormBeanReloader
    */
   public static CormBeanReloader getInstance() {
     return mybatisBeanReloder;
@@ -78,7 +80,7 @@ public class CormBeanReloader implements BeanReloader<File> {
   @Override
   public void updateBean(File mapperFile) {
     if (configuration == null) {
-      logger.error("corm had not ready. configuration is null.");
+      logger.error("CormBeanRealoder not prepare ready. Configuration object is null.");
       return;
     }
 
@@ -87,22 +89,20 @@ public class CormBeanReloader implements BeanReloader<File> {
       XPathParser parser = new XPathParser(fis, true, variables, new XMLMapperEntityResolver());
       XNode context = parser.evalNode("/mapper");
       String namespace = context.getStringAttribute(NAMESPACE);
-      // 清空Mybatis缓存
-      clearMapperRegistry(namespace);
+
+      // clear mapper cache
       clearLoadedResources(mapperFile.getName());
       clearCachedNames(namespace);
       clearParameterMap(context.evalNodes("/mapper/parameterMap"), namespace);
       clearResultMap(context.evalNodes("/mapper/resultMap"), namespace);
       clearSqlElement(context.evalNodes("/mapper/sql"), namespace);
-      // 使MyBatis重新加载xml配置的mapper对象
+      // reload mapper by xml file
       reloadXML(mapperFile);
     } catch (Exception e) {
-      logger.error("reload mybatis xml throw exception", e);
+      logger.error("Reload mybatis mapper by xml file fail.", e);
     }
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("reload mybatis xml file {} success", mapperFile.getName());
-    }
+    logger.info("Reload mybatis mapper by xml file {} success.", mapperFile.getName());
   }
 
   @Override
@@ -111,58 +111,28 @@ public class CormBeanReloader implements BeanReloader<File> {
   }
 
   /**
-   * reload x m l
+   * reload xml file
    *
    * @param mapperFile mapperFile
-   * @throws IOException java.io. i o exception
    */
   private void reloadXML(File mapperFile) throws IOException {
     InputStream is = Files.newInputStream(mapperFile.toPath());
-    XMLMapperBuilder builder = new XMLMapperBuilder(is, getConfiguration(), mapperFile.getName(),
-        getConfiguration().getSqlFragments(), new FileSystemResource(mapperFile));
+    XMLMapperBuilder builder = new XMLMapperBuilder(is, configuration, mapperFile.getName(),
+        configuration.getSqlFragments(), new FileSystemResource(mapperFile));
     builder.parse();
-  }
-
-  /**
-   * clear mapper registry
-   *
-   * @param namespace namespace
-   * @throws NoSuchFieldException   java.lang. no such field exception
-   * @throws IllegalAccessException java.lang. illegal access exception
-   */
-  @SuppressWarnings("unchecked")
-  private void clearMapperRegistry(String namespace)
-      throws NoSuchFieldException, IllegalAccessException {
-//        Field field = MapperRegistry.class.getDeclaredField("knownMappers");
-//        field.setAccessible(true);
-//        Map<Class<?>, Object> mapConfig = (Map<Class<?>, Object>) field.get(getConfiguration().getmapp());
-//        Class<?> refreshKey = null;
-//
-//        for (Map.Entry<Class<?>, Object> item : mapConfig.entrySet()) {
-//            if (item.getKey().getName().contains(namespace)) {
-//                refreshKey = item.getKey();
-//                break;
-//            }
-//        }
-//
-//        if (refreshKey != null) {
-//            mapConfig.remove(refreshKey);
-//        }
   }
 
   /**
    * clear loaded resources
    *
    * @param fileName fileName
-   * @throws NoSuchFieldException   java.lang. no such field exception
-   * @throws IllegalAccessException java.lang. illegal access exception
    */
   @SuppressWarnings("rawtypes")
   private void clearLoadedResources(String fileName)
       throws NoSuchFieldException, IllegalAccessException {
-    Field loadedResourcesField = getConfiguration().getClass().getDeclaredField("loadedResources");
+    Field loadedResourcesField = configuration.getClass().getDeclaredField("loadedResources");
     loadedResourcesField.setAccessible(true);
-    Set loadedResourcesSet = (Set) loadedResourcesField.get(getConfiguration());
+    Set loadedResourcesSet = (Set) loadedResourcesField.get(configuration);
     loadedResourcesSet.remove(fileName);
   }
 
@@ -172,7 +142,7 @@ public class CormBeanReloader implements BeanReloader<File> {
    * @param namespace namespace
    */
   private void clearCachedNames(String namespace) {
-    getConfiguration().getCacheNames().remove(namespace);
+    configuration.getCacheNames().remove(namespace);
   }
 
   /**
@@ -184,7 +154,7 @@ public class CormBeanReloader implements BeanReloader<File> {
   private void clearParameterMap(List<XNode> list, String namespace) {
     for (XNode xNode : list) {
       String id = xNode.getStringAttribute(ID);
-      getConfiguration().getResultMapNames().remove(namespace + "." + id);
+      configuration.getResultMapNames().remove(namespace + "." + id);
     }
   }
 
@@ -197,8 +167,8 @@ public class CormBeanReloader implements BeanReloader<File> {
   private void clearResultMap(List<XNode> list, String namespace) {
     for (XNode xNode : list) {
       String id = xNode.getStringAttribute(ID, xNode.getValueBasedIdentifier());
-      getConfiguration().getResultMapNames().remove(id);
-      getConfiguration().getResultMapNames().remove(namespace + "." + id);
+      configuration.getResultMapNames().remove(id);
+      configuration.getResultMapNames().remove(namespace + "." + id);
       clearResultMap(xNode, namespace);
     }
   }
@@ -214,9 +184,9 @@ public class CormBeanReloader implements BeanReloader<File> {
       if (Objects.equals("association", child.getName()) || Objects.equals("collection",
           child.getName()) || Objects.equals("case", child.getName())) {
         if (child.getStringAttribute("select") == null) {
-          getConfiguration().getResultMapNames().remove(child.getStringAttribute(ID,
+          configuration.getResultMapNames().remove(child.getStringAttribute(ID,
               child.getValueBasedIdentifier()));
-          getConfiguration().getResultMapNames()
+          configuration.getResultMapNames()
               .remove(namespace + "." + child.getStringAttribute(ID,
                   child.getValueBasedIdentifier()));
 
@@ -238,8 +208,8 @@ public class CormBeanReloader implements BeanReloader<File> {
   private void clearSqlElement(List<XNode> list, String namespace) {
     for (XNode xNode : list) {
       String id = xNode.getStringAttribute(ID);
-      getConfiguration().getSqlFragments().remove(id);
-      getConfiguration().getSqlFragments().remove(namespace + "." + id);
+      configuration.getSqlFragments().remove(id);
+      configuration.getSqlFragments().remove(namespace + "." + id);
     }
   }
 

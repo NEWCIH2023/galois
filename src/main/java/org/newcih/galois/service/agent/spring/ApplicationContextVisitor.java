@@ -39,7 +39,8 @@ import static org.newcih.galois.constants.Constant.SLASH;
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.newcih.galois.service.agent.MethodAdapter;
-import org.newcih.galois.utils.GaloisLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -49,8 +50,6 @@ import org.newcih.galois.utils.GaloisLog;
  * @since 1.0.0
  */
 public class ApplicationContextVisitor extends MethodAdapter {
-
-  private static final GaloisLog logger = GaloisLog.getLogger(ApplicationContextVisitor.class);
 
   public ApplicationContextVisitor() {
     super(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT);

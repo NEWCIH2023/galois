@@ -31,7 +31,8 @@ import static org.newcih.galois.constants.ClassNameConstant.SPRING_APPLICATION_R
 import java.util.ArrayList;
 import java.util.List;
 import org.newcih.galois.service.agent.AgentService;
-import org.newcih.galois.utils.GaloisLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplicationRunListener;
 
 /**
@@ -43,7 +44,7 @@ import org.springframework.boot.SpringApplicationRunListener;
 public class SpringAgentService extends AgentService {
 
   private static final SpringAgentService springAgent = new SpringAgentService();
-  private static final GaloisLog logger = GaloisLog.getLogger(SpringAgentService.class);
+  private static final Logger logger = LoggerFactory.getLogger(SpringAgentService.class);
   private final List<SpringApplicationRunListener> runners = new ArrayList<>(16);
 
   private SpringAgentService() {
@@ -78,7 +79,7 @@ public class SpringAgentService extends AgentService {
    */
   public void addRunner(SpringApplicationRunListener runner) {
     if (runner != null) {
-      logger.info("add new started runner {}.", runner);
+      logger.info("Add new started runner {}.", runner);
       runners.add(runner);
     }
   }
@@ -86,11 +87,12 @@ public class SpringAgentService extends AgentService {
   /**
    * add runners
    *
-   * @param runners runners
+   * @param runnerList runnerList
    */
-  public void addRunners(List<SpringApplicationRunListener> runners) {
-    if (runners != null && runners.isEmpty()) {
-      this.runners.addAll(runners);
+  public void addRunners(List<SpringApplicationRunListener> runnerList) {
+    if (runnerList != null && !runnerList.isEmpty()) {
+      logger.info("Add {} new started runners.", runnerList.size());
+      runners.addAll(runnerList);
     }
   }
 

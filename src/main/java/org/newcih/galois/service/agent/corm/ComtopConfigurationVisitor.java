@@ -14,7 +14,6 @@ import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.newcih.galois.constants.ClassNameConstant;
 import org.newcih.galois.service.agent.MethodAdapter;
-import org.newcih.galois.utils.GaloisLog;
 
 /**
  * comtop configuration visitor
@@ -23,8 +22,6 @@ import org.newcih.galois.utils.GaloisLog;
  * @since 1.0.0
  */
 public class ComtopConfigurationVisitor extends MethodAdapter {
-
-  private static final GaloisLog logger = GaloisLog.getLogger(ComtopConfigurationVisitor.class);
 
   public ComtopConfigurationVisitor() {
     super(ClassNameConstant.COMTOP_CONFIGURATION);

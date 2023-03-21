@@ -38,7 +38,8 @@ import static org.newcih.galois.constants.Constant.SLASH;
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.newcih.galois.service.agent.MethodAdapter;
-import org.newcih.galois.utils.GaloisLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * bean definition scanner visitor
@@ -47,8 +48,6 @@ import org.newcih.galois.utils.GaloisLog;
  * @since 1.0.0
  */
 public class BeanDefinitionScannerVisitor extends MethodAdapter {
-
-  private static final GaloisLog logger = GaloisLog.getLogger(BeanDefinitionScannerVisitor.class);
 
   public BeanDefinitionScannerVisitor() {
     super(CLASS_PATH_BEAN_DEFINITION_SCANNER);

@@ -57,7 +57,7 @@ public class JavaUtil {
     File directory = new File(compileDir);
     if (!directory.exists()) {
       try {
-        boolean createResult = directory.mkdir();
+        directory.mkdir();
       } catch (Exception ignored) {
       }
     }

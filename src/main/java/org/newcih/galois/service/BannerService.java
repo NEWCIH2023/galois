@@ -26,6 +26,7 @@ package org.newcih.galois.service;
 
 import static org.newcih.galois.constants.ConfConstant.BANNER_ENABLE;
 import static org.newcih.galois.constants.ConfConstant.GALOIS_VERSION;
+import static org.newcih.galois.constants.Constant.LF;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -40,13 +41,13 @@ import org.newcih.galois.conf.GlobalConfiguration;
  */
 public class BannerService {
 
-  public static final String BANNER =
+  private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
+  private static final String BANNER =
       "  ____       _       _     \n" +
           " / ___| __ _| | ___ (_)___ \n" +
           "| |  _ / _` | |/ _ \\| / __|\n" +
           "| |_| | (_| | | (_) | \\__ \\\n" +
-          " \\____|\\__,_|_|\\___/|_|___/";
-  private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
+          " \\____|\\__,_|_|\\___/|_|___/\t\t(" + galoisVersion() + ")";
 
   private BannerService() {
   }
@@ -59,10 +60,13 @@ public class BannerService {
       return;
     }
 
-    System.out.println(BANNER);
-    System.out.printf(
-        " :: SpringBoot (%s) :: Spring (%s) :: MyBatis (%s)%n :: Galois (%s) :: JDK (%s)%n%n",
-        springBootVersion(), springVersion(), mybatisVersion(), galoisVersion(), jdkVersion());
+    StringBuilder bannerBuilder = new StringBuilder();
+    bannerBuilder.append(BANNER).append(LF);
+    bannerBuilder.append(String.format(
+        " :: SpringBoot (%s) :: Spring (%s) :: MyBatis (%s)%n :: Jdk (%s)",
+        springBootVersion(), springVersion(), mybatisVersion(), jdkVersion()
+    )).append(LF);
+    System.out.println(bannerBuilder);
   }
 
   /**

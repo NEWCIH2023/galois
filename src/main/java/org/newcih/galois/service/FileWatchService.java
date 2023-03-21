@@ -38,7 +38,8 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.List;
-import org.newcih.galois.utils.GaloisLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * file monitor service based on {@link java.nio.file.WatchService}
@@ -48,7 +49,7 @@ import org.newcih.galois.utils.GaloisLog;
  */
 public class FileWatchService {
 
-  private final static GaloisLog logger = GaloisLog.getLogger(FileWatchService.class);
+  private static final Logger logger = LoggerFactory.getLogger(FileWatchService.class);
   private static final List<FileChangedListener> listeners = new ArrayList<>(16);
   private static final FileWatchService instance = new FileWatchService();
   private WatchService watchService;
@@ -111,7 +112,7 @@ public class FileWatchService {
    */
   public void start() {
     Thread watchThread = new Thread(() -> {
-      logger.info("file watch service started.");
+      logger.info("FileWatchService Started.");
 
       while (true) {
         try {

@@ -36,6 +36,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 import org.newcih.galois.constants.FileType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * file util
@@ -45,7 +47,7 @@ import org.newcih.galois.constants.FileType;
  */
 public class FileUtil {
 
-  private static final GaloisLog logger = GaloisLog.getLogger(FileUtil.class);
+  private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
 
   private FileUtil() {
   }
@@ -95,7 +97,7 @@ public class FileUtil {
     try (FileOutputStream fos = new FileOutputStream(path)) {
       fos.write(bytes, 0, bytes.length);
     } catch (IOException e) {
-      logger.error("write byte array to {} fail.", path, e);
+      logger.error("Write byte array to {} fail.", path, e);
     }
 
     return new File(path);
@@ -122,7 +124,7 @@ public class FileUtil {
 
       return byteArrayOutputStream.toByteArray();
     } catch (Exception e) {
-      logger.error("convert binary file to byte array fail.", e);
+      logger.error("Convert binary file to byte array fail.", e);
     }
 
     return new byte[0];
@@ -142,7 +144,7 @@ public class FileUtil {
     try (BufferedReader br = new BufferedReader(new FileReader(file))) {
       br.lines().map(line -> line + LF).forEach(sb::append);
     } catch (Exception e) {
-      logger.error("read text file fail.", e);
+      logger.error("Read text file fail.", e);
       return "";
     }
 
