@@ -24,6 +24,8 @@
 
 package org.newcih.galois.service.agent.mybatis;
 
+import static org.newcih.galois.constants.FileType.XML_FILE;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import javax.xml.parsers.DocumentBuilder;
@@ -35,66 +37,65 @@ import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.xml.sax.InputSource;
 
-import static org.newcih.galois.constants.FileType.XML_FILE;
-
 
 /**
  * MyBatis的XML文件变更监听处理
  */
 public class MyBatisXmlListener implements FileChangedListener {
 
-    public static final String DOC_TYPE = "mapper";
+  public static final String DOC_TYPE = "mapper";
 
-    private static final GaloisLog logger = GaloisLog.getLogger(MyBatisXmlListener.class);
+  private static final GaloisLog logger = GaloisLog.getLogger(MyBatisXmlListener.class);
 
-    private static final MyBatisBeanReloader reloader = MyBatisBeanReloader.getInstance();
+  private static final MyBatisBeanReloader reloader = MyBatisBeanReloader.getInstance();
 
-    @Override
-    public boolean isUseful(File file) {
-        boolean fileTypeCheck = FileUtil.validFileType(file, XML_FILE);
+  @Override
+  public boolean isUseful(File file) {
+    boolean fileTypeCheck = FileUtil.validFileType(file, XML_FILE);
 
-        if (!fileTypeCheck) {
-            return false;
-        }
-
-        // check xml file node contains mapper
-        try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setValidating(false);
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            // do no validate dtd
-            db.setEntityResolver(((publicId, systemId) -> new InputSource(new ByteArrayInputStream(new byte[0]))));
-            Document document = db.parse(file);
-            DocumentType documentType = document.getDoctype();
-            return documentType != null && documentType.toString().contains(DOC_TYPE);
-        } catch (Exception e) {
-            logger.error("parse xml file failed", e);
-            return false;
-        }
-
+    if (!fileTypeCheck) {
+      return false;
     }
 
-    @Override
-    public void createdHandle(File file) {
-        // TODO
+    // check xml file node contains mapper
+    try {
+      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      dbf.setValidating(false);
+      DocumentBuilder db = dbf.newDocumentBuilder();
+      // do no validate dtd
+      db.setEntityResolver(
+          ((publicId, systemId) -> new InputSource(new ByteArrayInputStream(new byte[0]))));
+      Document document = db.parse(file);
+      DocumentType documentType = document.getDoctype();
+      return documentType != null && documentType.toString().contains(DOC_TYPE);
+    } catch (Exception e) {
+      logger.error("parse xml file failed", e);
+      return false;
     }
 
-    @Override
-    public void modifiedHandle(File file) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("mybatis listener monitor file modified ==> {}.", file.getName());
-        }
+  }
 
-        reloader.updateBean(file);
+  @Override
+  public void createdHandle(File file) {
+    // TODO
+  }
+
+  @Override
+  public void modifiedHandle(File file) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("mybatis listener monitor file modified ==> {}.", file.getName());
     }
 
-    @Override
-    public void deletedHandle(File file) {
-        // TODO
-    }
+    reloader.updateBean(file);
+  }
 
-    @Override
-    public String toString() {
-        return "MyBatisXmlListener";
-    }
+  @Override
+  public void deletedHandle(File file) {
+    // TODO
+  }
+
+  @Override
+  public String toString() {
+    return "MyBatisXmlListener";
+  }
 }

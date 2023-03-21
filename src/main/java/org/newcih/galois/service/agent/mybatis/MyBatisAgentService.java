@@ -24,27 +24,27 @@
 
 package org.newcih.galois.service.agent.mybatis;
 
-import org.newcih.galois.service.agent.AgentService;
-
 import static org.newcih.galois.constants.ClassNameConstant.MYBATIS_CONFIGURATION;
+
+import org.newcih.galois.service.agent.AgentService;
 
 public class MyBatisAgentService extends AgentService {
 
-    private final static MyBatisAgentService myBatisAgentService = new MyBatisAgentService();
+  private final static MyBatisAgentService myBatisAgentService = new MyBatisAgentService();
 
-    private MyBatisAgentService() {
-        adapterMap.put(MYBATIS_CONFIGURATION, new MyBatisConfigurationVisitor());
-        necessaryClasses.addAll(adapterMap.keySet());
-    }
+  private MyBatisAgentService() {
+    adapterMap.put(MYBATIS_CONFIGURATION, new MyBatisConfigurationVisitor());
+    necessaryClasses.addAll(adapterMap.keySet());
+  }
 
-    public static MyBatisAgentService getInstance() {
-        return myBatisAgentService;
-    }
+  public static MyBatisAgentService getInstance() {
+    return myBatisAgentService;
+  }
 
-    @Override
-    public void init() {
-        super.init();
-        listeners.add(new MyBatisXmlListener());
-        beanReloader = MyBatisBeanReloader.getInstance();
-    }
+  @Override
+  public void init() {
+    super.init();
+    listeners.add(new MyBatisXmlListener());
+    beanReloader = MyBatisBeanReloader.getInstance();
+  }
 }

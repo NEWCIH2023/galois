@@ -38,30 +38,30 @@ import org.springframework.boot.SpringApplicationRunListener;
 
 public class PrintAsmCode {
 
-    private String log;
-    private List<SpringApplicationRunListener> listeners;
+  private String log;
+  private List<SpringApplicationRunListener> listeners;
 
-    public PrintAsmCode() {
+  public PrintAsmCode() {
+  }
+
+  public static void main(String[] args) throws IOException {
+    printCode(null, false);
+  }
+
+  public static void printCode(String className, boolean asmCode) throws IOException {
+    if (StringUtil.isBlank(className)) {
+      className = PrintAsmCode.class.getName();
     }
 
-    public void getTest(String log) {
-        this.listeners.addAll(SpringAgentService.getInstance().getRunners());
-    }
+    int parsingOptions = ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG;
+    Printer printer = asmCode ? new ASMifier() : new Textifier();
+    PrintWriter printWriter = new PrintWriter(System.out, true);
+    TraceClassVisitor cv = new TraceClassVisitor(null, printer, printWriter);
+    new ClassReader(className).accept(cv, parsingOptions);
+  }
 
-    public static void main(String[] args) throws IOException {
-        printCode(null, false);
-    }
-
-    public static void printCode(String className, boolean asmCode) throws IOException {
-        if (StringUtil.isBlank(className)) {
-            className = PrintAsmCode.class.getName();
-        }
-
-        int parsingOptions = ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG;
-        Printer printer = asmCode ? new ASMifier() : new Textifier();
-        PrintWriter printWriter = new PrintWriter(System.out, true);
-        TraceClassVisitor cv = new TraceClassVisitor(null, printer, printWriter);
-        new ClassReader(className).accept(cv, parsingOptions);
-    }
+  public void getTest(String log) {
+    this.listeners.addAll(SpringAgentService.getInstance().getRunners());
+  }
 
 }

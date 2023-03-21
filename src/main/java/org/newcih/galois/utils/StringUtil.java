@@ -26,19 +26,19 @@ package org.newcih.galois.utils;
 
 public class StringUtil {
 
-    public static boolean isBlank(String str) {
-        return isEmpty(str) || "".equals(str.trim());
-    }
+  public static boolean isBlank(String str) {
+    return isEmpty(str) || "".equals(str.trim());
+  }
 
-    public static boolean isEmpty(String str) {
-        return str == null || "".equals(str);
-    }
+  public static boolean isEmpty(String str) {
+    return str == null || "".equals(str);
+  }
 
-    public static boolean isNotBlank(String str) {
-        return !isBlank(str);
-    }
+  public static boolean isNotBlank(String str) {
+    return !isBlank(str);
+  }
 
-    public static boolean isNotEmpty(String str) {
-        return !isEmpty(str);
-    }
+  public static boolean isNotEmpty(String str) {
+    return !isEmpty(str);
+  }
 }

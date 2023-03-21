@@ -24,6 +24,12 @@
 
 package org.newcih.galois.service.agent.corm;
 
+import static org.newcih.galois.constants.FileType.XML_FILE;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import org.newcih.galois.service.FileChangedListener;
 import org.newcih.galois.service.agent.mybatis.MyBatisXmlListener;
 import org.newcih.galois.utils.FileUtil;
@@ -32,63 +38,57 @@ import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.xml.sax.InputSource;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-
-import static org.newcih.galois.constants.FileType.XML_FILE;
-
 public class CormXmlListener implements FileChangedListener {
 
-    public static final String DOC_TYPE = "mapper";
-    private static final GaloisLog logger = GaloisLog.getLogger(MyBatisXmlListener.class);
-    private static final CormBeanReloader reloader = CormBeanReloader.getInstance();
+  public static final String DOC_TYPE = "mapper";
+  private static final GaloisLog logger = GaloisLog.getLogger(MyBatisXmlListener.class);
+  private static final CormBeanReloader reloader = CormBeanReloader.getInstance();
 
-    @Override
-    public String toString() {
-        return "CormXmlListener";
+  @Override
+  public String toString() {
+    return "CormXmlListener";
+  }
+
+  @Override
+  public boolean isUseful(File file) {
+    boolean fileTypeCheck = FileUtil.validFileType(file, XML_FILE);
+
+    if (!fileTypeCheck) {
+      return false;
     }
 
-    @Override
-    public boolean isUseful(File file) {
-        boolean fileTypeCheck = FileUtil.validFileType(file, XML_FILE);
-
-        if (!fileTypeCheck) {
-            return false;
-        }
-
-        try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setValidating(false);
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            // do no validate dtd
-            db.setEntityResolver(((publicId, systemId) -> new InputSource(new ByteArrayInputStream(new byte[0]))));
-            Document document = db.parse(file);
-            DocumentType documentType = document.getDoctype();
-            return documentType != null && documentType.toString().contains(DOC_TYPE);
-        } catch (Exception e) {
-            logger.error("parse xml file failed", e);
-            return false;
-        }
-
+    try {
+      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      dbf.setValidating(false);
+      DocumentBuilder db = dbf.newDocumentBuilder();
+      // do no validate dtd
+      db.setEntityResolver(
+          ((publicId, systemId) -> new InputSource(new ByteArrayInputStream(new byte[0]))));
+      Document document = db.parse(file);
+      DocumentType documentType = document.getDoctype();
+      return documentType != null && documentType.toString().contains(DOC_TYPE);
+    } catch (Exception e) {
+      logger.error("parse xml file failed", e);
+      return false;
     }
 
-    @Override
-    public void createdHandle(File file) {
+  }
+
+  @Override
+  public void createdHandle(File file) {
+  }
+
+  @Override
+  public void modifiedHandle(File file) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("corm listener monitor file modified ==> {}.", file.getName());
     }
 
-    @Override
-    public void modifiedHandle(File file) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("corm listener monitor file modified ==> {}.", file.getName());
-        }
+    reloader.updateBean(file);
+  }
 
-        reloader.updateBean(file);
-    }
-
-    @Override
-    public void deletedHandle(File file) {
-        // TODO
-    }
+  @Override
+  public void deletedHandle(File file) {
+    // TODO
+  }
 }

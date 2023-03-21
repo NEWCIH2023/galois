@@ -24,93 +24,93 @@
 
 package org.newcih.galois.conf;
 
+import static org.newcih.galois.constants.Constant.EMPTY;
+import static org.newcih.galois.constants.Constant.FALSE;
+import static org.newcih.galois.constants.Constant.TRUE;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import org.newcih.galois.utils.FileUtil;
 import org.newcih.galois.utils.StringUtil;
 
-import static org.newcih.galois.constants.Constant.EMPTY;
-import static org.newcih.galois.constants.Constant.FALSE;
-import static org.newcih.galois.constants.Constant.TRUE;
-
 /**
  * global configuration service
  */
 public class GlobalConfiguration {
 
-    /**
-     * parse config key-value entry in galois.properties
-     */
-    private static final Properties configuration = new Properties();
-    private static final GlobalConfiguration globalConfiguration = new GlobalConfiguration();
+  /**
+   * parse config key-value entry in galois.properties
+   */
+  private static final Properties configuration = new Properties();
+  private static final GlobalConfiguration globalConfiguration = new GlobalConfiguration();
 
-    static {
-        try (InputStream is = FileUtil.readClassPathFile("galois.properties")) {
-            configuration.load(is);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+  static {
+    try (InputStream is = FileUtil.readClassPathFile("galois.properties")) {
+      configuration.load(is);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private GlobalConfiguration() {
+  }
+
+  public static GlobalConfiguration getInstance() {
+    return globalConfiguration;
+  }
+
+  public String getString(String key) {
+    return getString(key, EMPTY);
+  }
+
+  public String getString(String key, String defaultValue) {
+    if (StringUtil.isBlank(key)) {
+      return defaultValue;
     }
 
-    private GlobalConfiguration() {
+    String result = configuration.getProperty(key);
+
+    if (StringUtil.isBlank(result)) {
+      return System.getProperty(key, defaultValue);
     }
 
-    public static GlobalConfiguration getInstance() {
-        return globalConfiguration;
+    return result;
+  }
+
+  public boolean getBoolean(String key) {
+    return getBoolean(key, false);
+  }
+
+  public boolean getBoolean(String key, boolean defaultValue) {
+    String result = getString(key, defaultValue ? TRUE : FALSE);
+    return TRUE.equalsIgnoreCase(result);
+  }
+
+  public long getLong(String key) {
+    return getLong(key, 0L);
+  }
+
+  public long getLong(String key, long defaultValue) {
+    String result = getString(key, String.valueOf(defaultValue));
+    try {
+      return Long.parseLong(result);
+    } catch (Exception e) {
+      return -1L;
     }
+  }
 
-    public String getString(String key) {
-        return getString(key, EMPTY);
+  public int getInteger(String key) {
+    return getInteger(key, 0);
+  }
+
+  public int getInteger(String key, int defaultValue) {
+    String result = getString(key, String.valueOf(defaultValue));
+    try {
+      return Integer.parseInt(result);
+    } catch (Exception e) {
+      return -1;
     }
-
-    public String getString(String key, String defaultValue) {
-        if (StringUtil.isBlank(key)) {
-            return defaultValue;
-        }
-
-        String result = configuration.getProperty(key);
-
-        if (StringUtil.isBlank(result)) {
-            return System.getProperty(key, defaultValue);
-        }
-
-        return result;
-    }
-
-    public boolean getBoolean(String key) {
-        return getBoolean(key, false);
-    }
-
-    public boolean getBoolean(String key, boolean defaultValue) {
-        String result = getString(key, defaultValue ? TRUE : FALSE);
-        return TRUE.equalsIgnoreCase(result);
-    }
-
-    public long getLong(String key) {
-        return getLong(key, 0L);
-    }
-
-    public long getLong(String key, long defaultValue) {
-        String result = getString(key, String.valueOf(defaultValue));
-        try {
-            return Long.parseLong(result);
-        } catch (Exception e) {
-            return -1L;
-        }
-    }
-
-    public int getInteger(String key) {
-        return getInteger(key, 0);
-    }
-
-    public int getInteger(String key, int defaultValue) {
-        String result = getString(key, String.valueOf(defaultValue));
-        try {
-            return Integer.parseInt(result);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
+  }
 
 }

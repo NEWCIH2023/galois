@@ -24,6 +24,9 @@
 
 package org.newcih.galois.service.agent.mybatis;
 
+import static org.newcih.galois.constants.Constant.ID;
+import static org.newcih.galois.constants.Constant.NAMESPACE;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -51,180 +54,184 @@ import org.newcih.galois.service.agent.spring.SpringBeanReloader;
 import org.newcih.galois.utils.GaloisLog;
 import org.springframework.context.ApplicationContext;
 
-import static org.newcih.galois.constants.Constant.ID;
-import static org.newcih.galois.constants.Constant.NAMESPACE;
-
 /**
  * MyBatis的Mapper重新加载服务类，适用于 >= 3.2.0版本
  */
 public class MyBatisBeanReloader implements BeanReloader<File> {
 
-    private static final MyBatisBeanReloader mybatisBeanReloder = new MyBatisBeanReloader();
-    private static final GaloisLog logger = GaloisLog.getLogger(MyBatisBeanReloader.class);
-    protected Configuration configuration;
+  private static final MyBatisBeanReloader mybatisBeanReloder = new MyBatisBeanReloader();
+  private static final GaloisLog logger = GaloisLog.getLogger(MyBatisBeanReloader.class);
+  protected Configuration configuration;
 
-    private MyBatisBeanReloader() {
+  private MyBatisBeanReloader() {
+  }
+
+  /**
+   * 获取单例实例
+   */
+  public static MyBatisBeanReloader getInstance() {
+    return mybatisBeanReloder;
+  }
+
+  /**
+   * 更新bean实例
+   */
+  @Override
+  public void updateBean(File xmlFile) {
+    if (configuration == null) {
+      logger.error("mybatisBeanReloader had not ready. configuration is null.");
+      return;
     }
 
-    /**
-     * 获取单例实例
-     */
-    public static MyBatisBeanReloader getInstance() {
-        return mybatisBeanReloder;
+    try (FileInputStream fis = new FileInputStream(xmlFile)) {
+      Properties properties = getConfiguration().getVariables();
+      XPathParser parser = new XPathParser(fis, true, properties, new XMLMapperEntityResolver());
+      XNode context = parser.evalNode("/mapper");
+      String namespace = context.getStringAttribute(NAMESPACE);
+      // clear cache
+      clearMapperRegistry(namespace);
+      clearLoadedResources(xmlFile.getName());
+      clearCachedNames(namespace);
+      clearParameterMap(context.evalNodes("/mapper/parameterMap"), namespace);
+      clearResultMap(context.evalNodes("/mapper/resultMap"), namespace);
+      clearKeyGenerators(context.evalNodes("insert|update|select|delete"), namespace);
+      clearSqlElement(context.evalNodes("/mapper/sql"), namespace);
+      // reparse mybatis mapper xml file
+      reloadXML(xmlFile);
+    } catch (Exception e) {
+      logger.error("reload mybatis xml throw exception", e);
     }
 
-    /**
-     * 更新bean实例
-     */
-    @Override
-    public void updateBean(File xmlFile) {
-        if (configuration == null) {
-            logger.error("mybatisBeanReloader had not ready. configuration is null.");
-            return;
+    logger.info("reload mybatis xml file {} success", xmlFile.getName());
+  }
+
+  @Override
+  public boolean isUseful(File file) {
+    return true;
+  }
+
+  private void reloadXML(File xmlFile) throws IOException {
+    InputStream is = Files.newInputStream(xmlFile.toPath());
+    XMLMapperBuilder builder = new XMLMapperBuilder(is, getConfiguration(), xmlFile.getName(),
+        getConfiguration().getSqlFragments());
+    builder.parse();
+  }
+
+  @SuppressWarnings("unchecked")
+  private void clearMapperRegistry(String namespace)
+      throws NoSuchFieldException, IllegalAccessException {
+    Field field = MapperRegistry.class.getDeclaredField("knownMappers");
+    field.setAccessible(true);
+    Map<Class<?>, Object> mapConfig = (Map<Class<?>, Object>) field.get(
+        getConfiguration().getMapperRegistry());
+    Class<?> refreshKey = null;
+
+    for (Map.Entry<Class<?>, Object> item : mapConfig.entrySet()) {
+      if (item.getKey().getName().contains(namespace)) {
+        refreshKey = item.getKey();
+        break;
+      }
+    }
+
+    if (refreshKey != null) {
+      mapConfig.remove(refreshKey);
+    }
+  }
+
+  @SuppressWarnings("rawtypes")
+  @Deprecated
+  private void clearLoadedResources(String fileName)
+      throws NoSuchFieldException, IllegalAccessException {
+    Field loadedResourcesField = getConfiguration().getClass().getDeclaredField("loadedResources");
+    loadedResourcesField.setAccessible(true);
+    Set loadedResourcesSet = (Set) loadedResourcesField.get(getConfiguration());
+    loadedResourcesSet.remove(fileName);
+  }
+
+  private void clearCachedNames(String namespace) {
+    getConfiguration().getCacheNames().remove(namespace);
+  }
+
+  private void clearParameterMap(List<XNode> list, String namespace) {
+    for (XNode xNode : list) {
+      String id = xNode.getStringAttribute(ID);
+      getConfiguration().getResultMapNames().remove(namespace + "." + id);
+    }
+  }
+
+  private void clearResultMap(List<XNode> list, String namespace) {
+    for (XNode xNode : list) {
+      String id = xNode.getStringAttribute(ID, xNode.getValueBasedIdentifier());
+      getConfiguration().getResultMapNames().remove(id);
+      getConfiguration().getResultMapNames().remove(namespace + "." + id);
+      clearResultMap(xNode, namespace);
+    }
+  }
+
+  private void clearResultMap(XNode xNode, String namespace) {
+    for (XNode child : xNode.getChildren()) {
+      if (Objects.equals("association", child.getName()) || Objects.equals("collection",
+          child.getName()) || Objects.equals("case", child.getName())) {
+        if (child.getStringAttribute("select") == null) {
+          getConfiguration().getResultMapNames().remove(child.getStringAttribute(ID,
+              child.getValueBasedIdentifier()));
+          getConfiguration().getResultMapNames()
+              .remove(namespace + "." + child.getStringAttribute(ID,
+                  child.getValueBasedIdentifier()));
+
+          if (child.getChildren() != null && !child.getChildren().isEmpty()) {
+            clearResultMap(child, namespace);
+          }
         }
+      }
+    }
+  }
 
-        try (FileInputStream fis = new FileInputStream(xmlFile)) {
-            Properties properties = getConfiguration().getVariables();
-            XPathParser parser = new XPathParser(fis, true, properties, new XMLMapperEntityResolver());
-            XNode context = parser.evalNode("/mapper");
-            String namespace = context.getStringAttribute(NAMESPACE);
-            // clear cache
-            clearMapperRegistry(namespace);
-            clearLoadedResources(xmlFile.getName());
-            clearCachedNames(namespace);
-            clearParameterMap(context.evalNodes("/mapper/parameterMap"), namespace);
-            clearResultMap(context.evalNodes("/mapper/resultMap"), namespace);
-            clearKeyGenerators(context.evalNodes("insert|update|select|delete"), namespace);
-            clearSqlElement(context.evalNodes("/mapper/sql"), namespace);
-            // reparse mybatis mapper xml file
-            reloadXML(xmlFile);
-        } catch (Exception e) {
-            logger.error("reload mybatis xml throw exception", e);
+  private void clearKeyGenerators(List<XNode> list, String namespace) {
+    for (XNode xNode : list) {
+      String id = xNode.getStringAttribute(ID);
+      getConfiguration().getKeyGeneratorNames().remove(id + SelectKeyGenerator.SELECT_KEY_SUFFIX);
+      getConfiguration().getKeyGeneratorNames()
+          .remove(namespace + "." + id + SelectKeyGenerator.SELECT_KEY_SUFFIX);
+
+      Collection<MappedStatement> mappedStatements = getConfiguration().getMappedStatements();
+      List<MappedStatement> tempStatements = new ArrayList<>(64);
+
+      for (MappedStatement statement : mappedStatements) {
+        if (statement != null) {
+          if (Objects.equals(statement.getId(), namespace + "." + id)) {
+            tempStatements.add(statement);
+          }
         }
+      }
 
-        logger.info("reload mybatis xml file {} success", xmlFile.getName());
+      mappedStatements.removeAll(tempStatements);
+    }
+  }
+
+  private void clearSqlElement(List<XNode> list, String namespace) {
+    for (XNode xNode : list) {
+      String id = xNode.getStringAttribute(ID);
+      getConfiguration().getSqlFragments().remove(id);
+      getConfiguration().getSqlFragments().remove(namespace + "." + id);
+    }
+  }
+
+  public Configuration getConfiguration() {
+    if (configuration == null) {
+      try {
+        ApplicationContext context = SpringBeanReloader.getInstance().getContext();
+        configuration = Objects.requireNonNull(context.getBean(SqlSessionFactory.class))
+            .getConfiguration();
+      } catch (Exception e) {
+        logger.error("access configuration object from sqlSessionFactoryBean failed", e);
+      }
     }
 
-    @Override
-    public boolean isUseful(File file) {
-        return true;
-    }
+    return configuration;
+  }
 
-    private void reloadXML(File xmlFile) throws IOException {
-        InputStream is = Files.newInputStream(xmlFile.toPath());
-        XMLMapperBuilder builder = new XMLMapperBuilder(is, getConfiguration(), xmlFile.getName(),
-                getConfiguration().getSqlFragments());
-        builder.parse();
-    }
-
-    @SuppressWarnings("unchecked")
-    private void clearMapperRegistry(String namespace) throws NoSuchFieldException, IllegalAccessException {
-        Field field = MapperRegistry.class.getDeclaredField("knownMappers");
-        field.setAccessible(true);
-        Map<Class<?>, Object> mapConfig = (Map<Class<?>, Object>) field.get(getConfiguration().getMapperRegistry());
-        Class<?> refreshKey = null;
-
-        for (Map.Entry<Class<?>, Object> item : mapConfig.entrySet()) {
-            if (item.getKey().getName().contains(namespace)) {
-                refreshKey = item.getKey();
-                break;
-            }
-        }
-
-        if (refreshKey != null) {
-            mapConfig.remove(refreshKey);
-        }
-    }
-
-    @SuppressWarnings("rawtypes")
-    @Deprecated
-    private void clearLoadedResources(String fileName) throws NoSuchFieldException, IllegalAccessException {
-        Field loadedResourcesField = getConfiguration().getClass().getDeclaredField("loadedResources");
-        loadedResourcesField.setAccessible(true);
-        Set loadedResourcesSet = (Set) loadedResourcesField.get(getConfiguration());
-        loadedResourcesSet.remove(fileName);
-    }
-
-    private void clearCachedNames(String namespace) {
-        getConfiguration().getCacheNames().remove(namespace);
-    }
-
-    private void clearParameterMap(List<XNode> list, String namespace) {
-        for (XNode xNode : list) {
-            String id = xNode.getStringAttribute(ID);
-            getConfiguration().getResultMapNames().remove(namespace + "." + id);
-        }
-    }
-
-    private void clearResultMap(List<XNode> list, String namespace) {
-        for (XNode xNode : list) {
-            String id = xNode.getStringAttribute(ID, xNode.getValueBasedIdentifier());
-            getConfiguration().getResultMapNames().remove(id);
-            getConfiguration().getResultMapNames().remove(namespace + "." + id);
-            clearResultMap(xNode, namespace);
-        }
-    }
-
-    private void clearResultMap(XNode xNode, String namespace) {
-        for (XNode child : xNode.getChildren()) {
-            if (Objects.equals("association", child.getName()) || Objects.equals("collection", child.getName()) || Objects.equals("case", child.getName())) {
-                if (child.getStringAttribute("select") == null) {
-                    getConfiguration().getResultMapNames().remove(child.getStringAttribute(ID,
-                            child.getValueBasedIdentifier()));
-                    getConfiguration().getResultMapNames().remove(namespace + "." + child.getStringAttribute(ID,
-                            child.getValueBasedIdentifier()));
-
-                    if (child.getChildren() != null && !child.getChildren().isEmpty()) {
-                        clearResultMap(child, namespace);
-                    }
-                }
-            }
-        }
-    }
-
-    private void clearKeyGenerators(List<XNode> list, String namespace) {
-        for (XNode xNode : list) {
-            String id = xNode.getStringAttribute(ID);
-            getConfiguration().getKeyGeneratorNames().remove(id + SelectKeyGenerator.SELECT_KEY_SUFFIX);
-            getConfiguration().getKeyGeneratorNames().remove(namespace + "." + id + SelectKeyGenerator.SELECT_KEY_SUFFIX);
-
-            Collection<MappedStatement> mappedStatements = getConfiguration().getMappedStatements();
-            List<MappedStatement> tempStatements = new ArrayList<>(64);
-
-            for (MappedStatement statement : mappedStatements) {
-                if (statement != null) {
-                    if (Objects.equals(statement.getId(), namespace + "." + id)) {
-                        tempStatements.add(statement);
-                    }
-                }
-            }
-
-            mappedStatements.removeAll(tempStatements);
-        }
-    }
-
-    private void clearSqlElement(List<XNode> list, String namespace) {
-        for (XNode xNode : list) {
-            String id = xNode.getStringAttribute(ID);
-            getConfiguration().getSqlFragments().remove(id);
-            getConfiguration().getSqlFragments().remove(namespace + "." + id);
-        }
-    }
-
-    public Configuration getConfiguration() {
-        if (configuration == null) {
-            try {
-                ApplicationContext context = SpringBeanReloader.getInstance().getContext();
-                configuration = Objects.requireNonNull(context.getBean(SqlSessionFactory.class)).getConfiguration();
-            } catch (Exception e) {
-                logger.error("access configuration object from sqlSessionFactoryBean failed", e);
-            }
-        }
-
-        return configuration;
-    }
-
-    public void setConfiguration(Configuration configuration) {
-        this.configuration = configuration;
-    }
+  public void setConfiguration(Configuration configuration) {
+    this.configuration = configuration;
+  }
 }

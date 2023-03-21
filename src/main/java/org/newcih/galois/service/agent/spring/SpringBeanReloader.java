@@ -36,74 +36,77 @@ import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
  * Spring的Bean重载服务
  */
 public class SpringBeanReloader implements BeanReloader<Class<?>> {
-    private static final GaloisLog logger = GaloisLog.getLogger(SpringBeanReloader.class);
-    private static final SpringBeanReloader springBeanReloader = new SpringBeanReloader();
-    protected ClassPathBeanDefinitionScanner scanner;
-    protected AnnotationConfigServletWebServerApplicationContext context;
-    public static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
 
-    private SpringBeanReloader() {
+  public static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
+  private static final GaloisLog logger = GaloisLog.getLogger(SpringBeanReloader.class);
+  private static final SpringBeanReloader springBeanReloader = new SpringBeanReloader();
+  protected ClassPathBeanDefinitionScanner scanner;
+  protected AnnotationConfigServletWebServerApplicationContext context;
+
+  private SpringBeanReloader() {
+  }
+
+  /**
+   * 获取单例实例
+   */
+  public static SpringBeanReloader getInstance() {
+    return springBeanReloader;
+  }
+
+  /**
+   * 更新Spring管理的bean对象
+   *
+   * @param clazz 待更新实例的类对象类型
+   */
+  @Override
+  public void updateBean(Class<?> clazz) {
+    if (scanner == null || context == null) {
+      logger.error("springBeanReloader had not ready. scanner or context is null.");
+      return;
     }
 
-    /**
-     * 获取单例实例
-     */
-    public static SpringBeanReloader getInstance() {
-        return springBeanReloader;
+    DefaultListableBeanFactory factory = (DefaultListableBeanFactory) getContext().getAutowireCapableBeanFactory();
+    String beanName = factory.getBeanNamesForType(clazz)[0];
+
+    try {
+      Object bean = clazz.newInstance();
+      factory.destroySingleton(beanName);
+      factory.registerSingleton(beanName, bean);
+    } catch (InstantiationException ie) {
+      logger.error(
+          "can't create a new object from newInstance method, ensure that's not an abstract class.");
+    } catch (Exception e) {
+      logger.error("spring bean reloader update bean failed.", e);
     }
 
-    /**
-     * 更新Spring管理的bean对象
-     *
-     * @param clazz 待更新实例的类对象类型
-     */
-    @Override
-    public void updateBean(Class<?> clazz) {
-        if (scanner == null || context == null) {
-            logger.error("springBeanReloader had not ready. scanner or context is null.");
-            return;
-        }
+    logger.info("reload spring bean type {} success.", clazz.getName());
+  }
 
-        DefaultListableBeanFactory factory = (DefaultListableBeanFactory) getContext().getAutowireCapableBeanFactory();
-        String beanName = factory.getBeanNamesForType(clazz)[0];
-
-        try {
-            Object bean = clazz.newInstance();
-            factory.destroySingleton(beanName);
-            factory.registerSingleton(beanName, bean);
-        } catch (InstantiationException ie) {
-            logger.error("can't create a new object from newInstance method, ensure that's not an abstract class.");
-        } catch (Exception e) {
-            logger.error("spring bean reloader update bean failed.", e);
-        }
-
-        logger.info("reload spring bean type {} success.", clazz.getName());
+  @Override
+  public boolean isUseful(Class<?> clazz) {
+    int m = clazz.getModifiers();
+    if (Modifier.isInterface(m) || Modifier.isAbstract(m) || Modifier.isPrivate(m)
+        || Modifier.isStatic(m) || Modifier.isNative(m)) {
+      return false;
     }
 
-    @Override
-    public boolean isUseful(Class<?> clazz) {
-        int m = clazz.getModifiers();
-        if (Modifier.isInterface(m) || Modifier.isAbstract(m) || Modifier.isPrivate(m) || Modifier.isStatic(m) || Modifier.isNative(m)) {
-            return false;
-        }
+    String[] beanTypeNames = getContext().getBeanNamesForType(clazz);
+    return beanTypeNames.length > 0;
+  }
 
-        String[] beanTypeNames = getContext().getBeanNamesForType(clazz);
-        return beanTypeNames.length > 0;
-    }
+  public ClassPathBeanDefinitionScanner getScanner() {
+    return scanner;
+  }
 
-    public ClassPathBeanDefinitionScanner getScanner() {
-        return scanner;
-    }
+  public void setScanner(ClassPathBeanDefinitionScanner scanner) {
+    this.scanner = scanner;
+  }
 
-    public void setScanner(ClassPathBeanDefinitionScanner scanner) {
-        this.scanner = scanner;
-    }
+  public AnnotationConfigServletWebServerApplicationContext getContext() {
+    return context;
+  }
 
-    public AnnotationConfigServletWebServerApplicationContext getContext() {
-        return context;
-    }
-
-    public void setContext(AnnotationConfigServletWebServerApplicationContext context) {
-        this.context = context;
-    }
+  public void setContext(AnnotationConfigServletWebServerApplicationContext context) {
+    this.context = context;
+  }
 }

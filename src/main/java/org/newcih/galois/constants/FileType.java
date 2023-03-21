@@ -26,21 +26,21 @@ package org.newcih.galois.constants;
 
 public enum FileType {
 
-    CLASS_FILE(".class"), XML_FILE(".xml"), JAVA_FILE(".java");
+  CLASS_FILE(".class"), XML_FILE(".xml"), JAVA_FILE(".java");
 
-    private final String fileType;
-    private final String name;
+  private final String fileType;
+  private final String name;
 
-    FileType(String fileType) {
-        this.fileType = fileType;
-        this.name = fileType.substring(1);
-    }
+  FileType(String fileType) {
+    this.fileType = fileType;
+    this.name = fileType.substring(1);
+  }
 
-    public String getFileType() {
-        return fileType;
-    }
+  public String getFileType() {
+    return fileType;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 }

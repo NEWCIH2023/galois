@@ -31,17 +31,17 @@ package org.newcih.galois.service.agent;
  */
 public interface BeanReloader<T> {
 
-    /**
-     * 使框架重新加载类实例对象
-     *
-     * @param object 待更新的实例对象
-     */
-    void updateBean(T object);
+  /**
+   * 使框架重新加载类实例对象
+   *
+   * @param object 待更新的实例对象
+   */
+  void updateBean(T object);
 
-    /**
-     * @param object 用来判断当前实例对象是否可以被框架重新加载
-     * @return 验证结果
-     */
-    boolean isUseful(T object);
+  /**
+   * @param object 用来判断当前实例对象是否可以被框架重新加载
+   * @return 验证结果
+   */
+  boolean isUseful(T object);
 
 }

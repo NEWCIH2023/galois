@@ -34,59 +34,60 @@ import org.springframework.core.env.ConfigurableEnvironment;
  * 需要兼容 SpringBoot 2.0.3版本，该版本的 RunListener 全是接口，没有默认default实现
  */
 public class FileWatchRunner implements SpringApplicationRunListener {
-    private static FileWatchService fileWatchService = FileWatchService.getInstance();
 
-    public FileWatchRunner(String rootPath) {
-        fileWatchService.init(rootPath);
-    }
+  private static final FileWatchService fileWatchService = FileWatchService.getInstance();
 
-    @Override
-    public void starting(ConfigurableBootstrapContext bootstrapContext) {
-        // TODO
-    }
+  public FileWatchRunner(String rootPath) {
+    fileWatchService.init(rootPath);
+  }
 
-    @Override
-    public void starting() {
-        // TODO
-    }
+  @Override
+  public void starting(ConfigurableBootstrapContext bootstrapContext) {
+    // TODO
+  }
 
-    @Override
-    public void environmentPrepared(ConfigurableBootstrapContext bootstrapContext,
-                                    ConfigurableEnvironment environment) {
-        // TODO
-    }
+  @Override
+  public void starting() {
+    // TODO
+  }
 
-    @Override
-    public void environmentPrepared(ConfigurableEnvironment environment) {
-        // TODO
-    }
+  @Override
+  public void environmentPrepared(ConfigurableBootstrapContext bootstrapContext,
+      ConfigurableEnvironment environment) {
+    // TODO
+  }
 
-    @Override
-    public void contextPrepared(ConfigurableApplicationContext context) {
-        // TODO
+  @Override
+  public void environmentPrepared(ConfigurableEnvironment environment) {
+    // TODO
+  }
 
-    }
+  @Override
+  public void contextPrepared(ConfigurableApplicationContext context) {
+    // TODO
 
-    @Override
-    public void contextLoaded(ConfigurableApplicationContext context) {
-        // TODO
+  }
 
-    }
+  @Override
+  public void contextLoaded(ConfigurableApplicationContext context) {
+    // TODO
 
-    @Override
-    public void started(ConfigurableApplicationContext context) {
-        fileWatchService.start();
-    }
+  }
 
-    @Override
-    public void running(ConfigurableApplicationContext context) {
-        // TODO
+  @Override
+  public void started(ConfigurableApplicationContext context) {
+    fileWatchService.start();
+  }
 
-    }
+  @Override
+  public void running(ConfigurableApplicationContext context) {
+    // TODO
 
-    @Override
-    public void failed(ConfigurableApplicationContext context, Throwable exception) {
-        // TODO
+  }
 
-    }
+  @Override
+  public void failed(ConfigurableApplicationContext context, Throwable exception) {
+    // TODO
+
+  }
 }

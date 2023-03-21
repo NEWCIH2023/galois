@@ -24,11 +24,6 @@
 
 package org.newcih.galois.service.agent.spring;
 
-import java.util.Objects;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
-import org.newcih.galois.service.agent.MethodAdapter;
-import org.newcih.galois.utils.GaloisLog;
-
 import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
 import static jdk.internal.org.objectweb.asm.Opcodes.ATHROW;
@@ -41,6 +36,11 @@ import static org.newcih.galois.constants.ClassNameConstant.ANNOTATION_CONFIG_SE
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SLASH;
 
+import java.util.Objects;
+import jdk.internal.org.objectweb.asm.MethodVisitor;
+import org.newcih.galois.service.agent.MethodAdapter;
+import org.newcih.galois.utils.GaloisLog;
+
 
 /**
  * 用于SpringBoot上下文嵌入的Visitor类
@@ -49,42 +49,45 @@ import static org.newcih.galois.constants.Constant.SLASH;
  */
 public class ApplicationContextVisitor extends MethodAdapter {
 
-    private static final GaloisLog logger = GaloisLog.getLogger(ApplicationContextVisitor.class);
+  private static final GaloisLog logger = GaloisLog.getLogger(ApplicationContextVisitor.class);
 
-    public ApplicationContextVisitor() {
-        super(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT);
+  public ApplicationContextVisitor() {
+    super(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT);
+  }
+
+  @Override
+  public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
+      String[] exceptions) {
+    MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
+
+    if (Objects.equals("<init>", name) && Objects.equals(descriptor, "()V")) {
+      return new ConstructorVisiter(ASM5, mv);
+    }
+
+    return mv;
+  }
+
+  class ConstructorVisiter extends MethodVisitor {
+
+    public ConstructorVisiter(int api, MethodVisitor methodVisitor) {
+      super(api, methodVisitor);
     }
 
     @Override
-    public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
-                                     String[] exceptions) {
-        MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
+    public void visitInsn(int opcode) {
+      if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
+        String pClassName = SpringBeanReloader.class.getName().replace(DOT, SLASH);
+        String vClassName = className.replace(DOT, SLASH);
 
-        if (Objects.equals("<init>", name) && Objects.equals(descriptor, "()V")) {
-            return new ConstructorVisiter(ASM5, mv);
-        }
+        mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";",
+            false);
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitTypeInsn(CHECKCAST, vClassName);
+        mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setContext", "(L" + vClassName + ";)V",
+            false);
+      }
 
-        return mv;
+      super.visitInsn(opcode);
     }
-
-    class ConstructorVisiter extends MethodVisitor {
-        public ConstructorVisiter(int api, MethodVisitor methodVisitor) {
-            super(api, methodVisitor);
-        }
-
-        @Override
-        public void visitInsn(int opcode) {
-            if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-                String pClassName = SpringBeanReloader.class.getName().replace(DOT, SLASH);
-                String vClassName = className.replace(DOT, SLASH);
-
-                mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";", false);
-                mv.visitVarInsn(ALOAD, 0);
-                mv.visitTypeInsn(CHECKCAST, vClassName);
-                mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setContext", "(L" + vClassName + ";)V", false);
-            }
-
-            super.visitInsn(opcode);
-        }
-    }
+  }
 }

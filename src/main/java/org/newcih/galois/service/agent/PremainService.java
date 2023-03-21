@@ -24,6 +24,11 @@
 
 package org.newcih.galois.service.agent;
 
+import static java.util.stream.Collectors.joining;
+import static org.newcih.galois.constants.Constant.DOT;
+import static org.newcih.galois.constants.Constant.SLASH;
+import static org.newcih.galois.constants.Constant.USER_DIR;
+
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
@@ -42,93 +47,91 @@ import org.newcih.galois.utils.JavaUtil;
 import org.newcih.galois.utils.StringUtil;
 import org.springframework.boot.SpringApplication;
 
-import static java.util.stream.Collectors.joining;
-import static org.newcih.galois.constants.Constant.DOT;
-import static org.newcih.galois.constants.Constant.SLASH;
-import static org.newcih.galois.constants.Constant.USER_DIR;
-
 /**
  * premain agent服务入口
  */
 public class PremainService {
 
-    public static final GaloisLog logger = GaloisLog.getLogger(PremainService.class);
-    /**
-     * adding your custom agent service
-     */
-    public static final List<AgentService> agentServices = Arrays.asList(SpringAgentService.getInstance(),
-            MyBatisAgentService.getInstance(), CormAgentService.getInstance());
-    public static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
-    public static final FileWatchService fileWatchService = FileWatchService.getInstance();
+  public static final GaloisLog logger = GaloisLog.getLogger(PremainService.class);
+  /**
+   * adding your custom agent service
+   */
+  public static final List<AgentService> agentServices = Arrays.asList(
+      SpringAgentService.getInstance(),
+      MyBatisAgentService.getInstance(), CormAgentService.getInstance());
+  public static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
+  public static final FileWatchService fileWatchService = FileWatchService.getInstance();
 
-    static {
-        String rootPath = globalConfig.getString(USER_DIR);
-        SpringAgentService.getInstance().addRunner(new FileWatchRunner(rootPath));
-    }
+  static {
+    String rootPath = globalConfig.getString(USER_DIR);
+    SpringAgentService.getInstance().addRunner(new FileWatchRunner(rootPath));
+  }
 
-    /**
-     * premain entry
-     *
-     * @param agentArgs agent args
-     * @param inst      instrument object
-     */
-    public static void premain(String agentArgs, Instrumentation inst) {
-        JavaUtil.inst = inst;
-        inst.addTransformer(new InjectClassFile(), true);
-        // banner should be printed after necessary processes done
-        BannerService.printBanner();
-    }
+  /**
+   * premain entry
+   *
+   * @param agentArgs agent args
+   * @param inst      instrument object
+   */
+  public static void premain(String agentArgs, Instrumentation inst) {
+    JavaUtil.inst = inst;
+    inst.addTransformer(new InjectClassFile(), true);
+    // banner should be printed after necessary processes done
+    BannerService.printBanner();
+  }
 
-    /**
-     * custom class file transformer
-     */
-    static class InjectClassFile implements ClassFileTransformer {
-        @Override
-        public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
-                                ProtectionDomain protectionDomain, byte[] classfileBuffer) {
-            if (StringUtil.isBlank(className)) {
-                return null;
-            }
+  /**
+   * print current loading state of agent service
+   */
+  public static void printAgentState() {
+    List<AgentService> enabledAgents = agentServices.stream().filter(AgentService::isInited)
+        .collect(Collectors.toList());
+    String enableAgentNames = enabledAgents.stream().map(Object::toString)
+        .collect(joining(","));
+    String listenerNames = enabledAgents.stream().flatMap(agent -> agent.getListeners().stream())
+        .map(Object::toString)
+        .collect(joining(","));
+    logger.info("当前共启用[{}]，并配置了以下监听器 [{}]", enableAgentNames, listenerNames);
+  }
 
-            String newClassName = className.replace(SLASH, DOT);
+  /**
+   * custom class file transformer
+   */
+  static class InjectClassFile implements ClassFileTransformer {
 
-            if (Arrays.asList(SpringAgentService.class.getName(), SpringApplication.class.getName()).contains(newClassName)) {
-                logger.info("use {} load {}", loader, newClassName);
-            }
+    @Override
+    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
+        ProtectionDomain protectionDomain, byte[] classfileBuffer) {
+      if (StringUtil.isBlank(className)) {
+        return null;
+      }
 
-            for (AgentService agentService : agentServices) {
-                boolean checkedClass = agentService.checkAgentEnable(newClassName);
-                if (agentService.isUseful() && !agentService.isInited()) {
-                    agentService.init();
-                    fileWatchService.registerListeners(agentService.getListeners());
-                    printAgentState();
-                }
+      String newClassName = className.replace(SLASH, DOT);
 
-                // checkedClass表示当前加载的类newClassName是否有对应的MethodAdapter，当为false时，表示没有对应的MethodAdapter，
-                // 这时候就直接跳过
-                if (!checkedClass) {
-                    continue;
-                }
-                MethodAdapter adapter = agentService.getAdapterMap().get(newClassName);
-                return adapter.transform();
-            }
+      if (Arrays.asList(SpringAgentService.class.getName(), SpringApplication.class.getName())
+          .contains(newClassName)) {
+        logger.info("use {} load {}", loader, newClassName);
+      }
 
-            return null;
+      for (AgentService agentService : agentServices) {
+        boolean checkedClass = agentService.checkAgentEnable(newClassName);
+        if (agentService.isUseful() && !agentService.isInited()) {
+          agentService.init();
+          fileWatchService.registerListeners(agentService.getListeners());
+          printAgentState();
         }
-    }
 
-    /**
-     * print current loading state of agent service
-     */
-    public static void printAgentState() {
-        List<AgentService> enabledAgents = agentServices.stream().filter(AgentService::isInited)
-                .collect(Collectors.toList());
-        String enableAgentNames = enabledAgents.stream().map(Object::toString)
-                .collect(joining(","));
-        String listenerNames = enabledAgents.stream().flatMap(agent -> agent.getListeners().stream())
-                .map(Object::toString)
-                .collect(joining(","));
-        logger.info("当前共启用[{}]，并配置了以下监听器 [{}]", enableAgentNames, listenerNames);
+        // checkedClass表示当前加载的类newClassName是否有对应的MethodAdapter，当为false时，表示没有对应的MethodAdapter，
+        // 这时候就直接跳过
+        if (!checkedClass) {
+          continue;
+        }
+        MethodAdapter adapter = agentService.getAdapterMap().get(newClassName);
+        return adapter.transform();
+      }
+
+      return null;
     }
+  }
 
 }

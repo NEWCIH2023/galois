@@ -24,28 +24,28 @@
 
 package org.newcih.galois.service.agent.corm;
 
-import org.newcih.galois.service.agent.AgentService;
-
 import static org.newcih.galois.constants.ClassNameConstant.COMTOP_CONFIGURATION;
+
+import org.newcih.galois.service.agent.AgentService;
 
 public class CormAgentService extends AgentService {
 
-    private final static CormAgentService cormAgentService = new CormAgentService();
+  private final static CormAgentService cormAgentService = new CormAgentService();
 
-    private CormAgentService() {
-        adapterMap.put(COMTOP_CONFIGURATION, new ComtopConfigurationVisitor());
-        necessaryClasses.addAll(adapterMap.keySet());
-    }
+  private CormAgentService() {
+    adapterMap.put(COMTOP_CONFIGURATION, new ComtopConfigurationVisitor());
+    necessaryClasses.addAll(adapterMap.keySet());
+  }
 
-    public static CormAgentService getInstance() {
-        return cormAgentService;
-    }
+  public static CormAgentService getInstance() {
+    return cormAgentService;
+  }
 
-    @Override
-    public void init() {
-        super.init();
-        listeners.add(new CormXmlListener());
-        beanReloader = CormBeanReloader.getInstance();
-    }
+  @Override
+  public void init() {
+    super.init();
+    listeners.add(new CormXmlListener());
+    beanReloader = CormBeanReloader.getInstance();
+  }
 
 }

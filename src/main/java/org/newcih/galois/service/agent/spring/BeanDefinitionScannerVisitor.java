@@ -24,11 +24,6 @@
 
 package org.newcih.galois.service.agent.spring;
 
-import java.util.Objects;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
-import org.newcih.galois.service.agent.MethodAdapter;
-import org.newcih.galois.utils.GaloisLog;
-
 import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
 import static jdk.internal.org.objectweb.asm.Opcodes.ATHROW;
@@ -40,46 +35,53 @@ import static org.newcih.galois.constants.ClassNameConstant.CLASS_PATH_BEAN_DEFI
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SLASH;
 
+import java.util.Objects;
+import jdk.internal.org.objectweb.asm.MethodVisitor;
+import org.newcih.galois.service.agent.MethodAdapter;
+import org.newcih.galois.utils.GaloisLog;
+
 public class BeanDefinitionScannerVisitor extends MethodAdapter {
 
-    private static final GaloisLog logger = GaloisLog.getLogger(BeanDefinitionScannerVisitor.class);
+  private static final GaloisLog logger = GaloisLog.getLogger(BeanDefinitionScannerVisitor.class);
 
-    public BeanDefinitionScannerVisitor() {
-        super(CLASS_PATH_BEAN_DEFINITION_SCANNER);
+  public BeanDefinitionScannerVisitor() {
+    super(CLASS_PATH_BEAN_DEFINITION_SCANNER);
+  }
+
+  @Override
+  public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
+      String[] exceptions) {
+    MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
+
+    if (Objects.equals("doScan", name)) {
+      return new DoScanMethodVisitor(ASM5, mv);
+    }
+
+    return mv;
+  }
+
+  class DoScanMethodVisitor extends MethodVisitor {
+
+    public DoScanMethodVisitor(int api, MethodVisitor methodVisitor) {
+      super(api, methodVisitor);
     }
 
     @Override
-    public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
-                                     String[] exceptions) {
-        MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
+    public void visitInsn(int opcode) {
+      if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
+        String pClassName = SpringBeanReloader.class.getName().replace(DOT, SLASH);
+        String vClassName = className.replace(DOT, SLASH);
 
-        if (Objects.equals("doScan", name)) {
-            return new DoScanMethodVisitor(ASM5, mv);
-        }
+        mv.visitCode();
+        mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";",
+            false);
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setScanner", "(L" + vClassName + ";)V",
+            false);
+      }
 
-        return mv;
+      super.visitInsn(opcode);
     }
-
-    class DoScanMethodVisitor extends MethodVisitor {
-
-        public DoScanMethodVisitor(int api, MethodVisitor methodVisitor) {
-            super(api, methodVisitor);
-        }
-
-        @Override
-        public void visitInsn(int opcode) {
-            if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-                String pClassName = SpringBeanReloader.class.getName().replace(DOT, SLASH);
-                String vClassName = className.replace(DOT, SLASH);
-
-                mv.visitCode();
-                mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";", false);
-                mv.visitVarInsn(ALOAD, 0);
-                mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setScanner", "(L" + vClassName + ";)V", false);
-            }
-
-            super.visitInsn(opcode);
-        }
-    }
+  }
 
 }

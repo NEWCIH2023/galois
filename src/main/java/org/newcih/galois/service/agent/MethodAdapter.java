@@ -24,6 +24,11 @@
 
 package org.newcih.galois.service.agent;
 
+import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
+import static org.newcih.galois.constants.ConfConstant.PRINT_ASM_CODE_ENABLE;
+import static org.newcih.galois.constants.Constant.DOT;
+import static org.newcih.galois.constants.FileType.CLASS_FILE;
+
 import java.io.FileOutputStream;
 import jdk.internal.org.objectweb.asm.ClassReader;
 import jdk.internal.org.objectweb.asm.ClassVisitor;
@@ -31,65 +36,61 @@ import jdk.internal.org.objectweb.asm.ClassWriter;
 import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.utils.GaloisLog;
 
-import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
-import static org.newcih.galois.constants.ConfConstant.PRINT_ASM_CODE_ENABLE;
-import static org.newcih.galois.constants.Constant.DOT;
-import static org.newcih.galois.constants.FileType.CLASS_FILE;
-
 public abstract class MethodAdapter extends ClassVisitor {
 
-    private static final GaloisLog logger = GaloisLog.getLogger(MethodAdapter.class);
-    private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
-    protected final String className;
-    protected ClassReader cr;
-    protected ClassWriter cw;
+  private static final GaloisLog logger = GaloisLog.getLogger(MethodAdapter.class);
+  private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
+  protected final String className;
+  protected ClassReader cr;
+  protected ClassWriter cw;
 
-    public MethodAdapter(String className) {
-        super(ASM5);
+  public MethodAdapter(String className) {
+    super(ASM5);
 
-        if (className == null || className.isEmpty()) {
-            throw new NullPointerException("methodAdapter's class name cannot be null or empty.");
-        }
-
-        this.className = className;
+    if (className == null || className.isEmpty()) {
+      throw new NullPointerException("methodAdapter's class name cannot be null or empty.");
     }
 
-    /**
-     * convert byte[] of original class file
-     */
-    public byte[] transform() {
+    this.className = className;
+  }
 
-        try {
-            cr = new ClassReader(className);
-            // COMPUTE_MAXS means automatically compute the maximum stack size and the maximum number of local variables
-            // of methods.
-            // COMPUTE_FRAMES means automatically compute the stack map frames of methods from scratch.
-            cw = new ClassWriter(cr, ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
-            cv = this.cw;
-        } catch (Exception e) {
-            logger.error("create new methodadapter for class {} failed!", className, e);
-        }
+  /**
+   * convert byte[] of original class file
+   */
+  public byte[] transform() {
 
-        cr.accept(this, 0);
-        byte[] result = cw.toByteArray();
-
-        if (globalConfig.getBoolean(PRINT_ASM_CODE_ENABLE, false)) {
-            String tempClassFile = "" + className.substring(className.lastIndexOf(DOT) + 1) + CLASS_FILE.getFileType();
-            try (FileOutputStream fos = new FileOutputStream(tempClassFile)) {
-                fos.write(result);
-            } catch (Throwable e) {
-                logger.error("dump injected class file error.", e);
-            }
-            logger.info("had dump asm code to {}.", tempClassFile);
-        }
-
-        return result;
+    try {
+      cr = new ClassReader(className);
+      // COMPUTE_MAXS means automatically compute the maximum stack size and the maximum number of local variables
+      // of methods.
+      // COMPUTE_FRAMES means automatically compute the stack map frames of methods from scratch.
+      cw = new ClassWriter(cr, ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
+      cv = this.cw;
+    } catch (Exception e) {
+      logger.error("create new methodadapter for class {} failed!", className, e);
     }
 
-    /**
-     * check if methodadapter can injecte this version of service
-     */
-    public boolean isUseful() {
-        return true;
+    cr.accept(this, 0);
+    byte[] result = cw.toByteArray();
+
+    if (globalConfig.getBoolean(PRINT_ASM_CODE_ENABLE, false)) {
+      String tempClassFile =
+          "" + className.substring(className.lastIndexOf(DOT) + 1) + CLASS_FILE.getFileType();
+      try (FileOutputStream fos = new FileOutputStream(tempClassFile)) {
+        fos.write(result);
+      } catch (Throwable e) {
+        logger.error("dump injected class file error.", e);
+      }
+      logger.info("had dump asm code to {}.", tempClassFile);
     }
+
+    return result;
+  }
+
+  /**
+   * check if methodadapter can injecte this version of service
+   */
+  public boolean isUseful() {
+    return true;
+  }
 }

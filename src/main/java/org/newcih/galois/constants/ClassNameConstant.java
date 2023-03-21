@@ -25,12 +25,13 @@
 package org.newcih.galois.constants;
 
 public final class ClassNameConstant {
-    public static final String COMTOP_CONFIGURATION = "com.comtop.corm.session.Configuration";
-    public static final String MYBATIS_CONFIGURATION = "org.apache.ibatis.session.Configuration";
-    public static final String CLASS_PATH_BEAN_DEFINITION_SCANNER =
-            "org.springframework.context.annotation.ClassPathBeanDefinitionScanner";
-    public static final String ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT =
-            "org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext";
-    public static final String SPRING_APPLICATION_RUN_LISTENERS = "org.springframework.boot" +
-            ".SpringApplicationRunListeners";
+
+  public static final String COMTOP_CONFIGURATION = "com.comtop.corm.session.Configuration";
+  public static final String MYBATIS_CONFIGURATION = "org.apache.ibatis.session.Configuration";
+  public static final String CLASS_PATH_BEAN_DEFINITION_SCANNER =
+      "org.springframework.context.annotation.ClassPathBeanDefinitionScanner";
+  public static final String ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT =
+      "org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext";
+  public static final String SPRING_APPLICATION_RUN_LISTENERS = "org.springframework.boot" +
+      ".SpringApplicationRunListeners";
 }
