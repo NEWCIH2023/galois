@@ -38,4 +38,5 @@ public class ConfConstant {
   public static final String RELOADER_SPRING_BOOT_ENABLE = "reloader.spring.boot.enable";
   public static final String PRINT_ASM_CODE_ENABLE = "print-asm-code.enable";
   public static final String RELOADER_MYBATIS_ENABLE = "reloader.mybatis.enable";
+  public static final String GALOIS_VERSION = "galois.version";
 }

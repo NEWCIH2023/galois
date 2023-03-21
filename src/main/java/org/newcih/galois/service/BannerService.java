@@ -25,6 +25,7 @@
 package org.newcih.galois.service;
 
 import static org.newcih.galois.constants.ConfConstant.BANNER_ENABLE;
+import static org.newcih.galois.constants.ConfConstant.GALOIS_VERSION;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -51,7 +52,7 @@ public class BannerService {
   }
 
   /**
-   * print banner entry
+   * print banner
    */
   public static void printBanner() {
     if (!globalConfig.getBoolean(BANNER_ENABLE, true)) {
@@ -59,12 +60,16 @@ public class BannerService {
     }
 
     System.out.println(BANNER);
-    System.out.printf(" :: SpringBoot (%s) :: Spring (%s) :: MyBatis (%s)%n :: JDK (%s)%n%n",
-        springBootVersion(), springVersion(), mybatisVersion(), jdkVersion());
+    System.out.printf(
+        " :: SpringBoot (%s) :: Spring (%s) :: MyBatis (%s)%n :: Galois (%s) :: JDK (%s)%n%n",
+        springBootVersion(), springVersion(), mybatisVersion(), galoisVersion(), jdkVersion());
   }
 
   /**
-   * get spring boot version
+   * spring boot version
+   *
+   * @return {@link String}
+   * @see String
    */
   private static String springBootVersion() {
     try {
@@ -77,7 +82,10 @@ public class BannerService {
   }
 
   /**
-   * get spring version
+   * spring version
+   *
+   * @return {@link String}
+   * @see String
    */
   private static String springVersion() {
     try {
@@ -90,7 +98,10 @@ public class BannerService {
   }
 
   /**
-   * get jdk version
+   * jdk version
+   *
+   * @return {@link String}
+   * @see String
    */
   private static String jdkVersion() {
     try {
@@ -101,7 +112,10 @@ public class BannerService {
   }
 
   /**
-   * get mybatis version
+   * mybatis version
+   *
+   * @return {@link String}
+   * @see String
    */
   private static String mybatisVersion() {
     try {
@@ -112,5 +126,15 @@ public class BannerService {
     } catch (Exception e) {
       return "-";
     }
+  }
+
+  /**
+   * galois version
+   *
+   * @return {@link String}
+   * @see String
+   */
+  private static String galoisVersion() {
+    return globalConfig.getString(GALOIS_VERSION, "-");
   }
 }

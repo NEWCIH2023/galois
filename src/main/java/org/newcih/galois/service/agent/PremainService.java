@@ -77,30 +77,43 @@ public class PremainService {
    * @param inst      instrument object
    */
   public static void premain(String agentArgs, Instrumentation inst) {
-    JavaUtil.inst = inst;
-    inst.addTransformer(new InjectClassFile(), true);
-    // banner should be printed after necessary processes done
+    if (inst == null) {
+      logger.error("your program do not support instrumentation.");
+      System.exit(0);
+    }
+
+    inst.addTransformer(new CustomTransformer(), true);
+    JavaUtil.setInst(inst);
     BannerService.printBanner();
   }
 
   /**
    * print current loading state of agent service
    */
-  public static void printAgentState() {
-    List<AgentService> enabledAgents = agentServices.stream().filter(AgentService::isInited)
+  private static void printAgentState() {
+    List<AgentService> enabledAgents = agentServices.stream()
+        .filter(AgentService::isInited)
         .collect(Collectors.toList());
-    String enableAgentNames = enabledAgents.stream().map(Object::toString)
-        .collect(joining(","));
-    String listenerNames = enabledAgents.stream().flatMap(agent -> agent.getListeners().stream())
+
+    String enableAgentNames = enabledAgents.stream()
         .map(Object::toString)
         .collect(joining(","));
+
+    String listenerNames = enabledAgents.stream()
+        .flatMap(agent -> agent.getListeners().stream())
+        .map(Object::toString)
+        .collect(joining(","));
+
     logger.info("当前共启用[{}]，并配置了以下监听器 [{}]", enableAgentNames, listenerNames);
   }
 
   /**
    * custom class file transformer
+   *
+   * @author liuguangsheng
+   * @since 1.0.0
    */
-  static class InjectClassFile implements ClassFileTransformer {
+  static class CustomTransformer implements ClassFileTransformer {
 
     @Override
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,

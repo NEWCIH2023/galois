@@ -63,14 +63,12 @@ public class JavaUtil {
     }
   }
 
-  /**
-   * get inst
-   *
-   * @return {@link Instrumentation}
-   * @see Instrumentation
-   */
   public static Instrumentation getInst() {
     return inst;
+  }
+
+  public static void setInst(Instrumentation inst) {
+    JavaUtil.inst = inst;
   }
 
   /**

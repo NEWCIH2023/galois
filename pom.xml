@@ -29,7 +29,7 @@
 
     <groupId>org.newcih</groupId>
     <artifactId>galois</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
     <packaging>jar</packaging>
 
     <name>galois</name>
@@ -183,6 +183,7 @@
                         <addMavenDescriptor>false</addMavenDescriptor>
                         <manifestEntries>
                             <Build-Time>${maven.build.timestamp}</Build-Time>
+                            <Galois-Version>${galois.version}</Galois-Version>
                             <Agent-Class>org.newcih.galois.service.agent.debug.DebugMain</Agent-Class>
                             <Premain-Class>org.newcih.galois.service.agent.PremainService</Premain-Class>
                             <Main-Class>org.newcih.galois.service.agent.debug.DebugMain</Main-Class>
@@ -192,7 +193,24 @@
                     </archive>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>src/main/resources/galois.properties</file>
+                            </files>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
