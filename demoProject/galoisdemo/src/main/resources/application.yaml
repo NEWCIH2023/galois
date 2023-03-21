@@ -11,4 +11,5 @@ spring:
     password: GMP_MM_SDC#123
 mybatis:
   mapper-locations: classpath:mapper/*.xml
-
+server:
+    port: 9839

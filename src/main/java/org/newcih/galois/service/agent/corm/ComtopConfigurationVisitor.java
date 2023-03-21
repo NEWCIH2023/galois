@@ -54,10 +54,6 @@ public class ComtopConfigurationVisitor extends MethodAdapter {
                         "/Configuration;)V", false);
                 mv.visitInsn(RETURN);
                 mv.visitEnd();
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug("injected corm configuration constructor success!");
-                }
             }
         }
     }

@@ -75,10 +75,6 @@ public class BeanDefinitionScannerVisitor extends MethodAdapter {
                 mv.visitVarInsn(ALOAD, 0);
                 mv.visitMethodInsn(INVOKEVIRTUAL, reloaderClassName, "setScanner"
                         , "(Lorg/springframework/context/annotation/ClassPathBeanDefinitionScanner;)V", false);
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug("injected doScan method in springBeanReloader by ASM success!");
-                }
             }
 
             super.visitInsn(opcode);

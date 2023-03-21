@@ -27,6 +27,7 @@ package org.newcih.galois.service.agent.spring;
 import java.util.ArrayList;
 import java.util.List;
 import org.newcih.galois.service.agent.AgentService;
+import org.newcih.galois.utils.GaloisLog;
 import org.springframework.boot.SpringApplicationRunListener;
 
 import static org.newcih.galois.constants.ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT;
@@ -37,6 +38,7 @@ public class SpringAgentService extends AgentService {
 
     private static final SpringAgentService springAgent = new SpringAgentService();
     private final List<SpringApplicationRunListener> runners = new ArrayList<>(16);
+    private static final GaloisLog logger = GaloisLog.getLogger(SpringAgentService.class);
 
     private SpringAgentService() {
         adapterMap.put(CLASS_PATH_BEAN_DEFINITION_SCANNER, new BeanDefinitionScannerVisitor());
@@ -63,6 +65,7 @@ public class SpringAgentService extends AgentService {
      */
     public void addRunner(SpringApplicationRunListener runner) {
         if (runner != null) {
+            logger.info("add new started runner {}.", runner);
             runners.add(runner);
         }
     }

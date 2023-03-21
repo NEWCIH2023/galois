@@ -32,19 +32,14 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.List;
-import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.service.agent.FileChangedListener;
-import org.newcih.galois.service.agent.spring.SpringAgentService;
 import org.newcih.galois.utils.GaloisLog;
-import org.springframework.boot.SpringApplicationRunListener;
-import org.springframework.context.ConfigurableApplicationContext;
 
 import static com.sun.nio.file.SensitivityWatchEventModifier.MEDIUM;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 import static org.newcih.galois.constants.Constant.DOT;
-import static org.newcih.galois.constants.Constant.USER_DIR;
 
 /**
  * 基于Apache Common IO的文件变更监听工具
@@ -54,18 +49,6 @@ public class FileWatchService {
     private final static GaloisLog logger = GaloisLog.getLogger(FileWatchService.class);
     private static final List<FileChangedListener> listeners = new ArrayList<>(16);
     private WatchService watchService;
-    private static final SpringAgentService springAgentService = SpringAgentService.getInstance();
-    private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
-
-    static {
-        String rootPath = globalConfig.getString(USER_DIR);
-        springAgentService.addRunner(new SpringApplicationRunListener() {
-            @Override
-            public void started(ConfigurableApplicationContext context) {
-                new FileWatchService(rootPath).start();
-            }
-        });
-    }
 
     public FileWatchService(String rootPath) {
         if (rootPath == null || rootPath.isEmpty()) {
@@ -107,7 +90,7 @@ public class FileWatchService {
      */
     public void start() {
         Thread watchThread = new Thread(() -> {
-            logger.info("file change handle service started.");
+            logger.info("file watch service started.");
 
             while (true) {
                 try {

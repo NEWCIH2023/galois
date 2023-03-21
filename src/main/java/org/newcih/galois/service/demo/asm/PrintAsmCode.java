@@ -37,11 +37,11 @@ import org.springframework.boot.SpringApplicationRunListener;
 
 public class PrintAsmCode {
 
+    private String log;
     private List<SpringApplicationRunListener> listeners;
 
-    public void getTest() {
-        List<SpringApplicationRunListener> runners = SpringAgentService.getInstance().getRunners();
-        this.listeners.addAll(runners);
+    public void getTest(String log) {
+        this.listeners.addAll(SpringAgentService.getInstance().getRunners());
     }
 
     public static void main(String[] args) throws IOException {

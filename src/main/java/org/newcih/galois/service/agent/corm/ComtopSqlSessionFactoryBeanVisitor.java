@@ -84,10 +84,6 @@ public class ComtopSqlSessionFactoryBeanVisitor extends MethodAdapter {
                 mv.visitInsn(RETURN);
                 mv.visitMaxs(2, 2);
                 mv.visitEnd();
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug("injected corm sqlsessionfactorybean constructor success!");
-                }
             }
         }
     }

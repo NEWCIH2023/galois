@@ -50,10 +50,13 @@ public class BannerService {
         }
 
         System.out.println(BANNER);
-        System.out.printf(" :: SpringBoot :: (%s) :: Spring :: (%s) :: MyBatis :: (%s) ::%n%n",
-                springBootVersion(), springVersion(), mybatisVersion());
+        System.out.printf(" :: SpringBoot :: (%s) :: Spring :: (%s) :: MyBatis :: (%s) :: JDK :: (%s)%n%n",
+                springBootVersion(), springVersion(), mybatisVersion(), jdkVersion());
     }
 
+    /**
+     * print spring boot version
+     */
     private static String springBootVersion() {
         try {
             Class<?> springBootVersion = Class.forName("org.springframework.boot.SpringBootVersion");
@@ -64,6 +67,9 @@ public class BannerService {
         }
     }
 
+    /**
+     * print spring version
+     */
     private static String springVersion() {
         try {
             Class<?> springVersion = Class.forName("org.springframework.core.SpringVersion");
@@ -74,6 +80,20 @@ public class BannerService {
         }
     }
 
+    /**
+     * print jdk version
+     */
+    private static String jdkVersion() {
+        try {
+            return System.getProperty("java.version");
+        } catch (Exception e) {
+            return "-";
+        }
+    }
+
+    /**
+     * print mybatis version
+     */
     private static String mybatisVersion() {
         try {
             Class<?> mapperRegistry = Class.forName("org.apache.ibatis.binding.MapperRegistry");
