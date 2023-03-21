@@ -16,6 +16,10 @@ import org.newcih.galois.constants.ClassNameConstant;
 import org.newcih.galois.service.agent.MethodAdapter;
 import org.newcih.galois.utils.GaloisLog;
 
+/**
+ * @author liuguangsheng
+ * @since 1.0.0
+ */
 public class ComtopConfigurationVisitor extends MethodAdapter {
 
   private static final GaloisLog logger = GaloisLog.getLogger(ComtopConfigurationVisitor.class);

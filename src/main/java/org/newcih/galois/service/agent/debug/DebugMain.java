@@ -37,6 +37,9 @@ import org.newcih.galois.utils.GaloisLog;
 
 /**
  * 支持通过Attach Agent方式动态接入AgentService
+ *
+ * @author liuguangsheng
+ * @since 1.0.0
  */
 public class DebugMain {
 

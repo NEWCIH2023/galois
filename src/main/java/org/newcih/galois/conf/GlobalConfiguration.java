@@ -36,6 +36,9 @@ import org.newcih.galois.utils.StringUtil;
 
 /**
  * global configuration service
+ *
+ * @author liuguangsheng
+ * @since 1.0.0
  */
 public class GlobalConfiguration {
 

@@ -40,6 +40,9 @@ import org.xml.sax.InputSource;
 
 /**
  * MyBatis的XML文件变更监听处理
+ *
+ * @author liuguangsheng
+ * @since 1.0.0
  */
 public class MyBatisXmlListener implements FileChangedListener {
 

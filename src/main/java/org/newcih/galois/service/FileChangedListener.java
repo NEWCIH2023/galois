@@ -27,7 +27,10 @@ package org.newcih.galois.service;
 import java.io.File;
 
 /**
- * 文件变动监听
+ * file monitor service interface
+ *
+ * @author liuguangsheng
+ * @since 1.0.0
  */
 public interface FileChangedListener {
 

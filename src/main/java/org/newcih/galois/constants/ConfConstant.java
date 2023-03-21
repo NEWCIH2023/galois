@@ -24,6 +24,10 @@
 
 package org.newcih.galois.constants;
 
+/**
+ * @author liuguangsheng
+ * @since 1.0.0
+ */
 public class ConfConstant {
 
   public static final String LOGGING_ENABLE = "logging.enable";

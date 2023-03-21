@@ -31,6 +31,10 @@ import java.util.Map;
 import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.service.FileChangedListener;
 
+/**
+ * @author liuguangsheng
+ * @since 1.0.0
+ */
 public abstract class AgentService {
 
   protected static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();

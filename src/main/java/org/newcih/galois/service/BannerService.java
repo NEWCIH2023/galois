@@ -33,6 +33,9 @@ import org.newcih.galois.conf.GlobalConfiguration;
 
 /**
  * print banner when galois starting
+ *
+ * @author liuguangsheng
+ * @since 1.0.0
  */
 public class BannerService {
 

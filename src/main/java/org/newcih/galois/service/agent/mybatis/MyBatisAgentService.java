@@ -28,6 +28,10 @@ import static org.newcih.galois.constants.ClassNameConstant.MYBATIS_CONFIGURATIO
 
 import org.newcih.galois.service.agent.AgentService;
 
+/**
+ * @author liuguangsheng
+ * @since 1.0.0
+ */
 public class MyBatisAgentService extends AgentService {
 
   private final static MyBatisAgentService myBatisAgentService = new MyBatisAgentService();

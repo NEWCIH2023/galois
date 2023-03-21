@@ -38,6 +38,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.xml.sax.InputSource;
 
+/**
+ * @author liuguangsheng
+ * @since 1.0.0
+ */
 public class CormXmlListener implements FileChangedListener {
 
   public static final String DOC_TYPE = "mapper";

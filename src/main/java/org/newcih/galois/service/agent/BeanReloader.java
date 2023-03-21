@@ -28,6 +28,7 @@ package org.newcih.galois.service.agent;
  * 类实例对象重载服务
  *
  * @author liuguangsheng
+ * @since 1.0.0
  */
 public interface BeanReloader<T> {
 

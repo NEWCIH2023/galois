@@ -38,6 +38,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import jdk.internal.org.objectweb.asm.ClassReader;
 
+/**
+ * @author liuguangsheng
+ * @since 1.0.0
+ */
 public class JavaUtil {
 
   private static final String compileDir;

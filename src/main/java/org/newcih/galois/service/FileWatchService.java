@@ -41,7 +41,10 @@ import java.util.List;
 import org.newcih.galois.utils.GaloisLog;
 
 /**
- * 基于Apache Common IO的文件变更监听工具
+ * file monitor service based on {@link java.nio.file.WatchService}
+ *
+ * @author liuguangsheng
+ * @since 1.0.0
  */
 public class FileWatchService {
 
@@ -59,14 +62,14 @@ public class FileWatchService {
 
   public void init(String rootPath) {
     if (rootPath == null || rootPath.isEmpty()) {
-      throw new NullPointerException("empty path for galois listener!");
+      throw new NullPointerException("empty path for galois listener.");
     }
 
     try {
       watchService = FileSystems.getDefault().newWatchService();
       registerWatchService(new File(rootPath));
     } catch (IOException e) {
-      logger.error("start file watchService failed", e);
+      logger.error("start file watch service fail.", e);
       System.exit(0);
     }
   }

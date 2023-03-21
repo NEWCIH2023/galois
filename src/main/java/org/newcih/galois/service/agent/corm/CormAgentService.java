@@ -28,6 +28,10 @@ import static org.newcih.galois.constants.ClassNameConstant.COMTOP_CONFIGURATION
 
 import org.newcih.galois.service.agent.AgentService;
 
+/**
+ * @author liuguangsheng
+ * @since 1.0.0
+ */
 public class CormAgentService extends AgentService {
 
   private final static CormAgentService cormAgentService = new CormAgentService();

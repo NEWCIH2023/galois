@@ -48,6 +48,9 @@ import org.newcih.galois.utils.GaloisLog;
 
 /**
  * MyBatis的Mapper重新加载服务类
+ *
+ * @author liuguangsheng
+ * @since 1.0.0
  */
 public class CormBeanReloader implements BeanReloader<File> {
 

@@ -37,6 +37,9 @@ import org.slf4j.event.Level;
 
 /**
  * log util
+ *
+ * @author liuguangsheng
+ * @since 1.0.0
  */
 public class GaloisLog implements Logger {
 

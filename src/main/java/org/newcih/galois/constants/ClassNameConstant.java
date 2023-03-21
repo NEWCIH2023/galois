@@ -24,6 +24,10 @@
 
 package org.newcih.galois.constants;
 
+/**
+ * @author liuguangsheng
+ * @since 1.0.0
+ */
 public final class ClassNameConstant {
 
   public static final String COMTOP_CONFIGURATION = "com.comtop.corm.session.Configuration";

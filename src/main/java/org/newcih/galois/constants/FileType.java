@@ -24,6 +24,10 @@
 
 package org.newcih.galois.constants;
 
+/**
+ * @author liuguangsheng
+ * @since 1.0.0
+ */
 public enum FileType {
 
   CLASS_FILE(".class"), XML_FILE(".xml"), JAVA_FILE(".java");

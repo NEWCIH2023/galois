@@ -36,6 +36,10 @@ import jdk.internal.org.objectweb.asm.ClassWriter;
 import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.utils.GaloisLog;
 
+/**
+ * @author liuguangsheng
+ * @since 1.0.0
+ */
 public abstract class MethodAdapter extends ClassVisitor {
 
   private static final GaloisLog logger = GaloisLog.getLogger(MethodAdapter.class);

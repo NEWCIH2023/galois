@@ -36,6 +36,9 @@ import org.newcih.galois.utils.JavaUtil;
 
 /**
  * Spring的Bean变动监听器
+ *
+ * @author liuguangsheng
+ * @since 1.0.0
  */
 public class SpringBeanListener implements FileChangedListener {
 

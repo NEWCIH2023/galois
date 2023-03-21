@@ -24,6 +24,10 @@
 
 package org.newcih.galois.utils;
 
+/**
+ * @author liuguangsheng
+ * @since 1.0.0
+ */
 public class StringUtil {
 
   public static boolean isBlank(String str) {

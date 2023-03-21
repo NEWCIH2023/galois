@@ -17,6 +17,10 @@ import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.newcih.galois.service.agent.MethodAdapter;
 
+/**
+ * @author liuguangsheng
+ * @since 1.0.0
+ */
 public class SpringApplicationRunListenersVisitor extends MethodAdapter {
 
   public SpringApplicationRunListenersVisitor() {

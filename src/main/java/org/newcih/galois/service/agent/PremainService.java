@@ -49,6 +49,9 @@ import org.springframework.boot.SpringApplication;
 
 /**
  * premain agent服务入口
+ *
+ * @author liuguangsheng
+ * @since 1.0.0
  */
 public class PremainService {
 

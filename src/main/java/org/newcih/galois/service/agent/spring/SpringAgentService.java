@@ -34,6 +34,10 @@ import org.newcih.galois.service.agent.AgentService;
 import org.newcih.galois.utils.GaloisLog;
 import org.springframework.boot.SpringApplicationRunListener;
 
+/**
+ * @author liuguangsheng
+ * @since 1.0.0
+ */
 public class SpringAgentService extends AgentService {
 
   private static final SpringAgentService springAgent = new SpringAgentService();

@@ -46,6 +46,7 @@ import org.newcih.galois.utils.GaloisLog;
  * 用于SpringBoot上下文嵌入的Visitor类
  *
  * @author liuguangsheng
+ * @since 1.0.0
  */
 public class ApplicationContextVisitor extends MethodAdapter {
 

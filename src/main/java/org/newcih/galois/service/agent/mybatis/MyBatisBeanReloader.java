@@ -56,6 +56,9 @@ import org.springframework.context.ApplicationContext;
 
 /**
  * MyBatis的Mapper重新加载服务类，适用于 >= 3.2.0版本
+ *
+ * @author liuguangsheng
+ * @since 1.0.0
  */
 public class MyBatisBeanReloader implements BeanReloader<File> {
 

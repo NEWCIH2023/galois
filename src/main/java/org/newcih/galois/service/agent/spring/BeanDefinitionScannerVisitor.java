@@ -40,6 +40,10 @@ import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.newcih.galois.service.agent.MethodAdapter;
 import org.newcih.galois.utils.GaloisLog;
 
+/**
+ * @author liuguangsheng
+ * @since 1.0.0
+ */
 public class BeanDefinitionScannerVisitor extends MethodAdapter {
 
   private static final GaloisLog logger = GaloisLog.getLogger(BeanDefinitionScannerVisitor.class);

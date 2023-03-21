@@ -37,6 +37,12 @@ import java.io.InputStream;
 import java.util.Objects;
 import org.newcih.galois.constants.FileType;
 
+/**
+ * file util
+ *
+ * @author liuguangsheng
+ * @since 1.0.0
+ */
 public class FileUtil {
 
   private static final GaloisLog logger = GaloisLog.getLogger(FileUtil.class);
@@ -45,7 +51,10 @@ public class FileUtil {
   }
 
   /**
-   * 验证文件类型是否匹配
+   * check file type by file name
+   *
+   * @param file     input file
+   * @param fileType target file type
    */
   public static boolean validFileType(File file, FileType fileType) {
     return Objects.equals(getFileType(file), fileType.getFileType());
@@ -53,6 +62,8 @@ public class FileUtil {
 
   /**
    * get file type by filename and include dot char in result
+   *
+   * @param file input file
    */
   public static String getFileType(File file) {
     if (file == null) {
@@ -84,7 +95,7 @@ public class FileUtil {
     try (FileOutputStream fos = new FileOutputStream(path)) {
       fos.write(bytes, 0, bytes.length);
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      logger.error("write byte array to {} fail.", path, e);
     }
 
     return new File(path);
@@ -110,7 +121,8 @@ public class FileUtil {
       }
 
       return byteArrayOutputStream.toByteArray();
-    } catch (Exception ignored) {
+    } catch (Exception e) {
+      logger.error("convert binary file to byte array fail.", e);
     }
 
     return new byte[0];
@@ -130,6 +142,7 @@ public class FileUtil {
     try (BufferedReader br = new BufferedReader(new FileReader(file))) {
       br.lines().map(line -> line + LF).forEach(sb::append);
     } catch (Exception e) {
+      logger.error("read text file fail.", e);
       return "";
     }
 
