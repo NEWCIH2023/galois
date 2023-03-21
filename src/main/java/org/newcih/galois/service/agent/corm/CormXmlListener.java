@@ -82,6 +82,11 @@ public class CormXmlListener implements FileChangedListener {
 
   @Override
   public void createdHandle(File file) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("CormXmlListener detect file created: {}.", file.getName());
+    }
+
+    reloader.updateBean(file);
   }
 
   @Override

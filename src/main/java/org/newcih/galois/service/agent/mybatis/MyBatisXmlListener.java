@@ -78,7 +78,11 @@ public class MyBatisXmlListener implements FileChangedListener {
 
   @Override
   public void createdHandle(File file) {
-    // TODO
+    if (logger.isDebugEnabled()) {
+      logger.debug("MybatisXmlListener detect file created: {}.", file.getName());
+    }
+
+    reloader.updateBean(file);
   }
 
   @Override

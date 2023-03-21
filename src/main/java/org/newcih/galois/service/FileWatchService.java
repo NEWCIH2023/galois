@@ -74,14 +74,14 @@ public class FileWatchService {
    */
   public void init(String rootPath) {
     if (rootPath == null || rootPath.isEmpty()) {
-      throw new NullPointerException("empty path for galois listener.");
+      throw new NullPointerException("Empty path for galois listener.");
     }
 
     try {
       watchService = FileSystems.getDefault().newWatchService();
       registerWatchService(new File(rootPath));
     } catch (IOException e) {
-      logger.error("start file watch service fail.", e);
+      logger.error("Start file watch service fail.", e);
       System.exit(0);
     }
   }
@@ -142,7 +142,7 @@ public class FileWatchService {
 
           watchKey.reset();
         } catch (Exception e) {
-          logger.error("file change handle failed.", e);
+          logger.error("File monitor handle event failed.", e);
         }
       }
     });
