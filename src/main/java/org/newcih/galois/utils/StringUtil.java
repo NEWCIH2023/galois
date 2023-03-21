@@ -35,7 +35,7 @@ public class StringUtil {
     }
 
     public static boolean isNotBlank(String str) {
-        return !isNotBlank(str);
+        return !isBlank(str);
     }
 
     public static boolean isNotEmpty(String str) {

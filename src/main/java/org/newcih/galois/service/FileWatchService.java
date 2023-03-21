@@ -48,8 +48,16 @@ public class FileWatchService {
     private final static GaloisLog logger = GaloisLog.getLogger(FileWatchService.class);
     private static final List<FileChangedListener> listeners = new ArrayList<>(16);
     private WatchService watchService;
+    private static final FileWatchService instance = new FileWatchService();
 
-    public FileWatchService(String rootPath) {
+    private FileWatchService() {
+    }
+
+    public static FileWatchService getInstance() {
+        return instance;
+    }
+
+    public void init(String rootPath) {
         if (rootPath == null || rootPath.isEmpty()) {
             throw new NullPointerException("empty path for galois listener!");
         }

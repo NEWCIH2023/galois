@@ -25,23 +25,22 @@
 package org.newcih.galois.service.agent.spring;
 
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.List;
+import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.service.agent.BeanReloader;
 import org.newcih.galois.utils.GaloisLog;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.context.ApplicationContext;
+import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 
 /**
  * Spring的Bean重载服务
  */
 public class SpringBeanReloader implements BeanReloader<Class<?>> {
-    public static final List<String> ignorePackages = Arrays.asList("org.springframework", "org.apache");
     private static final GaloisLog logger = GaloisLog.getLogger(SpringBeanReloader.class);
     private static final SpringBeanReloader springBeanReloader = new SpringBeanReloader();
     protected ClassPathBeanDefinitionScanner scanner;
-    protected ApplicationContext context;
+    protected AnnotationConfigServletWebServerApplicationContext context;
+    public static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
 
     private SpringBeanReloader() {
     }
@@ -83,12 +82,6 @@ public class SpringBeanReloader implements BeanReloader<Class<?>> {
 
     @Override
     public boolean isUseful(Class<?> clazz) {
-        String className = clazz.getName();
-        boolean isIgnoredClass = ignorePackages.stream().anyMatch(className::startsWith);
-        if (isIgnoredClass) {
-            return false;
-        }
-
         int m = clazz.getModifiers();
         if (Modifier.isInterface(m) || Modifier.isAbstract(m) || Modifier.isPrivate(m) || Modifier.isStatic(m) || Modifier.isNative(m)) {
             return false;
@@ -106,11 +99,11 @@ public class SpringBeanReloader implements BeanReloader<Class<?>> {
         this.scanner = scanner;
     }
 
-    public ApplicationContext getContext() {
+    public AnnotationConfigServletWebServerApplicationContext getContext() {
         return context;
     }
 
-    public void setContext(ApplicationContext context) {
+    public void setContext(AnnotationConfigServletWebServerApplicationContext context) {
         this.context = context;
     }
 }

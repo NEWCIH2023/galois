@@ -37,6 +37,8 @@ import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
 import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
 import static org.newcih.galois.constants.ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER;
+import static org.newcih.galois.constants.Constant.DOT;
+import static org.newcih.galois.constants.Constant.SLASH;
 
 public class BeanDefinitionScannerVisitor extends MethodAdapter {
 
@@ -58,7 +60,7 @@ public class BeanDefinitionScannerVisitor extends MethodAdapter {
         return mv;
     }
 
-    static class DoScanMethodVisitor extends MethodVisitor {
+    class DoScanMethodVisitor extends MethodVisitor {
 
         public DoScanMethodVisitor(int api, MethodVisitor methodVisitor) {
             super(api, methodVisitor);
@@ -67,14 +69,13 @@ public class BeanDefinitionScannerVisitor extends MethodAdapter {
         @Override
         public void visitInsn(int opcode) {
             if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-                String reloaderClassName = SpringBeanReloader.class.getName().replace(".", "/");
+                String pClassName = SpringBeanReloader.class.getName().replace(DOT, SLASH);
+                String vClassName = className.replace(DOT, SLASH);
 
                 mv.visitCode();
-                mv.visitMethodInsn(INVOKESTATIC, reloaderClassName, "getInstance", "()L" + reloaderClassName + ";",
-                        false);
+                mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";", false);
                 mv.visitVarInsn(ALOAD, 0);
-                mv.visitMethodInsn(INVOKEVIRTUAL, reloaderClassName, "setScanner"
-                        , "(Lorg/springframework/context/annotation/ClassPathBeanDefinitionScanner;)V", false);
+                mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setScanner", "(L" + vClassName + ";)V", false);
             }
 
             super.visitInsn(opcode);

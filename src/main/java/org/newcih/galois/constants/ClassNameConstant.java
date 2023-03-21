@@ -25,22 +25,10 @@
 package org.newcih.galois.constants;
 
 public final class ClassNameConstant {
-    /**
-     * SqlSessionBean管理工厂类
-     */
-    public static final String SQL_SESSION_FACTORY_BEAN =
-            "org.mybatis.spring.SqlSessionFactoryBean";
-
-    public static final String COMTOP_SQL_SESSION_FACTORY = "com.comtop.corm.session.defaults.DefaultSqlSessionFactory";
     public static final String COMTOP_CONFIGURATION = "com.comtop.corm.session.Configuration";
-    /**
-     * Bean扫描服务类
-     */
+    public static final String MYBATIS_CONFIGURATION = "org.apache.ibatis.session.Configuration";
     public static final String CLASS_PATH_BEAN_DEFINITION_SCANNER =
             "org.springframework.context.annotation.ClassPathBeanDefinitionScanner";
-    /**
-     * Spring上下文服务类
-     */
     public static final String ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT =
             "org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext";
     public static final String SPRING_APPLICATION_RUN_LISTENERS = "org.springframework.boot" +

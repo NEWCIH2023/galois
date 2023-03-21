@@ -1,8 +1,7 @@
-package org.newcih.galois.service.agent.corm;
+package org.newcih.galois.service.agent.mybatis;
 
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
-import org.newcih.galois.constants.ClassNameConstant;
 import org.newcih.galois.service.agent.MethodAdapter;
 import org.newcih.galois.utils.GaloisLog;
 
@@ -13,14 +12,15 @@ import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
 import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
+import static org.newcih.galois.constants.ClassNameConstant.MYBATIS_CONFIGURATION;
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SLASH;
 
-public class ComtopConfigurationVisitor extends MethodAdapter {
-    private static final GaloisLog logger = GaloisLog.getLogger(ComtopConfigurationVisitor.class);
+public class MyBatisConfigurationVisitor extends MethodAdapter {
+    private static final GaloisLog logger = GaloisLog.getLogger(MyBatisConfigurationVisitor.class);
 
-    public ComtopConfigurationVisitor() {
-        super(ClassNameConstant.COMTOP_CONFIGURATION);
+    public MyBatisConfigurationVisitor() {
+        super(MYBATIS_CONFIGURATION);
     }
 
     @Override
@@ -29,7 +29,7 @@ public class ComtopConfigurationVisitor extends MethodAdapter {
         MethodVisitor mv = cv.visitMethod(access, name, descriptor, signature, exceptions);
 
         if (Objects.equals(name, "<init>") && Objects.equals(descriptor, "()V")) {
-            return new ComtopConfigurationVisitor.ConstructorVisitor(ASM5, mv);
+            return new MyBatisConfigurationVisitor.ConstructorVisitor(ASM5, mv);
         }
 
         return mv;
@@ -43,7 +43,7 @@ public class ComtopConfigurationVisitor extends MethodAdapter {
         @Override
         public void visitInsn(int opcode) {
             if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-                String pClassName = CormBeanReloader.class.getName().replace(DOT, SLASH);
+                String pClassName = MyBatisBeanReloader.class.getName().replace(DOT, SLASH);
                 String vClassName = className.replace(DOT, SLASH);
 
                 mv.visitCode();

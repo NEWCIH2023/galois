@@ -26,14 +26,15 @@ package org.newcih.galois.service.agent.mybatis;
 
 import org.newcih.galois.service.agent.AgentService;
 
-import static org.newcih.galois.constants.ClassNameConstant.SQL_SESSION_FACTORY_BEAN;
+import static org.newcih.galois.constants.ClassNameConstant.MYBATIS_CONFIGURATION;
 
 public class MyBatisAgentService extends AgentService {
 
     private final static MyBatisAgentService myBatisAgentService = new MyBatisAgentService();
 
     private MyBatisAgentService() {
-        necessaryClasses.add(SQL_SESSION_FACTORY_BEAN);
+        adapterMap.put(MYBATIS_CONFIGURATION, new MyBatisConfigurationVisitor());
+        necessaryClasses.addAll(adapterMap.keySet());
     }
 
     public static MyBatisAgentService getInstance() {

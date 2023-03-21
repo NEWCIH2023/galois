@@ -29,11 +29,10 @@ import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.service.BannerService;
-import org.newcih.galois.service.FileChangedListener;
+import org.newcih.galois.service.FileWatchService;
 import org.newcih.galois.service.agent.corm.CormAgentService;
 import org.newcih.galois.service.agent.mybatis.MyBatisAgentService;
 import org.newcih.galois.service.agent.spring.SpringAgentService;
@@ -59,8 +58,8 @@ public class PremainService {
      */
     public static final List<AgentService> agentServices = Arrays.asList(SpringAgentService.getInstance(),
             MyBatisAgentService.getInstance(), CormAgentService.getInstance());
-    public static final CopyOnWriteArrayList<FileChangedListener> listeners = new CopyOnWriteArrayList<>();
     public static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
+    public static final FileWatchService fileWatchService = FileWatchService.getInstance();
 
     static {
         String rootPath = globalConfig.getString(USER_DIR);
@@ -101,7 +100,7 @@ public class PremainService {
                 boolean checkedClass = agentService.checkAgentEnable(newClassName);
                 if (agentService.isUseful() && !agentService.isInited()) {
                     agentService.init();
-                    listeners.addAll(agentService.getListeners());
+                    fileWatchService.registerListeners(agentService.getListeners());
                     printAgentState();
                 }
 

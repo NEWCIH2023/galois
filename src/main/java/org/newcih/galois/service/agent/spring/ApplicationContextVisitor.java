@@ -26,7 +26,6 @@ package org.newcih.galois.service.agent.spring;
 
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
-import org.newcih.galois.constants.ClassNameConstant;
 import org.newcih.galois.service.agent.MethodAdapter;
 import org.newcih.galois.utils.GaloisLog;
 
@@ -38,6 +37,9 @@ import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
 import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
+import static org.newcih.galois.constants.ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT;
+import static org.newcih.galois.constants.Constant.DOT;
+import static org.newcih.galois.constants.Constant.SLASH;
 
 
 /**
@@ -50,7 +52,7 @@ public class ApplicationContextVisitor extends MethodAdapter {
     private static final GaloisLog logger = GaloisLog.getLogger(ApplicationContextVisitor.class);
 
     public ApplicationContextVisitor() {
-        super(ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT);
+        super(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT);
     }
 
     @Override
@@ -65,7 +67,7 @@ public class ApplicationContextVisitor extends MethodAdapter {
         return mv;
     }
 
-    static class ConstructorVisiter extends MethodVisitor {
+    class ConstructorVisiter extends MethodVisitor {
         public ConstructorVisiter(int api, MethodVisitor methodVisitor) {
             super(api, methodVisitor);
         }
@@ -73,14 +75,13 @@ public class ApplicationContextVisitor extends MethodAdapter {
         @Override
         public void visitInsn(int opcode) {
             if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-                String reloaderClassName = SpringBeanReloader.class.getName().replace(".", "/");
+                String pClassName = SpringBeanReloader.class.getName().replace(DOT, SLASH);
+                String vClassName = className.replace(DOT, SLASH);
 
-                mv.visitMethodInsn(INVOKESTATIC, reloaderClassName, "getInstance", "()L" + reloaderClassName + ";",
-                        false);
+                mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";", false);
                 mv.visitVarInsn(ALOAD, 0);
-                mv.visitTypeInsn(CHECKCAST, "org/springframework/context/ApplicationContext");
-                mv.visitMethodInsn(INVOKEVIRTUAL, reloaderClassName,
-                        "setContext", "(Lorg/springframework/context/ApplicationContext;)V", false);
+                mv.visitTypeInsn(CHECKCAST, vClassName);
+                mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setContext", "(L" + vClassName + ";)V", false);
             }
 
             super.visitInsn(opcode);

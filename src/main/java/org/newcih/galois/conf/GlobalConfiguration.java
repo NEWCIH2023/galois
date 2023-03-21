@@ -40,17 +40,13 @@ import static org.newcih.galois.constants.Constant.TRUE;
 public class GlobalConfiguration {
 
     /**
-     * 解析配置文件galois.properties的属性对象
+     * parse config key-value entry in galois.properties
      */
     private static final Properties configuration = new Properties();
     private static final GlobalConfiguration globalConfiguration = new GlobalConfiguration();
 
-    /**
-     * 加载galois.propertise文件并解析出配置项
-     */
     static {
         try (InputStream is = FileUtil.readClassPathFile("galois.properties")) {
-            // 加载配置文件中的配置，这部分参数使用完全匹配
             configuration.load(is);
         } catch (IOException e) {
             throw new RuntimeException(e);

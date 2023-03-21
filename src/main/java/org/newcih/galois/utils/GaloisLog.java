@@ -35,6 +35,9 @@ import static org.newcih.galois.constants.ConfConstant.LOGGING_ENABLE;
 import static org.newcih.galois.constants.ConfConstant.LOGGING_LEVEL;
 import static org.slf4j.event.Level.ERROR;
 
+/**
+ * log util
+ */
 public class GaloisLog implements Logger {
 
     public static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();

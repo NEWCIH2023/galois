@@ -38,6 +38,7 @@ import org.newcih.galois.constants.FileType;
 import static org.newcih.galois.constants.Constant.LF;
 
 public class FileUtil {
+    private static final GaloisLog logger = GaloisLog.getLogger(FileUtil.class);
 
     private FileUtil() {
     }
@@ -50,7 +51,7 @@ public class FileUtil {
     }
 
     /**
-     * 获取文件类型的通用方法，带上.字符
+     * get file type by filename and include dot char in result
      */
     public static String getFileType(File file) {
         if (file == null) {
@@ -69,7 +70,10 @@ public class FileUtil {
     }
 
     /**
-     * 将字节数组写入对应路径的文件
+     * write byte array to file
+     *
+     * @param bytes the byte array
+     * @param path  target file
      */
     public static File writeFile(byte[] bytes, String path) {
         if (bytes == null || bytes.length == 0) {
@@ -86,7 +90,9 @@ public class FileUtil {
     }
 
     /**
-     * 将File转为byte[]数组
+     * read file to byte array
+     *
+     * @param file input file
      */
     public static byte[] readFile(File file) {
         if (file == null) {
@@ -110,7 +116,9 @@ public class FileUtil {
     }
 
     /**
-     * 读取字符类型文件，并返回String类型结果
+     * get text content in file
+     *
+     * @param file input file
      */
     public static String readTextFile(File file) {
         if (file == null) {
@@ -128,9 +136,9 @@ public class FileUtil {
     }
 
     /**
-     * 读取classpath路径下的文件
+     * read file in classpath
      *
-     * @param relativePath 文件的相对路径，相对于classpath路径
+     * @param relativePath relative path
      */
     public static InputStream readClassPathFile(String relativePath) {
         if (StringUtil.isBlank(relativePath)) {

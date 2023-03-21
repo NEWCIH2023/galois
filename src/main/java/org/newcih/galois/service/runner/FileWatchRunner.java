@@ -34,11 +34,10 @@ import org.springframework.core.env.ConfigurableEnvironment;
  * 需要兼容 SpringBoot 2.0.3版本，该版本的 RunListener 全是接口，没有默认default实现
  */
 public class FileWatchRunner implements SpringApplicationRunListener {
-
-    private final String rootPath;
+    private static FileWatchService fileWatchService = FileWatchService.getInstance();
 
     public FileWatchRunner(String rootPath) {
-        this.rootPath = rootPath;
+        fileWatchService.init(rootPath);
     }
 
     @Override
@@ -76,7 +75,7 @@ public class FileWatchRunner implements SpringApplicationRunListener {
 
     @Override
     public void started(ConfigurableApplicationContext context) {
-        new FileWatchService(rootPath).start();
+        fileWatchService.start();
     }
 
     @Override
