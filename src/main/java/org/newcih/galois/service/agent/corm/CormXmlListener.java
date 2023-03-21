@@ -39,6 +39,8 @@ import org.w3c.dom.DocumentType;
 import org.xml.sax.InputSource;
 
 /**
+ * corm xml listener
+ *
  * @author liuguangsheng
  * @since 1.0.0
  */

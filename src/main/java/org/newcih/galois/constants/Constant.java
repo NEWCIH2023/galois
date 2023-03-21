@@ -25,6 +25,8 @@
 package org.newcih.galois.constants;
 
 /**
+ * constant
+ *
  * @author liuguangsheng
  * @since 1.0.0
  */

@@ -39,6 +39,8 @@ import java.util.regex.Pattern;
 import jdk.internal.org.objectweb.asm.ClassReader;
 
 /**
+ * java util
+ *
  * @author liuguangsheng
  * @since 1.0.0
  */
@@ -47,13 +49,9 @@ public class JavaUtil {
   private static final String compileDir;
   private static final Pattern packagePattern = Pattern.compile("^package +(\\S+);");
   private static final Pattern classNamePattern = Pattern.compile("class +([\\S&&[^<]]+)");
-  //    private static final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-//    private static final StandardJavaFileManager standardJavaFileManager;
   public static Instrumentation inst;
 
   static {
-//        standardJavaFileManager = compiler.getStandardFileManager(null, null, null);
-
     compileDir =
         System.getProperty("java.io.tmpdir") + File.separator + "GaloisCompile" + File.separator;
     File directory = new File(compileDir);

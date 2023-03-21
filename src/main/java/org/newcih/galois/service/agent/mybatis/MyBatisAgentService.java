@@ -29,6 +29,8 @@ import static org.newcih.galois.constants.ClassNameConstant.MYBATIS_CONFIGURATIO
 import org.newcih.galois.service.agent.AgentService;
 
 /**
+ * mybatis agent service
+ *
  * @author liuguangsheng
  * @since 1.0.0
  */

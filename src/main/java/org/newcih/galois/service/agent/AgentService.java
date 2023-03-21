@@ -32,6 +32,8 @@ import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.service.FileChangedListener;
 
 /**
+ * abstract agent service
+ *
  * @author liuguangsheng
  * @since 1.0.0
  */

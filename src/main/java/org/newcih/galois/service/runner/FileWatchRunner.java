@@ -31,7 +31,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
- * 需要兼容 SpringBoot 2.0.3版本，该版本的 RunListener 全是接口，没有默认default实现
+ * 需要兼容 SpringBoot 2.0.3版本，该版本的 SpringApplicationRunListener 接口全是抽象方法，没有默认default实现
  *
  * @author liuguangsheng
  * @since 1.0.0

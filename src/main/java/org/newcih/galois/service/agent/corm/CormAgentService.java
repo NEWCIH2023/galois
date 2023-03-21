@@ -29,6 +29,8 @@ import static org.newcih.galois.constants.ClassNameConstant.COMTOP_CONFIGURATION
 import org.newcih.galois.service.agent.AgentService;
 
 /**
+ * corm agent service
+ *
  * @author liuguangsheng
  * @since 1.0.0
  */

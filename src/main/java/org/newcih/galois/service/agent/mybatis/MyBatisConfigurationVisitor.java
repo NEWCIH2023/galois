@@ -17,6 +17,8 @@ import org.newcih.galois.service.agent.MethodAdapter;
 import org.newcih.galois.utils.GaloisLog;
 
 /**
+ * mybatis configuration visitor
+ *
  * @author liuguangsheng
  * @since 1.0.0
  */

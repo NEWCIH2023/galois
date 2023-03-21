@@ -65,9 +65,9 @@ public class SpringBeanListener implements FileChangedListener {
       JavaUtil.getInst().redefineClasses(definition);
       logger.info("had redefine class file => {}", classFile.getName());
 
-//            if (reloader.isUseful(clazz)) {
-//                reloader.updateBean(clazz);
-//            }
+//      if (reloader.isUseful(clazz)) {
+//        reloader.updateBean(clazz);
+//      }
     } catch (Throwable e) {
       logger.error("reload bean failed", e);
     }
@@ -85,7 +85,7 @@ public class SpringBeanListener implements FileChangedListener {
   /**
    * handler for file modifed
    *
-   * @param file
+   * @param file file
    */
   @Override
   public void modifiedHandle(File file) {
@@ -104,7 +104,7 @@ public class SpringBeanListener implements FileChangedListener {
   /**
    * handler for file deleted
    *
-   * @param file
+   * @param file file
    */
   @Override
   public void deletedHandle(File file) {

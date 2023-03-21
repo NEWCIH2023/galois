@@ -35,6 +35,8 @@ import org.newcih.galois.utils.GaloisLog;
 import org.springframework.boot.SpringApplicationRunListener;
 
 /**
+ * spring agent service
+ *
  * @author liuguangsheng
  * @since 1.0.0
  */
@@ -72,7 +74,7 @@ public class SpringAgentService extends AgentService {
   /**
    * add runner
    *
-   * @param runner
+   * @param runner runner
    */
   public void addRunner(SpringApplicationRunListener runner) {
     if (runner != null) {

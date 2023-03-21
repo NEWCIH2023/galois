@@ -37,6 +37,8 @@ import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.utils.GaloisLog;
 
 /**
+ * method adapter
+ *
  * @author liuguangsheng
  * @since 1.0.0
  */

@@ -25,6 +25,8 @@
 package org.newcih.galois.utils;
 
 /**
+ * string util
+ *
  * @author liuguangsheng
  * @since 1.0.0
  */
