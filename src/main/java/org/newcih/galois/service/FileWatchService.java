@@ -53,6 +53,7 @@ public class FileWatchService {
   private static final List<FileChangedListener> listeners = new ArrayList<>(16);
   private static final FileWatchService instance = new FileWatchService();
   private WatchService watchService;
+  private String rootPath;
 
   private FileWatchService() {
   }
@@ -76,6 +77,7 @@ public class FileWatchService {
     if (rootPath == null || rootPath.isEmpty()) {
       throw new NullPointerException("Empty path for galois listener.");
     }
+    this.rootPath = rootPath;
 
     try {
       watchService = FileSystems.getDefault().newWatchService();
@@ -112,7 +114,7 @@ public class FileWatchService {
    */
   public void start() {
     Thread watchThread = new Thread(() -> {
-      logger.info("FileWatchService Started.");
+      logger.info("FileWatchService Started in path {}.", rootPath);
 
       while (true) {
         try {

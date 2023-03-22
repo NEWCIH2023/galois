@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.service.FileChangedListener;
 
 /**
@@ -39,7 +38,6 @@ import org.newcih.galois.service.FileChangedListener;
  */
 public abstract class AgentService {
 
-  protected static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
   /**
    * 文件变更监听器列表
    */
@@ -52,10 +50,6 @@ public abstract class AgentService {
    * 类名到MethodAdapter的映射
    */
   protected Map<String, MethodAdapter> adapterMap = new HashMap<>(4);
-  /**
-   * 配置文件对应的AgentService名称
-   */
-  protected String confAgentName;
   /**
    * 必备的加载类名称列表
    */
@@ -75,7 +69,7 @@ public abstract class AgentService {
    * @return 当项目已经加载了必须的类之后，该AgentService将成为可用状态
    */
   public boolean isUseful() {
-    return enabled == necessaryClasses.size() && globalConfig.getBoolean(confAgentName, true);
+    return enabled == necessaryClasses.size();
   }
 
   /**
@@ -128,10 +122,6 @@ public abstract class AgentService {
 
   public int getEnabled() {
     return enabled;
-  }
-
-  public String getConfAgentName() {
-    return confAgentName;
   }
 
   public List<String> getNecessaryClasses() {

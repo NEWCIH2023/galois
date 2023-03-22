@@ -25,7 +25,9 @@
 package org.newcih.galois.service.agent.mybatis;
 
 import static org.newcih.galois.constants.ClassNameConstant.MYBATIS_CONFIGURATION;
+import static org.newcih.galois.constants.ConfConstant.RELOADER_MYBATIS_ENABLE;
 
+import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.service.agent.AgentService;
 
 /**
@@ -36,11 +38,17 @@ import org.newcih.galois.service.agent.AgentService;
  */
 public class MyBatisAgentService extends AgentService {
 
-  private final static MyBatisAgentService myBatisAgentService = new MyBatisAgentService();
+  private static final MyBatisAgentService myBatisAgentService = new MyBatisAgentService();
+  private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
 
   private MyBatisAgentService() {
     adapterMap.put(MYBATIS_CONFIGURATION, new MyBatisConfigurationVisitor());
     necessaryClasses.addAll(adapterMap.keySet());
+  }
+
+  @Override
+  public boolean isUseful() {
+    return super.isUseful() && globalConfig.getBoolean(RELOADER_MYBATIS_ENABLE);
   }
 
   /**
