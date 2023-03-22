@@ -28,7 +28,6 @@ import static java.util.stream.Collectors.joining;
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SLASH;
 import static org.newcih.galois.constants.Constant.USER_DIR;
-
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
@@ -103,8 +102,8 @@ public class PremainService {
         .map(Object::toString)
         .collect(joining(","));
 
-    logger.info("Now enable Plugins [{}], and start FileWatchListeners [{}]", enableAgentNames,
-        listenerNames);
+    logger.info("Now had enabled Plugins [{}], and started FileWatchListeners [{}]",
+        enableAgentNames, listenerNames);
   }
 
   /**
