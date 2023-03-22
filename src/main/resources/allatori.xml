@@ -37,6 +37,9 @@
   </keep-names>
   <ignore-classes>
     <class template="class *springframework*"/>
+    <class template="class *apache*"/>
+    <class template="class *comtop*"/>
+    <class template="class *slf4j*"/>
   </ignore-classes>
 
 </config>
