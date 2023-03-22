@@ -24,221 +24,182 @@
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.newcih</groupId>
-  <artifactId>galois</artifactId>
-  <version>0.3.0</version>
-  <packaging>jar</packaging>
+    <groupId>org.newcih</groupId>
+    <artifactId>galois</artifactId>
+    <version>${galois.version}</version>
+    <packaging>jar</packaging>
 
-  <name>galois</name>
+    <name>galois</name>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <asm.version>5.2</asm.version>
-    <springboot.version>2.3.0.RELEASE</springboot.version>
-    <spring.version>5.2.6.RELEASE</spring.version>
-  </properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <asm.version>5.2</asm.version>
+        <springboot.version>2.3.0.RELEASE</springboot.version>
+        <spring.version>5.2.6.RELEASE</spring.version>
+    </properties>
 
-  <dependencies>
-    <!--   事先将自己JDK的lib目录下的tools.jar包通过install:install-file的方式安装到本地仓库     -->
-    <!--        <dependency>-->
-    <!--            <groupId>com.sun</groupId>-->
-    <!--            <artifactId>tools</artifactId>-->
-    <!--            <version>1.8</version>-->
-    <!--        </dependency>-->
-    <dependency>
-      <groupId>java</groupId>
-      <artifactId>rt</artifactId>
-      <version>8</version>
-      <scope>system</scope>
-      <systemPath>${java.home}/lib/rt.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>java</groupId>
-      <artifactId>tools</artifactId>
-      <version>8</version>
-      <scope>system</scope>
-      <systemPath>${java.home}/../lib/tools.jar</systemPath>
-    </dependency>
+    <dependencies>
+        <!--   事先将自己JDK的lib目录下的tools.jar包通过install:install-file的方式安装到本地仓库     -->
+        <!--        <dependency>-->
+        <!--            <groupId>com.sun</groupId>-->
+        <!--            <artifactId>tools</artifactId>-->
+        <!--            <version>1.8</version>-->
+        <!--        </dependency>-->
+        <dependency>
+            <groupId>java</groupId>
+            <artifactId>rt</artifactId>
+            <version>8</version>
+            <scope>system</scope>
+            <systemPath>${java.home}/lib/rt.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>java</groupId>
+            <artifactId>tools</artifactId>
+            <version>8</version>
+            <scope>system</scope>
+            <systemPath>${java.home}/../lib/tools.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>${asm.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>5.2.6.RELEASE</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.6</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.5.9</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-spring</artifactId>
+            <version>2.0.6</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.comtop</groupId>
+            <artifactId>corm</artifactId>
+            <version>3.1.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+            <version>2.5.5</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
-    <!--   打包时需要检测rt.jar的存在，因此自己通过项目lib库添加上rt.jar，让打包检测通过就行，实际运行时依赖运行时环境的rt.jar  -->
+    <build>
+        <plugins>
 
-    <!--        <dependency>-->
-    <!--            <groupId>commons-io</groupId>-->
-    <!--            <artifactId>commons-io</artifactId>-->
-    <!--            <version>2.11.0</version>-->
-    <!--        </dependency>-->
-    <dependency>
-      <groupId>org.ow2.asm</groupId>
-      <artifactId>asm</artifactId>
-      <version>${asm.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <!--        <dependency>-->
-    <!--            <groupId>org.ow2.asm</groupId>-->
-    <!--            <artifactId>asm-commons</artifactId>-->
-    <!--            <version>${asm.version}</version>-->
-    <!--        </dependency>-->
-    <!--        <dependency>-->
-    <!--            <groupId>org.ow2.asm</groupId>-->
-    <!--            <artifactId>asm-util</artifactId>-->
-    <!--            <version>${asm.version}</version>-->
-    <!--        </dependency>-->
-    <!--        <dependency>-->
-    <!--            <groupId>org.ow2.asm</groupId>-->
-    <!--            <artifactId>asm-tree</artifactId>-->
-    <!--            <version>${asm.version}</version>-->
-    <!--        </dependency>-->
-    <!--        <dependency>-->
-    <!--            <groupId>org.ow2.asm</groupId>-->
-    <!--            <artifactId>asm-analysis</artifactId>-->
-    <!--            <version>${asm.version}</version>-->
-    <!--        </dependency>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <compilerArgs>
+                        <arg>-XDignore.symbol.file</arg>
+                    </compilerArgs>
+                    <fork>true</fork>
+                </configuration>
+            </plugin>
 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <excludes>
+                        <exclude>libs/exclude/*</exclude>
+                    </excludes>
+                    <finalName>${artifactId}</finalName>
+                    <archive>
+                        <index>true</index>
+                        <addMavenDescriptor>false</addMavenDescriptor>
+                        <manifestEntries>
+                            <Build-Time>${maven.build.timestamp}</Build-Time>
+                            <!--suppress UnresolvedMavenProperty -->
+                            <Galois-Version>${galois.version}</Galois-Version>
+                            <Premain-Class>org.newcih.galois.service.agent.PremainService</Premain-Class>
+                            <Can-Redefine-Classes>true</Can-Redefine-Classes>
+                            <Can-Retransform-Classes>true</Can-Retransform-Classes>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
 
-    <!--   dependentices needed to removed when packaging :: start   -->
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-web</artifactId>
-      <version>5.2.6.RELEASE</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>2.0.6</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mybatis</groupId>
-      <artifactId>mybatis</artifactId>
-      <version>3.5.9</version>
-      <scope>provided</scope>
-    </dependency>
-    <!--        <dependency>-->
-    <!--            <groupId>org.mybatis</groupId>-->
-    <!--            <artifactId>mybatis</artifactId>-->
-    <!--            <version>3.1.1</version>-->
-    <!--            <scope>provided</scope>-->
-    <!--        </dependency>-->
-    <dependency>
-      <groupId>org.mybatis</groupId>
-      <artifactId>mybatis-spring</artifactId>
-      <version>2.0.6</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-      <version>${spring.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.comtop</groupId>
-      <artifactId>corm</artifactId>
-      <version>3.1.2</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot</artifactId>
-      <version>2.5.5</version>
-      <scope>provided</scope>
-    </dependency>
-    <!--   dependentices needed to removed when packaging :: end    -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>src/main/resources/galois.properties</file>
+                            </files>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-  </dependencies>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>run-allatori</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <executable>java</executable>
+                    <arguments>
+                        <argument>-Xms128m</argument>
+                        <argument>-Xmx512m</argument>
+                        <argument>-jar</argument>
+                        <argument>src/main/resources/libs/exclude/allatori.jar</argument>
+                        <argument>${basedir}/target/classes/allatori.xml</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
 
-  <build>
-    <plugins>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-          <compilerArgs>
-            <arg>-XDignore.symbol.file</arg>
-          </compilerArgs>
-          <fork>true</fork>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>3.3.0</version>
-        <configuration>
-          <excludes>
-            <exclude>libs/exclude/*</exclude>
-          </excludes>
-          <finalName>${artifactId}</finalName>
-          <archive>
-            <index>true</index>
-            <addMavenDescriptor>false</addMavenDescriptor>
-            <manifestEntries>
-              <Build-Time>${maven.build.timestamp}</Build-Time>
-              <!--suppress UnresolvedMavenProperty -->
-              <Galois-Version>${galois.version}</Galois-Version>
-              <Premain-Class>org.newcih.galois.service.agent.PremainService</Premain-Class>
-              <Can-Redefine-Classes>true</Can-Redefine-Classes>
-              <Can-Retransform-Classes>true</Can-Retransform-Classes>
-            </manifestEntries>
-          </archive>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>properties-maven-plugin</artifactId>
-        <version>1.0-alpha-2</version>
-        <executions>
-          <execution>
-            <phase>initialize</phase>
-            <goals>
-              <goal>read-project-properties</goal>
-            </goals>
-            <configuration>
-              <files>
-                <file>src/main/resources/galois.properties</file>
-              </files>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>3.1.0</version>
-        <executions>
-          <execution>
-            <id>run-allatori</id>
-            <phase>package</phase>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <executable>java</executable>
-          <arguments>
-            <argument>-Xms128m</argument>
-            <argument>-Xmx512m</argument>
-            <argument>-jar</argument>
-            <argument>src/main/resources/libs/exclude/allatori.jar</argument>
-            <argument>${basedir}/target/classes/allatori.xml</argument>
-          </arguments>
-        </configuration>
-      </plugin>
-
-    </plugins>
-  </build>
+        </plugins>
+    </build>
 </project>
