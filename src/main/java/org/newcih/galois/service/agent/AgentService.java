@@ -26,8 +26,10 @@ package org.newcih.galois.service.agent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.newcih.galois.service.FileChangedListener;
 
 /**
@@ -53,7 +55,7 @@ public abstract class AgentService {
   /**
    * 必备的加载类名称列表
    */
-  protected List<String> necessaryClasses = new ArrayList<>(8);
+  protected Set<String> necessaryClasses = new HashSet<>(8);
   /**
    * 是否启用该AgentService，当该变量值与necessaryClasses的大小一致时，表示该AgentService启用
    */
@@ -94,6 +96,11 @@ public abstract class AgentService {
     }
 
     return false;
+  }
+
+  public void registerMethodAdapter(String className, MethodAdapter methodAdapter) {
+    adapterMap.put(className, methodAdapter);
+    necessaryClasses.add(className);
   }
 
   public List<FileChangedListener> getListeners() {

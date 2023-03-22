@@ -25,7 +25,6 @@
 package org.newcih.galois.service.agent.corm;
 
 import static org.newcih.galois.constants.ClassNameConstant.COMTOP_CONFIGURATION;
-
 import org.newcih.galois.service.agent.AgentService;
 
 /**
