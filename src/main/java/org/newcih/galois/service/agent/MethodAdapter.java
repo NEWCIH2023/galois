@@ -100,4 +100,8 @@ public abstract class MethodAdapter extends ClassVisitor {
   public boolean isUseful() {
     return true;
   }
+
+  public String getClassName() {
+    return className;
+  }
 }

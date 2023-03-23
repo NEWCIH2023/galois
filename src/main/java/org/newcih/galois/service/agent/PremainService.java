@@ -28,6 +28,7 @@ import static java.util.stream.Collectors.joining;
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SLASH;
 import static org.newcih.galois.constants.Constant.USER_DIR;
+
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
@@ -54,6 +55,10 @@ import org.slf4j.LoggerFactory;
  */
 public class PremainService {
 
+  static {
+    System.out.println(0);
+  }
+
   private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
   private static final FileWatchService fileWatchService = FileWatchService.getInstance();
   private static final Logger logger = LoggerFactory.getLogger(PremainService.class);
@@ -75,14 +80,21 @@ public class PremainService {
    * @param inst      instrument object
    */
   public static void premain(String agentArgs, Instrumentation inst) {
+    System.out.println(1);
     if (inst == null) {
       logger.error("Your program do not support instrumentation.");
       System.exit(0);
     }
 
-    inst.addTransformer(new CustomTransformer(), true);
-    JavaUtil.setInst(inst);
-    BannerService.printBanner();
+    try {
+
+      inst.addTransformer(new CustomTransformer(), true);
+      JavaUtil.setInst(inst);
+      BannerService.printBanner();
+    } catch (Throwable e) {
+      e.printStackTrace();
+      System.out.println(1);
+    }
   }
 
   /**

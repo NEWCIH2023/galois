@@ -29,7 +29,6 @@
   </input>
 
   <keep-names>
-    <!-- protected/public的都保留名称 -->
     <class access="protected+">
       <field access="protected+"/>
       <method access="protected+"/>

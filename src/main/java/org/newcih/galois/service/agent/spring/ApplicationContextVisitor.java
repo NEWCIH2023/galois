@@ -39,8 +39,6 @@ import static org.newcih.galois.constants.Constant.SLASH;
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.newcih.galois.service.agent.MethodAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**

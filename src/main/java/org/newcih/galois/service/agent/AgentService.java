@@ -25,6 +25,7 @@
 package org.newcih.galois.service.agent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -98,9 +99,29 @@ public abstract class AgentService {
     return false;
   }
 
+  /**
+   * register method adapter
+   *
+   * @param className     className
+   * @param methodAdapter methodAdapter
+   */
   public void registerMethodAdapter(String className, MethodAdapter methodAdapter) {
     adapterMap.put(className, methodAdapter);
     necessaryClasses.add(className);
+  }
+
+  /**
+   * add necessary classes
+   *
+   * @param classNames classNames
+   */
+  public void addNecessaryClasses(String... classNames) {
+    necessaryClasses.addAll(Arrays.asList(classNames));
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName();
   }
 
   public List<FileChangedListener> getListeners() {
@@ -115,28 +136,15 @@ public abstract class AgentService {
     return adapterMap;
   }
 
-  public boolean isInited() {
-    return inited;
-  }
-
-  public void setInited(boolean inited) {
-    this.inited = inited;
-  }
-
-  public void setEnabled(int enabled) {
-    this.enabled = enabled;
+  public Set<String> getNecessaryClasses() {
+    return necessaryClasses;
   }
 
   public int getEnabled() {
     return enabled;
   }
 
-  public List<String> getNecessaryClasses() {
-    return necessaryClasses;
-  }
-
-  @Override
-  public String toString() {
-    return getClass().getSimpleName();
+  public boolean isInited() {
+    return inited;
   }
 }
