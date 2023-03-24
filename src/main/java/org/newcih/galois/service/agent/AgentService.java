@@ -119,6 +119,10 @@ public abstract class AgentService {
     necessaryClasses.addAll(Arrays.asList(classNames));
   }
 
+  public void registerFileChangedListener(FileChangedListener listener) {
+    this.listeners.add(listener);
+  }
+
   @Override
   public String toString() {
     return getClass().getSimpleName();
