@@ -32,11 +32,32 @@ package org.newcih.galois.constants;
  */
 public class ConfConstant {
 
+  /**
+   * The constant LOGGING_ENABLE.
+   */
   public static final String LOGGING_ENABLE = "logging.enable";
+  /**
+   * The constant LOGGING_LEVEL.
+   */
   public static final String LOGGING_LEVEL = "logging.level";
+  /**
+   * The constant BANNER_ENABLE.
+   */
   public static final String BANNER_ENABLE = "banner.enable";
+  /**
+   * The constant RELOADER_SPRING_BOOT_ENABLE.
+   */
   public static final String RELOADER_SPRING_BOOT_ENABLE = "reloader.spring.boot.enable";
+  /**
+   * The constant PRINT_ASM_CODE_ENABLE.
+   */
   public static final String PRINT_ASM_CODE_ENABLE = "print-asm-code.enable";
+  /**
+   * The constant RELOADER_MYBATIS_ENABLE.
+   */
   public static final String RELOADER_MYBATIS_ENABLE = "reloader.mybatis.enable";
+  /**
+   * The constant GALOIS_VERSION.
+   */
   public static final String GALOIS_VERSION = "galois.version";
 }

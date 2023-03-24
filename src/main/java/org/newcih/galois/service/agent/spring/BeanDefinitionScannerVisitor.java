@@ -49,6 +49,9 @@ import org.slf4j.LoggerFactory;
  */
 public class BeanDefinitionScannerVisitor extends MethodAdapter {
 
+  /**
+   * Instantiates a new Bean definition scanner visitor.
+   */
   public BeanDefinitionScannerVisitor() {
     super(CLASS_PATH_BEAN_DEFINITION_SCANNER);
   }
@@ -65,8 +68,17 @@ public class BeanDefinitionScannerVisitor extends MethodAdapter {
     return mv;
   }
 
+  /**
+   * The type Do scan method visitor.
+   */
   class DoScanMethodVisitor extends MethodVisitor {
 
+    /**
+     * Instantiates a new Do scan method visitor.
+     *
+     * @param api           the api
+     * @param methodVisitor the method visitor
+     */
     public DoScanMethodVisitor(int api, MethodVisitor methodVisitor) {
       super(api, methodVisitor);
     }

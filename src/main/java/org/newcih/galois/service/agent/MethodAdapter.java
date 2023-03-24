@@ -47,10 +47,24 @@ public abstract class MethodAdapter extends ClassVisitor {
 
   private static final Logger logger = LoggerFactory.getLogger(MethodAdapter.class);
   private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
+  /**
+   * The Class name.
+   */
   protected final String className;
+  /**
+   * The Cr.
+   */
   protected ClassReader cr;
+  /**
+   * The Cw.
+   */
   protected ClassWriter cw;
 
+  /**
+   * Instantiates a new Method adapter.
+   *
+   * @param className the class name
+   */
   public MethodAdapter(String className) {
     super(ASM5);
 
@@ -63,6 +77,8 @@ public abstract class MethodAdapter extends ClassVisitor {
 
   /**
    * convert byte[] of original class file
+   *
+   * @return the byte [ ]
    */
   public byte[] transform() {
 
@@ -96,11 +112,18 @@ public abstract class MethodAdapter extends ClassVisitor {
 
   /**
    * check if methodadapter can injecte this version of service
+   *
+   * @return the boolean
    */
   public boolean isUseful() {
     return true;
   }
 
+  /**
+   * Gets class name.
+   *
+   * @return the class name
+   */
   public String getClassName() {
     return className;
   }

@@ -47,6 +47,9 @@ import org.xml.sax.InputSource;
  */
 public class MyBatisXmlListener implements FileChangedListener {
 
+  /**
+   * The constant DOC_TYPE.
+   */
   public static final String DOC_TYPE = "mapper";
   private static final Logger logger = LoggerFactory.getLogger(MyBatisXmlListener.class);
   private static final MyBatisBeanReloader reloader = MyBatisBeanReloader.getInstance();

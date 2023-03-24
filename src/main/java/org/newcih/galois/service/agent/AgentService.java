@@ -69,7 +69,7 @@ public abstract class AgentService {
   /**
    * 当前AgentService是否可启用
    *
-   * @return 当项目已经加载了必须的类之后，该AgentService将成为可用状态
+   * @return 当项目已经加载了必须的类之后 ，该AgentService将成为可用状态
    */
   public boolean isUseful() {
     return enabled == necessaryClasses.size();
@@ -88,7 +88,7 @@ public abstract class AgentService {
    * necessaryClasses的大小时，表示该agentService正式启用
    *
    * @param loadedClassName loaded class name
-   * @return 项目是否加载了对应的类名的类
+   * @return 项目是否加载了对应的类名的类 boolean
    */
   public boolean checkAgentEnable(String loadedClassName) {
     if (necessaryClasses.contains(loadedClassName)) {
@@ -119,6 +119,11 @@ public abstract class AgentService {
     necessaryClasses.addAll(Arrays.asList(classNames));
   }
 
+  /**
+   * Register file changed listener.
+   *
+   * @param listener the listener
+   */
   public void registerFileChangedListener(FileChangedListener listener) {
     this.listeners.add(listener);
   }
@@ -128,26 +133,56 @@ public abstract class AgentService {
     return getClass().getSimpleName();
   }
 
+  /**
+   * Gets listeners.
+   *
+   * @return the listeners
+   */
   public List<FileChangedListener> getListeners() {
     return listeners;
   }
 
+  /**
+   * Gets bean reloader.
+   *
+   * @return the bean reloader
+   */
   public BeanReloader<?> getBeanReloader() {
     return beanReloader;
   }
 
+  /**
+   * Gets adapter map.
+   *
+   * @return the adapter map
+   */
   public Map<String, MethodAdapter> getAdapterMap() {
     return adapterMap;
   }
 
+  /**
+   * Gets necessary classes.
+   *
+   * @return the necessary classes
+   */
   public Set<String> getNecessaryClasses() {
     return necessaryClasses;
   }
 
+  /**
+   * Gets enabled.
+   *
+   * @return the enabled
+   */
   public int getEnabled() {
     return enabled;
   }
 
+  /**
+   * Is inited boolean.
+   *
+   * @return the boolean
+   */
   public boolean isInited() {
     return inited;
   }

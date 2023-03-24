@@ -25,6 +25,9 @@ import org.newcih.galois.service.agent.MethodAdapter;
  */
 public class SpringApplicationRunListenersVisitor extends MethodAdapter {
 
+  /**
+   * Instantiates a new Spring application run listeners visitor.
+   */
   public SpringApplicationRunListenersVisitor() {
     super(SPRING_APPLICATION_RUN_LISTENERS);
   }
@@ -42,6 +45,12 @@ public class SpringApplicationRunListenersVisitor extends MethodAdapter {
 
   private class RunMethod extends MethodVisitor {
 
+    /**
+     * Instantiates a new Run method.
+     *
+     * @param i             the
+     * @param methodVisitor the method visitor
+     */
     public RunMethod(int i, MethodVisitor methodVisitor) {
       super(i, methodVisitor);
     }

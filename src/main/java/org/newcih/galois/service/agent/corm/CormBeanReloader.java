@@ -55,8 +55,14 @@ import org.slf4j.LoggerFactory;
  */
 public class CormBeanReloader implements BeanReloader<File> {
 
+  /**
+   * The constant mybatisBeanReloder.
+   */
   public static final CormBeanReloader mybatisBeanReloder = new CormBeanReloader();
   private static final Logger logger = LoggerFactory.getLogger(CormBeanReloader.class);
+  /**
+   * The Configuration.
+   */
   protected Configuration configuration;
 
   private CormBeanReloader() {
@@ -213,10 +219,20 @@ public class CormBeanReloader implements BeanReloader<File> {
     }
   }
 
+  /**
+   * Gets configuration.
+   *
+   * @return the configuration
+   */
   public Configuration getConfiguration() {
     return configuration;
   }
 
+  /**
+   * Sets configuration.
+   *
+   * @param configuration the configuration
+   */
   public void setConfiguration(Configuration configuration) {
     this.configuration = configuration;
   }

@@ -63,6 +63,9 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
 
   private static final MyBatisBeanReloader mybatisBeanReloder = new MyBatisBeanReloader();
   private static final Logger logger = LoggerFactory.getLogger(MyBatisBeanReloader.class);
+  /**
+   * The Configuration.
+   */
   protected Configuration configuration;
   private static final List<String> CHILD_NAMES = Arrays.asList("association", "collection",
       "case");
@@ -72,6 +75,8 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
 
   /**
    * 获取单例实例
+   *
+   * @return the instance
    */
   public static MyBatisBeanReloader getInstance() {
     return mybatisBeanReloder;
@@ -279,6 +284,11 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
     return configuration;
   }
 
+  /**
+   * Sets configuration.
+   *
+   * @param configuration the configuration
+   */
   public void setConfiguration(Configuration configuration) {
     this.configuration = configuration;
   }

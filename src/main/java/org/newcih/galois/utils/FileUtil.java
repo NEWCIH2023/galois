@@ -57,6 +57,7 @@ public class FileUtil {
    *
    * @param file     input file
    * @param fileType target file type
+   * @return the boolean
    */
   public static boolean validFileType(File file, FileType fileType) {
     return Objects.equals(getFileType(file), fileType.getFileType());
@@ -66,6 +67,7 @@ public class FileUtil {
    * get file type by filename and include dot char in result
    *
    * @param file input file
+   * @return the file type
    */
   public static String getFileType(File file) {
     if (file == null) {
@@ -88,6 +90,7 @@ public class FileUtil {
    *
    * @param bytes the byte array
    * @param path  target file
+   * @return the file
    */
   public static File writeFile(byte[] bytes, String path) {
     if (bytes == null || bytes.length == 0) {
@@ -107,6 +110,7 @@ public class FileUtil {
    * read file to byte array
    *
    * @param file input file
+   * @return the byte [ ]
    */
   public static byte[] readFile(File file) {
     if (file == null) {
@@ -134,6 +138,7 @@ public class FileUtil {
    * get text content in file
    *
    * @param file input file
+   * @return the string
    */
   public static String readTextFile(File file) {
     if (file == null) {
@@ -155,6 +160,7 @@ public class FileUtil {
    * read file in classpath
    *
    * @param relativePath relative path
+   * @return the input stream
    */
   public static InputStream readClassPathFile(String relativePath) {
     if (StringUtil.isBlank(relativePath)) {

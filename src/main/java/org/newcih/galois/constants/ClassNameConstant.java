@@ -32,12 +32,27 @@ package org.newcih.galois.constants;
  */
 public final class ClassNameConstant {
 
+  /**
+   * The constant COMTOP_CONFIGURATION.
+   */
   public static final String COMTOP_CONFIGURATION = "com.comtop.corm.session.Configuration";
+  /**
+   * The constant MYBATIS_CONFIGURATION.
+   */
   public static final String MYBATIS_CONFIGURATION = "org.apache.ibatis.session.Configuration";
+  /**
+   * The constant CLASS_PATH_BEAN_DEFINITION_SCANNER.
+   */
   public static final String CLASS_PATH_BEAN_DEFINITION_SCANNER =
       "org.springframework.context.annotation.ClassPathBeanDefinitionScanner";
+  /**
+   * The constant ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT.
+   */
   public static final String ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT =
       "org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext";
+  /**
+   * The constant SPRING_APPLICATION_RUN_LISTENERS.
+   */
   public static final String SPRING_APPLICATION_RUN_LISTENERS = "org.springframework.boot" +
       ".SpringApplicationRunListeners";
 }

@@ -49,6 +49,9 @@ import org.newcih.galois.service.agent.MethodAdapter;
  */
 public class ApplicationContextVisitor extends MethodAdapter {
 
+  /**
+   * Instantiates a new Application context visitor.
+   */
   public ApplicationContextVisitor() {
     super(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT);
   }
@@ -65,8 +68,17 @@ public class ApplicationContextVisitor extends MethodAdapter {
     return mv;
   }
 
+  /**
+   * The type Constructor visiter.
+   */
   class ConstructorVisiter extends MethodVisitor {
 
+    /**
+     * Instantiates a new Constructor visiter.
+     *
+     * @param api           the api
+     * @param methodVisitor the method visitor
+     */
     public ConstructorVisiter(int api, MethodVisitor methodVisitor) {
       super(api, methodVisitor);
     }

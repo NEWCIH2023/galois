@@ -42,7 +42,13 @@ public class SpringBeanReloader implements BeanReloader<Class<?>> {
 
   private static final Logger logger = LoggerFactory.getLogger(SpringBeanReloader.class);
   private static final SpringBeanReloader springBeanReloader = new SpringBeanReloader();
+  /**
+   * The Scanner.
+   */
   protected ClassPathBeanDefinitionScanner scanner;
+  /**
+   * The Context.
+   */
   protected AnnotationConfigServletWebServerApplicationContext context;
 
   private SpringBeanReloader() {
@@ -50,6 +56,8 @@ public class SpringBeanReloader implements BeanReloader<Class<?>> {
 
   /**
    * 获取单例实例
+   *
+   * @return the instance
    */
   public static SpringBeanReloader getInstance() {
     return springBeanReloader;
@@ -97,18 +105,38 @@ public class SpringBeanReloader implements BeanReloader<Class<?>> {
     return beanTypeNames.length > 0;
   }
 
+  /**
+   * Gets scanner.
+   *
+   * @return the scanner
+   */
   public ClassPathBeanDefinitionScanner getScanner() {
     return scanner;
   }
 
+  /**
+   * Sets scanner.
+   *
+   * @param scanner the scanner
+   */
   public void setScanner(ClassPathBeanDefinitionScanner scanner) {
     this.scanner = scanner;
   }
 
+  /**
+   * Gets context.
+   *
+   * @return the context
+   */
   public AnnotationConfigServletWebServerApplicationContext getContext() {
     return context;
   }
 
+  /**
+   * Sets context.
+   *
+   * @param context the context
+   */
   public void setContext(AnnotationConfigServletWebServerApplicationContext context) {
     this.context = context;
   }

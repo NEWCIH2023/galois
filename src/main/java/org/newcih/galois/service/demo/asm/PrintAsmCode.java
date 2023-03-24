@@ -37,6 +37,8 @@ import org.newcih.galois.utils.StringUtil;
 import org.springframework.boot.SpringApplicationRunListener;
 
 /**
+ * The type Print asm code.
+ *
  * @author liuguangsheng
  * @since 1.0.0
  */
@@ -45,13 +47,29 @@ public class PrintAsmCode {
   private String log;
   private List<SpringApplicationRunListener> listeners;
 
+  /**
+   * Instantiates a new Print asm code.
+   */
   public PrintAsmCode() {
   }
 
+  /**
+   * The entry point of application.
+   *
+   * @param args the input arguments
+   * @throws IOException the io exception
+   */
   public static void main(String[] args) throws IOException {
     printCode(null, false);
   }
 
+  /**
+   * Print code.
+   *
+   * @param className the class name
+   * @param asmCode   the asm code
+   * @throws IOException the io exception
+   */
   public static void printCode(String className, boolean asmCode) throws IOException {
     if (StringUtil.isBlank(className)) {
       className = PrintAsmCode.class.getName();
@@ -64,6 +82,11 @@ public class PrintAsmCode {
     new ClassReader(className).accept(cv, parsingOptions);
   }
 
+  /**
+   * Gets test.
+   *
+   * @param log the log
+   */
   public void getTest(String log) {
     this.listeners.addAll(SpringAgentService.getInstance().getRunners());
   }

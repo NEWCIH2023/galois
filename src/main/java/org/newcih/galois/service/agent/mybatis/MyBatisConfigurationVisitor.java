@@ -23,6 +23,9 @@ import org.newcih.galois.service.agent.MethodAdapter;
  */
 public class MyBatisConfigurationVisitor extends MethodAdapter {
 
+  /**
+   * Instantiates a new My batis configuration visitor.
+   */
   public MyBatisConfigurationVisitor() {
     super(MYBATIS_CONFIGURATION);
   }
@@ -39,8 +42,17 @@ public class MyBatisConfigurationVisitor extends MethodAdapter {
     return mv;
   }
 
+  /**
+   * The type Constructor visitor.
+   */
   class ConstructorVisitor extends MethodVisitor {
 
+    /**
+     * Instantiates a new Constructor visitor.
+     *
+     * @param api the api
+     * @param mv  the mv
+     */
     public ConstructorVisitor(int api, MethodVisitor mv) {
       super(api, mv);
     }

@@ -153,6 +153,11 @@ public class FileWatchService {
     watchThread.start();
   }
 
+  /**
+   * Gets listeners.
+   *
+   * @return the listeners
+   */
   public List<FileChangedListener> getListeners() {
     return listeners;
   }

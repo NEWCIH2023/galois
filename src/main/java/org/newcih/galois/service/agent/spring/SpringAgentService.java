@@ -109,6 +109,11 @@ public class SpringAgentService extends AgentService {
     }
   }
 
+  /**
+   * Gets runners.
+   *
+   * @return the runners
+   */
   public List<SpringApplicationRunListener> getRunners() {
     return runners;
   }

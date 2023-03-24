@@ -49,6 +49,9 @@ public class JavaUtil {
   private static final String compileDir;
   private static final Pattern packagePattern = Pattern.compile("^package +(\\S+);");
   private static final Pattern classNamePattern = Pattern.compile("class +([\\S&&[^<]]+)");
+  /**
+   * The constant inst.
+   */
   public static Instrumentation inst;
 
   static {
@@ -63,10 +66,20 @@ public class JavaUtil {
     }
   }
 
+  /**
+   * Gets inst.
+   *
+   * @return the inst
+   */
   public static Instrumentation getInst() {
     return inst;
   }
 
+  /**
+   * Sets inst.
+   *
+   * @param inst the inst
+   */
   public static void setInst(Instrumentation inst) {
     JavaUtil.inst = inst;
   }
@@ -123,16 +136,20 @@ public class JavaUtil {
 
 
   /**
+   * Gets class file.
+   *
    * @param clazz must include package path
-   * @return
+   * @return class file
    */
   public static File getClassFile(Class<?> clazz) {
     return getClassFile(clazz.getName());
   }
 
   /**
+   * Gets class file.
+   *
    * @param className must include package path
-   * @return
+   * @return class file
    */
   public static File getClassFile(String className) {
     if (StringUtil.isBlank(className)) {
