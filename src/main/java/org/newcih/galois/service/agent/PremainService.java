@@ -150,7 +150,7 @@ public class PremainService {
         MethodAdapter adapter = agentService.getAdapterMap().get(newClassName);
 
         if (logger.isDebugEnabled()) {
-          logger.debug("instrumentation had retransformed class {}.", newClassName);
+          logger.debug("Instrumentation had retransformed class {}.", newClassName);
         }
 
         return adapter.transform();
