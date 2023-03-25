@@ -27,6 +27,7 @@ package org.newcih.galois.service.agent.spring;
 import static org.newcih.galois.constants.FileType.CLASS_FILE;
 import java.io.File;
 import java.lang.instrument.ClassDefinition;
+import java.util.Arrays;
 import org.newcih.galois.service.FileChangedListener;
 import org.newcih.galois.utils.FileUtil;
 import org.newcih.galois.utils.JavaUtil;
@@ -59,7 +60,9 @@ public class SpringBeanListener implements FileChangedListener {
     byte[] classBytes = FileUtil.readFile(classFile);
 
     try {
-      Class<?> clazz = Class.forName(className, false, null);
+      Class<?> clazz = Arrays.stream(JavaUtil.getInst().getAllLoadedClasses())
+          .filter(item -> item.getName().equals(className)).findFirst()
+          .orElseThrow(NullPointerException::new);
       logger.debug("Invoke forName method for class {}", className);
 
       ClassDefinition definition = new ClassDefinition(clazz, classBytes);
