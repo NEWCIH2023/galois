@@ -59,7 +59,7 @@ public class SpringBeanListener implements FileChangedListener {
     byte[] classBytes = FileUtil.readFile(classFile);
 
     try {
-      Class<?> clazz = Class.forName(className);
+      Class<?> clazz = Class.forName(className, false, null);
       logger.debug("Invoke forName method for class {}", className);
 
       ClassDefinition definition = new ClassDefinition(clazz, classBytes);
