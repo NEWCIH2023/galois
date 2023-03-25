@@ -1,7 +1,8 @@
+
 /*
  * MIT License
  *
- * Copyright (c) [2023] [liuguangsheng]
+ * Copyright (c) [2023] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +28,6 @@ package org.newcih.galois.utils;
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SLASH;
 import static org.newcih.galois.constants.FileType.CLASS_FILE;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
