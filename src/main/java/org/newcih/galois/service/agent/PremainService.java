@@ -28,7 +28,6 @@ import static java.util.stream.Collectors.joining;
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SLASH;
 import static org.newcih.galois.constants.Constant.USER_DIR;
-
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
@@ -87,7 +86,6 @@ public class PremainService {
     }
 
     try {
-
       inst.addTransformer(new CustomTransformer(), true);
       JavaUtil.setInst(inst);
       BannerService.printBanner();
@@ -148,7 +146,13 @@ public class PremainService {
         if (!checkedClass) {
           continue;
         }
+
         MethodAdapter adapter = agentService.getAdapterMap().get(newClassName);
+
+        if (logger.isDebugEnabled()) {
+          logger.debug("instrumentation had retransformed class {}.", newClassName);
+        }
+
         return adapter.transform();
       }
 

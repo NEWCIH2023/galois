@@ -29,7 +29,6 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 import static org.newcih.galois.constants.Constant.DOT;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -129,6 +128,10 @@ public class FileWatchService {
 
             if (event.count() > 1 || kind == OVERFLOW || file.isDirectory()) {
               continue;
+            }
+
+            if (logger.isDebugEnabled()) {
+              logger.debug("monitor file {} {}.", kind, file);
             }
 
             listeners.stream()
