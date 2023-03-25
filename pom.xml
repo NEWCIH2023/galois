@@ -107,6 +107,17 @@
       <id>default</id>
       <properties>
         <galois.version>${version}</galois.version>
+        <print-asm-code.enable>true</print-asm-code.enable>
+      </properties>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+    </profile>
+    <profile>
+      <id>release</id>
+      <properties>
+        <galois.version>${version}</galois.version>
+        <print-asm-code.enable>false</print-asm-code.enable>
       </properties>
     </profile>
   </profiles>
