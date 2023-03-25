@@ -28,7 +28,6 @@ import static org.newcih.galois.constants.ClassNameConstant.ANNOTATION_CONFIG_SE
 import static org.newcih.galois.constants.ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER;
 import static org.newcih.galois.constants.ClassNameConstant.SPRING_APPLICATION_RUN_LISTENERS;
 import static org.newcih.galois.constants.ConfConstant.RELOADER_SPRING_BOOT_ENABLE;
-
 import java.util.ArrayList;
 import java.util.List;
 import org.newcih.galois.conf.GlobalConfiguration;
