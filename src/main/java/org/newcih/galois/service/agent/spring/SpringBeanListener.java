@@ -25,7 +25,6 @@
 package org.newcih.galois.service.agent.spring;
 
 import static org.newcih.galois.constants.FileType.CLASS_FILE;
-
 import java.io.File;
 import java.lang.instrument.ClassDefinition;
 import org.newcih.galois.service.FileChangedListener;
@@ -61,6 +60,8 @@ public class SpringBeanListener implements FileChangedListener {
 
     try {
       Class<?> clazz = Class.forName(className);
+      logger.debug("Invoke forName method for class {}", className);
+
       ClassDefinition definition = new ClassDefinition(clazz, classBytes);
       JavaUtil.getInst().redefineClasses(definition);
       logger.info("Redefine class file {} success.", classFile.getName());

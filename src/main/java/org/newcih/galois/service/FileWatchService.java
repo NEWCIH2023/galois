@@ -102,6 +102,8 @@ public class FileWatchService {
     String dirName;
     for (File subDir : subDirs) {
       dirName = subDir.getName();
+
+      // do not monitor hide path
       if (!dirName.startsWith(DOT)) {
         registerWatchService(subDir);
       }
