@@ -30,7 +30,7 @@
 
   <groupId>org.newcih</groupId>
   <artifactId>galois</artifactId>
-  <version>${galois.version}</version>
+  <version>0.3.5</version>
   <packaging>jar</packaging>
 
   <name>galois</name>
@@ -39,7 +39,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <asm.version>5.2</asm.version>
     <springboot.version>2.3.0.RELEASE</springboot.version>
     <spring.version>5.2.6.RELEASE</spring.version>
   </properties>
@@ -58,12 +57,6 @@
       <version>8</version>
       <scope>system</scope>
       <systemPath>${java.home}/../lib/tools.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>org.ow2.asm</groupId>
-      <artifactId>asm</artifactId>
-      <version>${asm.version}</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -109,7 +102,22 @@
     </dependency>
   </dependencies>
 
+  <profiles>
+    <profile>
+      <id>default</id>
+      <properties>
+        <galois.version>${version}</galois.version>
+      </properties>
+    </profile>
+  </profiles>
+
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -138,32 +146,13 @@
             <addMavenDescriptor>false</addMavenDescriptor>
             <manifestEntries>
               <Build-Time>${maven.build.timestamp}</Build-Time>
-              <Galois-Version>${galois.version}</Galois-Version>
+              <Galois-Version>${version}</Galois-Version>
               <Premain-Class>org.newcih.galois.service.agent.PremainService</Premain-Class>
               <Can-Redefine-Classes>true</Can-Redefine-Classes>
               <Can-Retransform-Classes>true</Can-Retransform-Classes>
             </manifestEntries>
           </archive>
         </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>properties-maven-plugin</artifactId>
-        <version>1.1.0</version>
-        <executions>
-          <execution>
-            <phase>initialize</phase>
-            <goals>
-              <goal>read-project-properties</goal>
-            </goals>
-            <configuration>
-              <files>
-                <file>src/main/resources/galois.properties</file>
-              </files>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
