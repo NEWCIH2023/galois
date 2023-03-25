@@ -24,7 +24,7 @@
 
 package org.newcih.galois.service;
 
-import static com.sun.nio.file.SensitivityWatchEventModifier.MEDIUM;
+import static com.sun.nio.file.SensitivityWatchEventModifier.HIGH;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
@@ -93,7 +93,7 @@ public class FileWatchService {
    * @param dir root dir
    */
   private void registerWatchService(File dir) throws IOException {
-    dir.toPath().register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY}, MEDIUM);
+    dir.toPath().register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY}, HIGH);
     File[] subDirs = dir.listFiles(File::isDirectory);
     if (subDirs == null) {
       return;
@@ -119,7 +119,7 @@ public class FileWatchService {
 
       while (true) {
         try {
-          WatchKey watchKey = watchService.take();
+          WatchKey watchKey = watchService.poll();
           if (watchKey == null) {
             continue;
           }
@@ -136,15 +136,13 @@ public class FileWatchService {
               logger.debug("monitor file {} {}.", kind, file);
             }
 
-            listeners.stream()
-                .filter(listener -> listener.isUseful(file))
-                .forEach(listener -> {
-                  if (kind == ENTRY_CREATE) {
-                    listener.createdHandle(file);
-                  } else if (kind == ENTRY_MODIFY) {
-                    listener.modifiedHandle(file);
-                  }
-                });
+            listeners.stream().filter(listener -> listener.isUseful(file)).forEach(listener -> {
+              if (kind == ENTRY_CREATE) {
+                listener.createdHandle(file);
+              } else if (kind == ENTRY_MODIFY) {
+                listener.modifiedHandle(file);
+              }
+            });
           }
 
           watchKey.reset();
