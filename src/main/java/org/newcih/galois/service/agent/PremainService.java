@@ -31,8 +31,10 @@ import static org.newcih.galois.constants.Constant.USER_DIR;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
-import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.service.BannerService;
@@ -60,8 +62,7 @@ public class PremainService {
   private static final SpringAgentService springAgentService = SpringAgentService.getInstance();
   private static final MyBatisAgentService mybatisAgentService = MyBatisAgentService.getInstance();
   private static final CormAgentService cormAgentService = CormAgentService.getInstance();
-  private static final List<AgentService> agentServices = Arrays.asList(mybatisAgentService,
-      cormAgentService, springAgentService);
+  private static final Map<String, AgentService> agentServiceMap = new HashMap<>(8);
 
   static {
     String rootPath = globalConfig.getString(USER_DIR);
@@ -94,7 +95,7 @@ public class PremainService {
    * print current loading state of agent service
    */
   private static void printAgentState() {
-    List<AgentService> enabledAgents = agentServices.stream()
+    List<AgentService> enabledAgents = agentServiceMap.values().stream()
         .filter(AgentService::isInited)
         .collect(Collectors.toList());
 
@@ -114,10 +115,11 @@ public class PremainService {
   /**
    * Register agent service.
    *
+   * @param serviceName  the service name
    * @param agentService the agent service
    */
-  public static void registerAgentService(AgentService agentService) {
-    agentServices.add(agentService);
+  public static void registerAgentService(String serviceName, AgentService agentService) {
+    agentServiceMap.put(serviceName, agentService);
   }
 
   /**
@@ -137,6 +139,7 @@ public class PremainService {
 
       String newClassName = className.replace(SLASH, DOT);
 
+      Collection<AgentService> agentServices = agentServiceMap.values();
       for (AgentService agentService : agentServices) {
         boolean checkedClass = agentService.checkAgentEnable(newClassName);
         if (agentService.isUseful() && !agentService.isInited()) {
