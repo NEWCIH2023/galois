@@ -112,6 +112,15 @@ public class PremainService {
   }
 
   /**
+   * Register agent service.
+   *
+   * @param agentService the agent service
+   */
+  public static void registerAgentService(AgentService agentService) {
+    agentServices.add(agentService);
+  }
+
+  /**
    * custom class file transformer
    *
    * @author liuguangsheng
