@@ -27,7 +27,6 @@ package org.newcih.galois.service.agent;
 import static java.util.stream.Collectors.joining;
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SLASH;
-import static org.newcih.galois.constants.Constant.USER_DIR;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
@@ -38,11 +37,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.service.BannerService;
-import org.newcih.galois.service.FileWatchService;
 import org.newcih.galois.service.agent.corm.CormAgentService;
 import org.newcih.galois.service.agent.mybatis.MyBatisAgentService;
-import org.newcih.galois.service.agent.spring.SpringAgentService;
-import org.newcih.galois.service.runner.FileWatchRunner;
 import org.newcih.galois.utils.JavaUtil;
 import org.newcih.galois.utils.StringUtil;
 import org.slf4j.Logger;
@@ -57,18 +53,10 @@ import org.slf4j.LoggerFactory;
 public class PremainService {
 
   private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
-  private static final FileWatchService fileWatchService;
   private static final Logger logger = LoggerFactory.getLogger(PremainService.class);
-  private static final SpringAgentService springAgentService = SpringAgentService.getInstance();
   private static final MyBatisAgentService mybatisAgentService = MyBatisAgentService.getInstance();
   private static final CormAgentService cormAgentService = CormAgentService.getInstance();
   private static final Map<String, AgentService> agentServiceMap = new HashMap<>(8);
-
-  static {
-    String rootPath = globalConfig.getString(USER_DIR);
-    fileWatchService = new FileWatchService(rootPath);
-    springAgentService.addRunner(new FileWatchRunner(fileWatchService));
-  }
 
   /**
    * premain entry
