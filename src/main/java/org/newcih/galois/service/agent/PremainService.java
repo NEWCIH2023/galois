@@ -54,10 +54,6 @@ import org.slf4j.LoggerFactory;
  */
 public class PremainService {
 
-  static {
-    System.out.println(0);
-  }
-
   private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
   private static final FileWatchService fileWatchService;
   private static final Logger logger = LoggerFactory.getLogger(PremainService.class);
@@ -80,7 +76,6 @@ public class PremainService {
    * @param inst      instrument object
    */
   public static void premain(String agentArgs, Instrumentation inst) {
-    System.out.println(1);
     if (inst == null) {
       logger.error("Your program do not support instrumentation.");
       System.exit(0);
@@ -91,8 +86,7 @@ public class PremainService {
       JavaUtil.setInst(inst);
       BannerService.printBanner();
     } catch (Throwable e) {
-      e.printStackTrace();
-      System.out.println(1);
+      logger.error("Start Premain Service fail.", e);
     }
   }
 
