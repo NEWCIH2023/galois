@@ -52,7 +52,7 @@ public class JavaUtil {
   /**
    * The constant inst.
    */
-  public static Instrumentation inst;
+  public static Instrumentation instrumentation;
 
   static {
     compileDir =
@@ -67,21 +67,21 @@ public class JavaUtil {
   }
 
   /**
-   * Gets inst.
+   * Gets instrumentation.
    *
-   * @return the inst
+   * @return the instrumentation
    */
-  public static Instrumentation getInst() {
-    return inst;
+  public static Instrumentation getInstrumentation() {
+    return instrumentation;
   }
 
   /**
-   * Sets inst.
+   * Sets instrumentation.
    *
-   * @param inst the inst
+   * @param instrumentation the instrumentation
    */
-  public static void setInst(Instrumentation inst) {
-    JavaUtil.inst = inst;
+  public static void setInstrumentation(Instrumentation instrumentation) {
+    JavaUtil.instrumentation = instrumentation;
   }
 
   /**

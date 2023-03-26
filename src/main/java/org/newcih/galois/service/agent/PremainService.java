@@ -27,6 +27,7 @@ package org.newcih.galois.service.agent;
 import static java.util.stream.Collectors.joining;
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SLASH;
+import static org.newcih.galois.constants.Constant.USER_DIR;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
@@ -37,6 +38,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.service.BannerService;
+import org.newcih.galois.service.FileChangedListener;
+import org.newcih.galois.service.FileWatchService;
 import org.newcih.galois.service.agent.corm.CormAgentService;
 import org.newcih.galois.service.agent.mybatis.MyBatisAgentService;
 import org.newcih.galois.utils.JavaUtil;
@@ -57,6 +60,12 @@ public class PremainService {
   private static final MyBatisAgentService mybatisAgentService = MyBatisAgentService.getInstance();
   private static final CormAgentService cormAgentService = CormAgentService.getInstance();
   private static final Map<String, AgentService> agentServiceMap = new HashMap<>(8);
+  private static final FileWatchService fileWatchService;
+
+  static {
+    String rootPath = globalConfig.getString(USER_DIR);
+    fileWatchService = new FileWatchService(rootPath);
+  }
 
   /**
    * premain entry
@@ -71,8 +80,9 @@ public class PremainService {
     }
 
     try {
-      inst.addTransformer(new CustomTransformer(), true);
-      JavaUtil.setInst(inst);
+      ClassFileTransformer custom = new CustomTransformer();
+      inst.addTransformer(custom, true);
+      JavaUtil.setInstrumentation(inst);
       BannerService.printBanner();
     } catch (Throwable e) {
       logger.error("Start Premain Service fail.", e);
@@ -108,6 +118,8 @@ public class PremainService {
    */
   public static void registerAgentService(String serviceName, AgentService agentService) {
     agentServiceMap.put(serviceName, agentService);
+    List<FileChangedListener> listeners = agentService.getListeners();
+    fileWatchService.registerListeners(listeners);
   }
 
   /**
