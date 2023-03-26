@@ -72,7 +72,7 @@ public class FileWatchService {
    *
    * @param rootPath rootPath
    */
-  public void init(String rootPath) {
+  private void init(String rootPath) {
     if (rootPath == null || rootPath.isEmpty()) {
       throw new NullPointerException("Empty path for galois listener.");
     }
@@ -102,7 +102,6 @@ public class FileWatchService {
     String dirName;
     for (File subDir : subDirs) {
       dirName = subDir.getName();
-
       // do not monitor hide path
       if (!dirName.startsWith(DOT)) {
         registerWatchService(subDir);
@@ -112,8 +111,12 @@ public class FileWatchService {
 
   /**
    * begin file monitor service
+   *
+   * @param rootPath the root path
    */
-  public void start() {
+  public void start(String rootPath) {
+    init(rootPath);
+
     Thread watchThread = new Thread(() -> {
       logger.info("FileWatchService Started in path {}.", rootPath);
 

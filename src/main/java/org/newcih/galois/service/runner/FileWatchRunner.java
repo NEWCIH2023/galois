@@ -47,7 +47,7 @@ public class FileWatchRunner implements SpringApplicationRunListener {
    * @param rootPath the root path
    */
   public FileWatchRunner(String rootPath) {
-    fileWatchService.init(rootPath);
+    fileWatchService.start(rootPath);
   }
 
   @Override
