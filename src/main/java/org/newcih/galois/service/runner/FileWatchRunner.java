@@ -35,7 +35,6 @@ import org.springframework.core.env.ConfigurableEnvironment;
  *
  * @author liuguangsheng
  * @see org.newcih.galois.service.FileWatchService
- * @since 1.0.0
  */
 public class FileWatchRunner implements SpringApplicationRunListener {
 
@@ -44,7 +43,7 @@ public class FileWatchRunner implements SpringApplicationRunListener {
   /**
    * Instantiates a new File watch runner.
    *
-   * @param rootPath the root path
+   * @param fileWatchService the file watch service
    */
   public FileWatchRunner(FileWatchService fileWatchService) {
     this.fileWatchService = fileWatchService;
