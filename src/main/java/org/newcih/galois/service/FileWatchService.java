@@ -53,17 +53,8 @@ public class FileWatchService {
   private WatchService watchService;
   private String rootPath;
 
-  private FileWatchService() {
-  }
-
-  /**
-   * get instance
-   *
-   * @return {@link FileWatchService}
-   * @see FileWatchService
-   */
-  public static FileWatchService getInstance() {
-    return instance;
+  public FileWatchService(String rootPath) {
+    this.rootPath = rootPath;
   }
 
   /**
@@ -71,7 +62,7 @@ public class FileWatchService {
    *
    * @param rootPath rootPath
    */
-  private void init(String rootPath) {
+  private void init() {
     if (rootPath == null || rootPath.isEmpty()) {
       throw new NullPointerException("Empty path for galois listener.");
     }
@@ -112,8 +103,8 @@ public class FileWatchService {
    *
    * @param rootPath the root path
    */
-  public void start(String rootPath) {
-    init(rootPath);
+  public void start() {
+    init();
 
     Thread watchThread = new Thread(() -> {
       logger.info("FileWatchService Started in path {}.", rootPath);
@@ -133,8 +124,8 @@ public class FileWatchService {
               continue;
             }
 
-            if (logger.isDebugEnabled()) {
-              logger.debug("monitor file {} {}.", kind, file);
+            if (logger.isTraceEnabled()) {
+              logger.trace("monitor file {} {}.", kind, file);
             }
 
             listeners.stream().filter(listener -> listener.isUseful(file)).forEach(listener -> {

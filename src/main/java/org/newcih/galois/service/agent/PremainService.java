@@ -59,7 +59,7 @@ public class PremainService {
   }
 
   private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
-  private static final FileWatchService fileWatchService = FileWatchService.getInstance();
+  private static final FileWatchService fileWatchService;
   private static final Logger logger = LoggerFactory.getLogger(PremainService.class);
   private static final SpringAgentService springAgentService = SpringAgentService.getInstance();
   private static final MyBatisAgentService mybatisAgentService = MyBatisAgentService.getInstance();
@@ -69,7 +69,8 @@ public class PremainService {
 
   static {
     String rootPath = globalConfig.getString(USER_DIR);
-    springAgentService.addRunner(new FileWatchRunner(rootPath));
+    fileWatchService = new FileWatchService(rootPath);
+    springAgentService.addRunner(new FileWatchRunner(fileWatchService));
   }
 
   /**
