@@ -126,7 +126,6 @@ public class PremainService {
    * custom class file transformer
    *
    * @author liuguangsheng
-   * @since 1.0.0
    */
   static class CustomTransformer implements ClassFileTransformer {
 

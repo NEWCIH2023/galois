@@ -29,6 +29,7 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 import static org.newcih.galois.constants.Constant.DOT;
+import static org.newcih.galois.constants.Constant.USER_DIR;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -37,6 +38,7 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.List;
+import org.newcih.galois.conf.GlobalConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,11 +52,12 @@ public class FileWatchService {
 
   private static final Logger logger = LoggerFactory.getLogger(FileWatchService.class);
   private static final List<FileChangedListener> listeners = new ArrayList<>(16);
+  private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
   private WatchService watchService;
-  private String rootPath;
+  private static final String rootPath = globalConfig.getString(USER_DIR);
+  private static final FileWatchService instance = new FileWatchService();
 
-  public FileWatchService(String rootPath) {
-    this.rootPath = rootPath;
+  private FileWatchService() {
   }
 
   /**
