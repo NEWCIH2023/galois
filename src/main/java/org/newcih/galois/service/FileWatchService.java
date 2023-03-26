@@ -50,7 +50,6 @@ public class FileWatchService {
 
   private static final Logger logger = LoggerFactory.getLogger(FileWatchService.class);
   private static final List<FileChangedListener> listeners = new ArrayList<>(16);
-  private static final FileWatchService instance = new FileWatchService();
   private WatchService watchService;
   private String rootPath;
 
@@ -76,7 +75,6 @@ public class FileWatchService {
     if (rootPath == null || rootPath.isEmpty()) {
       throw new NullPointerException("Empty path for galois listener.");
     }
-    this.rootPath = rootPath;
 
     try {
       watchService = FileSystems.getDefault().newWatchService();
@@ -190,4 +188,21 @@ public class FileWatchService {
     }
   }
 
+  /**
+   * Gets root path.
+   *
+   * @return the root path
+   */
+  public String getRootPath() {
+    return rootPath;
+  }
+
+  /**
+   * Sets root path.
+   *
+   * @param rootPath the root path
+   */
+  public void setRootPath(String rootPath) {
+    this.rootPath = rootPath;
+  }
 }

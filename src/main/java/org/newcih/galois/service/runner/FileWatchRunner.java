@@ -41,13 +41,15 @@ public class FileWatchRunner implements SpringApplicationRunListener {
 
   private static final FileWatchService fileWatchService = FileWatchService.getInstance();
 
+  private String rootPath;
+
   /**
    * Instantiates a new File watch runner.
    *
    * @param rootPath the root path
    */
   public FileWatchRunner(String rootPath) {
-    fileWatchService.start(rootPath);
+    this.rootPath = rootPath;
   }
 
   @Override
@@ -85,7 +87,7 @@ public class FileWatchRunner implements SpringApplicationRunListener {
 
   @Override
   public void started(ConfigurableApplicationContext context) {
-    fileWatchService.start();
+    fileWatchService.start(rootPath);
   }
 
   @Override
