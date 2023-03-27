@@ -37,7 +37,8 @@ import static org.newcih.galois.constants.Constant.SLASH;
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.newcih.galois.service.MethodAdapter;
-import org.newcih.galois.service.spring.executors.SpringBeanReloader;
+import org.newcih.galois.service.spring.SpringAgentService;
+import org.newcih.galois.service.spring.SpringBeanReloader;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 
 /**
@@ -48,10 +49,14 @@ import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
  */
 public class BeanDefinitionScannerVisitor extends MethodAdapter {
 
+  static {
+    SpringAgentService.getInstance().registerMethodAdapter(new BeanDefinitionScannerVisitor());
+  }
+
   /**
    * Instantiates a new Bean definition scanner visitor.
    */
-  public BeanDefinitionScannerVisitor() {
+  private BeanDefinitionScannerVisitor() {
     super(CLASS_PATH_BEAN_DEFINITION_SCANNER);
   }
 

@@ -24,11 +24,8 @@
 
 package org.newcih.galois.service.corm;
 
-import static org.newcih.galois.constants.ClassNameConstant.COMTOP_CONFIGURATION;
 import org.newcih.galois.service.AgentService;
-import org.newcih.galois.service.corm.executors.CormBeanReloader;
 import org.newcih.galois.service.corm.listeners.CormXmlListener;
-import org.newcih.galois.service.corm.visitors.ComtopConfigurationVisitor;
 
 /**
  * corm agent service
@@ -39,11 +36,6 @@ import org.newcih.galois.service.corm.visitors.ComtopConfigurationVisitor;
 public class CormAgentService extends AgentService {
 
   private final static CormAgentService cormAgentService = new CormAgentService();
-
-  private CormAgentService() {
-    adapterMap.put(COMTOP_CONFIGURATION, new ComtopConfigurationVisitor());
-    necessaryClasses.addAll(adapterMap.keySet());
-  }
 
   /**
    * get instance
@@ -57,8 +49,7 @@ public class CormAgentService extends AgentService {
 
   @Override
   public void init() {
-    super.init();
-    listeners.add(new CormXmlListener());
+    registerFileChangedListener(new CormXmlListener());
     beanReloader = CormBeanReloader.getInstance();
   }
 

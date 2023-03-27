@@ -30,7 +30,7 @@ import java.io.File;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.newcih.galois.service.FileChangedListener;
-import org.newcih.galois.service.corm.executors.CormBeanReloader;
+import org.newcih.galois.service.corm.CormBeanReloader;
 import org.newcih.galois.utils.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

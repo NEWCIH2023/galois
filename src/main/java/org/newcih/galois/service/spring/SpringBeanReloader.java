@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [liuguangsheng]
+ * Copyright (c) [2023] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.spring.executors;
+package org.newcih.galois.service.spring;
 
 import java.lang.reflect.Modifier;
 import org.newcih.galois.service.BeanReloader;

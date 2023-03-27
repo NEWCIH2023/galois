@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.mybatis.executors;
+package org.newcih.galois.service.mybatis;
 
 import static org.newcih.galois.constants.Constant.ID;
 import static org.newcih.galois.constants.Constant.NAMESPACE;

@@ -22,11 +22,10 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.corm.executors;
+package org.newcih.galois.service.corm;
 
 import static org.newcih.galois.constants.Constant.ID;
 import static org.newcih.galois.constants.Constant.NAMESPACE;
-
 import com.comtop.corm.builder.xml.XMLMapperBuilder;
 import com.comtop.corm.builder.xml.XMLMapperEntityResolver;
 import com.comtop.corm.parsing.XNode;
@@ -44,6 +43,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import org.newcih.galois.service.BeanReloader;
+import org.newcih.galois.service.corm.visitors.ComtopConfigurationVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +53,8 @@ import org.slf4j.LoggerFactory;
  * @author liuguangsheng
  * @since 1.0.0
  */
-public class CormBeanReloader implements BeanReloader<File> {
+public class CormBeanReloader implements BeanReloader<File>,
+    ComtopConfigurationVisitor.NecessaryMethods {
 
   /**
    * The constant mybatisBeanReloder.
@@ -233,6 +234,7 @@ public class CormBeanReloader implements BeanReloader<File> {
    *
    * @param configuration the configuration
    */
+  @Override
   public void setConfiguration(Configuration configuration) {
     this.configuration = configuration;
   }

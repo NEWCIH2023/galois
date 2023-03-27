@@ -33,12 +33,13 @@ import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
 import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SLASH;
-
+import com.comtop.corm.session.Configuration;
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.newcih.galois.constants.ClassNameConstant;
 import org.newcih.galois.service.MethodAdapter;
-import org.newcih.galois.service.corm.executors.CormBeanReloader;
+import org.newcih.galois.service.corm.CormAgentService;
+import org.newcih.galois.service.corm.CormBeanReloader;
 
 /**
  * comtop configuration visitor
@@ -48,10 +49,14 @@ import org.newcih.galois.service.corm.executors.CormBeanReloader;
  */
 public class ComtopConfigurationVisitor extends MethodAdapter {
 
+  static {
+    CormAgentService.getInstance().registerMethodAdapter(new ComtopConfigurationVisitor());
+  }
+
   /**
    * Instantiates a new Comtop configuration visitor.
    */
-  public ComtopConfigurationVisitor() {
+  private ComtopConfigurationVisitor() {
     super(ClassNameConstant.COMTOP_CONFIGURATION);
   }
 
@@ -99,5 +104,10 @@ public class ComtopConfigurationVisitor extends MethodAdapter {
 
       super.visitInsn(opcode);
     }
+  }
+
+  public static interface NecessaryMethods {
+
+    void setConfiguration(Configuration configuration);
   }
 }

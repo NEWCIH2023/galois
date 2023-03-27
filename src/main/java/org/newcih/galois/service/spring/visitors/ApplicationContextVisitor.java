@@ -38,7 +38,8 @@ import static org.newcih.galois.constants.Constant.SLASH;
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.newcih.galois.service.MethodAdapter;
-import org.newcih.galois.service.spring.executors.SpringBeanReloader;
+import org.newcih.galois.service.spring.SpringAgentService;
+import org.newcih.galois.service.spring.SpringBeanReloader;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 
 
@@ -50,10 +51,14 @@ import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebSe
  */
 public class ApplicationContextVisitor extends MethodAdapter {
 
+  static {
+    SpringAgentService.getInstance().registerMethodAdapter(new ApplicationContextVisitor());
+  }
+
   /**
    * Instantiates a new Application context visitor.
    */
-  public ApplicationContextVisitor() {
+  private ApplicationContextVisitor() {
     super(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT);
   }
 

@@ -38,7 +38,8 @@ import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.apache.ibatis.session.Configuration;
 import org.newcih.galois.service.MethodAdapter;
-import org.newcih.galois.service.mybatis.executors.MyBatisBeanReloader;
+import org.newcih.galois.service.mybatis.MyBatisAgentService;
+import org.newcih.galois.service.mybatis.MyBatisBeanReloader;
 
 /**
  * mybatis configuration visitor
@@ -48,10 +49,14 @@ import org.newcih.galois.service.mybatis.executors.MyBatisBeanReloader;
  */
 public class MyBatisConfigurationVisitor extends MethodAdapter {
 
+  static {
+    MyBatisAgentService.getInstance().registerMethodAdapter(new MyBatisConfigurationVisitor());
+  }
+
   /**
    * Instantiates a new My batis configuration visitor.
    */
-  public MyBatisConfigurationVisitor() {
+  private MyBatisConfigurationVisitor() {
     super(MYBATIS_CONFIGURATION);
   }
 

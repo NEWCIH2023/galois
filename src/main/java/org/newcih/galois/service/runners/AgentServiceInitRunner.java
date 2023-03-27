@@ -26,9 +26,7 @@ package org.newcih.galois.service.runners;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import org.newcih.galois.service.AgentService;
-import org.newcih.galois.service.FileChangedListener;
 import org.newcih.galois.service.FileWatchService;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -63,9 +61,8 @@ public class AgentServiceInitRunner extends AbstractRunner {
     agentServices.stream()
         .filter(AgentService::isUseful)
         .forEach(agentService -> {
-          List<FileChangedListener> listeners = agentService.getListeners();
-          fileWatchService.registerListeners(listeners);
           agentService.init();
+          fileWatchService.registerListeners(agentService.getListeners());
         });
   }
 }

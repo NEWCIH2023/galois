@@ -24,20 +24,11 @@
 
 package org.newcih.galois.service.spring;
 
-import static org.newcih.galois.constants.ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT;
-import static org.newcih.galois.constants.ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER;
-import static org.newcih.galois.constants.ClassNameConstant.SPRING_APPLICATION_RUN_LISTENERS;
 import static org.newcih.galois.constants.ConfConstant.RELOADER_SPRING_BOOT_ENABLE;
-import java.util.Map;
 import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.service.AgentService;
-import org.newcih.galois.service.MethodAdapter;
 import org.newcih.galois.service.PremainService;
-import org.newcih.galois.service.spring.executors.SpringBeanReloader;
 import org.newcih.galois.service.spring.listeners.SpringBeanListener;
-import org.newcih.galois.service.spring.visitors.ApplicationContextVisitor;
-import org.newcih.galois.service.spring.visitors.BeanDefinitionScannerVisitor;
-import org.newcih.galois.service.spring.visitors.SpringApplicationRunListenersVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,19 +47,6 @@ public class SpringAgentService extends AgentService {
   static {
     SpringAgentService service = SpringAgentService.getInstance();
     PremainService.registerAgentService(SpringAgentService.class.getSimpleName(), service);
-  }
-
-  private SpringAgentService() {
-    adapterMap.put(CLASS_PATH_BEAN_DEFINITION_SCANNER, new BeanDefinitionScannerVisitor());
-    adapterMap.put(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT,
-        new ApplicationContextVisitor());
-    adapterMap.put(SPRING_APPLICATION_RUN_LISTENERS, new SpringApplicationRunListenersVisitor());
-    necessaryClasses.addAll(adapterMap.keySet());
-  }
-
-  public static void registerVisitor(MethodAdapter methodAdapter) {
-    Map<String, MethodAdapter> adapterMap = getInstance().getAdapterMap();
-    adapterMap.put(methodAdapter.getClassName(), methodAdapter);
   }
 
   /**
@@ -96,6 +74,4 @@ public class SpringAgentService extends AgentService {
     listeners.add(new SpringBeanListener());
     beanReloader = SpringBeanReloader.getInstance();
   }
-
-
 }

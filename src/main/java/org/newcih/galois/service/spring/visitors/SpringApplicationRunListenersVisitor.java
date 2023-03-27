@@ -41,6 +41,7 @@ import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.newcih.galois.service.MethodAdapter;
 import org.newcih.galois.service.SpringRunnerManager;
+import org.newcih.galois.service.spring.SpringAgentService;
 import org.springframework.boot.SpringApplicationRunListener;
 
 /**
@@ -50,6 +51,11 @@ import org.springframework.boot.SpringApplicationRunListener;
  * @since 1.0.0
  */
 public class SpringApplicationRunListenersVisitor extends MethodAdapter {
+
+  static {
+    SpringAgentService.getInstance()
+        .registerMethodAdapter(new SpringApplicationRunListenersVisitor());
+  }
 
   /**
    * Instantiates a new Spring application run listeners visitor.

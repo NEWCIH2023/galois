@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -47,6 +46,9 @@ public abstract class AgentService {
    * 对应的Bean重载的service
    */
   protected BeanReloader<?> beanReloader;
+  /**
+   * The Method adapters.
+   */
   protected List<MethodAdapter> methodAdapters = new ArrayList<>(32);
   /**
    * 必备的加载类名称列表
@@ -91,12 +93,11 @@ public abstract class AgentService {
   /**
    * register method adapter
    *
-   * @param className     className
    * @param methodAdapter methodAdapter
    */
-  public void registerMethodAdapter(String className, MethodAdapter methodAdapter) {
-    adapterMap.put(className, methodAdapter);
-    necessaryClasses.add(className);
+  public void registerMethodAdapter(MethodAdapter methodAdapter) {
+    methodAdapters.add(methodAdapter);
+    necessaryClasses.add(methodAdapter.getClassName());
   }
 
   /**
@@ -141,12 +142,12 @@ public abstract class AgentService {
   }
 
   /**
-   * Gets adapter map.
+   * Gets method adapters.
    *
-   * @return the adapter map
+   * @return the method adapters
    */
-  public Map<String, MethodAdapter> getAdapterMap() {
-    return adapterMap;
+  public List<MethodAdapter> getMethodAdapters() {
+    return methodAdapters;
   }
 
   /**

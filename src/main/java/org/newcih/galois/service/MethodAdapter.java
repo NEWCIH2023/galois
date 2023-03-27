@@ -64,7 +64,7 @@ public abstract class MethodAdapter extends ClassVisitor {
    *
    * @param className the class name
    */
-  public MethodAdapter(String className) {
+  protected MethodAdapter(String className) {
     super(ASM5);
 
     if (className == null || className.isEmpty()) {

@@ -31,7 +31,7 @@ import java.io.File;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.newcih.galois.service.FileChangedListener;
-import org.newcih.galois.service.mybatis.executors.MyBatisBeanReloader;
+import org.newcih.galois.service.mybatis.MyBatisBeanReloader;
 import org.newcih.galois.utils.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
