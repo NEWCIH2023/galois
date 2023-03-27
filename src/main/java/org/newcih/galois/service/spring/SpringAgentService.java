@@ -49,6 +49,11 @@ public class SpringAgentService extends AgentService {
     PremainService.registerAgentService(SpringAgentService.class.getSimpleName(), service);
   }
 
+  private SpringAgentService() {
+    registerFileChangedListener(new SpringBeanListener());
+    setBeanReloader(SpringBeanReloader.getInstance());
+  }
+
   /**
    * 当前AgentService是否可启用
    *
@@ -67,11 +72,5 @@ public class SpringAgentService extends AgentService {
    */
   public static SpringAgentService getInstance() {
     return springAgent;
-  }
-
-  @Override
-  public void init() {
-    listeners.add(new SpringBeanListener());
-    beanReloader = SpringBeanReloader.getInstance();
   }
 }

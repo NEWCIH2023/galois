@@ -61,7 +61,6 @@ public class AgentServiceInitRunner extends AbstractRunner {
     agentServices.stream()
         .filter(AgentService::isUseful)
         .forEach(agentService -> {
-          agentService.init();
           fileWatchService.registerListeners(agentService.getListeners());
         });
   }

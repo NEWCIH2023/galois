@@ -69,12 +69,6 @@ public abstract class AgentService {
   }
 
   /**
-   * 通过getInstance获取对象时，不应该执行初始化步骤，有些特殊依赖的类此时并不会存在，因为这个AgentService
-   * 不一定会被启用，所以项目中也不一定存在对应的import的类。所以要等到isUseful为true的时候，才来执行init方法， 完成AgentService的初始化
-   */
-  public abstract void init();
-
-  /**
    * 检测到当前已经加载了名为loadedClassName的类时，则更新该AgentService的enabled值，使其++，当enabled值等于
    * necessaryClasses的大小时，表示该agentService正式启用
    *
@@ -115,7 +109,16 @@ public abstract class AgentService {
    * @param listener the listener
    */
   public void registerFileChangedListener(FileChangedListener listener) {
-    this.listeners.add(listener);
+    listeners.add(listener);
+  }
+
+  /**
+   * Sets bean reloader.
+   *
+   * @param beanReloader the bean reloader
+   */
+  public void setBeanReloader(BeanReloader<?> beanReloader) {
+    this.beanReloader = beanReloader;
   }
 
   @Override
