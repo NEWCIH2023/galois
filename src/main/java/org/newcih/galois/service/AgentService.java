@@ -60,10 +60,6 @@ public abstract class AgentService {
    * 是否启用该AgentService，当该变量值与necessaryClasses的大小一致时，表示该AgentService启用
    */
   private int enabled;
-  /**
-   * 是否初始化完成
-   */
-  private boolean inited;
 
   /**
    * 当前AgentService是否可启用
@@ -78,9 +74,7 @@ public abstract class AgentService {
    * 通过getInstance获取对象时，不应该执行初始化步骤，有些特殊依赖的类此时并不会存在，因为这个AgentService
    * 不一定会被启用，所以项目中也不一定存在对应的import的类。所以要等到isUseful为true的时候，才来执行init方法， 完成AgentService的初始化
    */
-  public void init() {
-    inited = true;
-  }
+  public abstract void init();
 
   /**
    * 检测到当前已经加载了名为loadedClassName的类时，则更新该AgentService的enabled值，使其++，当enabled值等于

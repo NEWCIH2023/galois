@@ -39,6 +39,8 @@ public class AgentServiceInitRunner extends AbstractRunner {
   @Override
   public void started(ConfigurableApplicationContext context) {
     Collection<AgentService> agentServices = PremainService.getAgentServices();
-
+    agentServices.stream()
+        .filter(AgentService::isUseful)
+        .forEach(AgentService::init);
   }
 }
