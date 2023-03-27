@@ -24,6 +24,7 @@
 
 package org.newcih.galois.service.runners;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import org.newcih.galois.service.AgentService;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -35,16 +36,22 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 public class AgentServiceInitRunner extends AbstractRunner {
 
-  private final Collection<AgentService> agentServices;
+  private final Collection<AgentService> agentServices = new ArrayList<>(32);
 
   /**
    * Instantiates a new Agent service init runner.
-   *
-   * @param agentServiceList the agent service list
    */
-  public AgentServiceInitRunner(Collection<AgentService> agentServiceList) {
+  public AgentServiceInitRunner() {
     setRank(FileWatchRunner.RANK + 1);
-    this.agentServices = agentServiceList;
+  }
+
+  /**
+   * Add agent service.
+   *
+   * @param agentService the agent service
+   */
+  public void addAgentService(AgentService agentService) {
+    this.agentServices.add(agentService);
   }
 
   @Override

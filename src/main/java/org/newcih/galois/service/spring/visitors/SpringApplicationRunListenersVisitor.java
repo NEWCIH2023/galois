@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.newcih.galois.service.MethodAdapter;
-import org.newcih.galois.service.spring.executor.SpringRunnerManager;
+import org.newcih.galois.service.SpringRunnerManager;
 import org.springframework.boot.SpringApplicationRunListener;
 
 /**

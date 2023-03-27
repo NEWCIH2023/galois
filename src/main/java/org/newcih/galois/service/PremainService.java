@@ -24,10 +24,8 @@
 
 package org.newcih.galois.service;
 
-import static java.util.stream.Collectors.joining;
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SLASH;
-import static org.newcih.galois.constants.Constant.USER_DIR;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
@@ -35,10 +33,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import org.newcih.galois.conf.GlobalConfiguration;
-import org.newcih.galois.service.corm.CormAgentService;
-import org.newcih.galois.service.mybatis.MyBatisAgentService;
 import org.newcih.galois.utils.JavaUtil;
 import org.newcih.galois.utils.StringUtil;
 import org.slf4j.Logger;
@@ -52,16 +46,11 @@ import org.slf4j.LoggerFactory;
  */
 public class PremainService {
 
-  private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
   private static final Logger logger = LoggerFactory.getLogger(PremainService.class);
-  private static final MyBatisAgentService mybatisAgentService = MyBatisAgentService.getInstance();
-  private static final CormAgentService cormAgentService = CormAgentService.getInstance();
   private static final Map<String, AgentService> agentServiceMap = new HashMap<>(8);
-  private static final FileWatchService fileWatchService;
+  private static final FileWatchService fileWatchService = FileWatchService.getInstance();
 
   static {
-    String rootPath = globalConfig.getString(USER_DIR);
-    fileWatchService = new FileWatchService(rootPath);
   }
 
   /**
@@ -84,27 +73,6 @@ public class PremainService {
     } catch (Throwable e) {
       logger.error("Start Premain Service fail.", e);
     }
-  }
-
-  /**
-   * print current loading state of agent service
-   */
-  private static void printAgentState() {
-    List<AgentService> enabledAgents = agentServiceMap.values().stream()
-        .filter(AgentService::isInited)
-        .collect(Collectors.toList());
-
-    String enableAgentNames = enabledAgents.stream()
-        .map(Object::toString)
-        .collect(joining(","));
-
-    String listenerNames = enabledAgents.stream()
-        .flatMap(agent -> agent.getListeners().stream())
-        .map(Object::toString)
-        .collect(joining(","));
-
-    logger.info("Now had enabled Plugins [{}], and started FileWatchListeners [{}]",
-        enableAgentNames, listenerNames);
   }
 
   /**
@@ -152,7 +120,6 @@ public class PremainService {
         if (agentService.isUseful() && !agentService.isInited()) {
           agentService.init();
           fileWatchService.registerListeners(agentService.getListeners());
-          printAgentState();
         }
 
         // checkedClass表示当前加载的类newClassName是否有对应的MethodAdapter，当为false时，表示没有对应的MethodAdapter，

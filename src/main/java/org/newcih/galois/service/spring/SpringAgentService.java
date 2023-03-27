@@ -28,22 +28,16 @@ import static org.newcih.galois.constants.ClassNameConstant.ANNOTATION_CONFIG_SE
 import static org.newcih.galois.constants.ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER;
 import static org.newcih.galois.constants.ClassNameConstant.SPRING_APPLICATION_RUN_LISTENERS;
 import static org.newcih.galois.constants.ConfConstant.RELOADER_SPRING_BOOT_ENABLE;
-import static org.newcih.galois.constants.Constant.USER_DIR;
-import java.util.ArrayList;
-import java.util.List;
 import org.newcih.galois.conf.GlobalConfiguration;
-import org.newcih.galois.service.FileWatchService;
 import org.newcih.galois.service.AgentService;
 import org.newcih.galois.service.PremainService;
-import org.newcih.galois.service.runners.FileWatchRunner;
-import org.newcih.galois.service.spring.listeners.SpringBeanListener;
 import org.newcih.galois.service.spring.executor.SpringBeanReloader;
+import org.newcih.galois.service.spring.listeners.SpringBeanListener;
 import org.newcih.galois.service.spring.visitors.ApplicationContextVisitor;
 import org.newcih.galois.service.spring.visitors.BeanDefinitionScannerVisitor;
 import org.newcih.galois.service.spring.visitors.SpringApplicationRunListenersVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.SpringApplicationRunListener;
 
 /**
  * spring agent service
@@ -55,16 +49,10 @@ public class SpringAgentService extends AgentService {
 
   private static final SpringAgentService springAgent = new SpringAgentService();
   private static final Logger logger = LoggerFactory.getLogger(SpringAgentService.class);
-  private final List<SpringApplicationRunListener> runners = new ArrayList<>(16);
   private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
 
   static {
     SpringAgentService service = SpringAgentService.getInstance();
-    String rootPath = globalConfig.getString(USER_DIR);
-    FileWatchService fileWatchService = new FileWatchService(rootPath);
-    FileWatchRunner fileWatchRunner = new FileWatchRunner(fileWatchService);
-    service.addRunner(fileWatchRunner);
-
     PremainService.registerAgentService(SpringAgentService.class.getSimpleName(), service);
   }
 
@@ -98,41 +86,9 @@ public class SpringAgentService extends AgentService {
 
   @Override
   public void init() {
-    super.init();
     listeners.add(new SpringBeanListener());
     beanReloader = SpringBeanReloader.getInstance();
   }
 
-  /**
-   * add runner
-   *
-   * @param runner runner
-   */
-  public void addRunner(SpringApplicationRunListener runner) {
-    if (runner != null) {
-      logger.info("Add new started runner {}.", runner);
-      runners.add(runner);
-    }
-  }
 
-  /**
-   * add runners
-   *
-   * @param runnerList runnerList
-   */
-  public void addRunners(List<SpringApplicationRunListener> runnerList) {
-    if (runnerList != null && !runnerList.isEmpty()) {
-      logger.info("Add {} new started runners.", runnerList.size());
-      runners.addAll(runnerList);
-    }
-  }
-
-  /**
-   * Gets runners.
-   *
-   * @return the runners
-   */
-  public List<SpringApplicationRunListener> getRunners() {
-    return runners;
-  }
 }
