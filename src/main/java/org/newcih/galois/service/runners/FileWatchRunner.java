@@ -35,6 +35,10 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 public class FileWatchRunner extends AbstractRunner {
 
+  /**
+   * The constant RANK.
+   */
+  public static final int RANK = 1;
   private final FileWatchService fileWatchService;
 
   /**
@@ -43,6 +47,7 @@ public class FileWatchRunner extends AbstractRunner {
    * @param fileWatchService the file watch service
    */
   public FileWatchRunner(FileWatchService fileWatchService) {
+    this.rank = RANK;
     this.fileWatchService = fileWatchService;
   }
 
