@@ -26,8 +26,10 @@ package org.newcih.galois.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -49,7 +51,7 @@ public abstract class AgentService {
   /**
    * The Method adapters.
    */
-  protected List<MethodAdapter> methodAdapters = new ArrayList<>(32);
+  protected Map<String, MethodAdapter> methodAdapterMap = new HashMap<>(32);
   /**
    * 必备的加载类名称列表
    */
@@ -90,7 +92,7 @@ public abstract class AgentService {
    * @param methodAdapter methodAdapter
    */
   public void registerMethodAdapter(MethodAdapter methodAdapter) {
-    methodAdapters.add(methodAdapter);
+    methodAdapterMap.put(methodAdapter.getClassName(), methodAdapter);
     necessaryClasses.add(methodAdapter.getClassName());
   }
 
@@ -145,12 +147,12 @@ public abstract class AgentService {
   }
 
   /**
-   * Gets method adapters.
+   * Gets method adapter map.
    *
-   * @return the method adapters
+   * @return the method adapter map
    */
-  public List<MethodAdapter> getMethodAdapters() {
-    return methodAdapters;
+  public Map<String, MethodAdapter> getMethodAdapterMap() {
+    return methodAdapterMap;
   }
 
   /**

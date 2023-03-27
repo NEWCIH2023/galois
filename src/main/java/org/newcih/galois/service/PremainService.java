@@ -32,6 +32,7 @@ import java.security.ProtectionDomain;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import org.newcih.galois.service.runners.AgentServiceInitRunner;
 import org.newcih.galois.utils.JavaUtil;
 import org.newcih.galois.utils.StringUtil;
@@ -129,7 +130,8 @@ public class PremainService {
           continue;
         }
 
-        MethodAdapter adapter = agentService.getMethodAdapters().get(newClassName);
+        MethodAdapter adapter = agentService.getMethodAdapters();
+
         if (logger.isDebugEnabled()) {
           logger.debug("Instrumentation had retransformed class {}.", newClassName);
         }
