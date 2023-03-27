@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.mybatis;
+package org.newcih.galois.service.corm.visitors;
 
 import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
@@ -31,27 +31,28 @@ import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
 import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
-import static org.newcih.galois.constants.ClassNameConstant.MYBATIS_CONFIGURATION;
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SLASH;
 
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
+import org.newcih.galois.constants.ClassNameConstant;
 import org.newcih.galois.service.MethodAdapter;
+import org.newcih.galois.service.corm.executors.CormBeanReloader;
 
 /**
- * mybatis configuration visitor
+ * comtop configuration visitor
  *
  * @author liuguangsheng
  * @since 1.0.0
  */
-public class MyBatisConfigurationVisitor extends MethodAdapter {
+public class ComtopConfigurationVisitor extends MethodAdapter {
 
   /**
-   * Instantiates a new My batis configuration visitor.
+   * Instantiates a new Comtop configuration visitor.
    */
-  public MyBatisConfigurationVisitor() {
-    super(MYBATIS_CONFIGURATION);
+  public ComtopConfigurationVisitor() {
+    super(ClassNameConstant.COMTOP_CONFIGURATION);
   }
 
   @Override
@@ -60,7 +61,7 @@ public class MyBatisConfigurationVisitor extends MethodAdapter {
     MethodVisitor mv = cv.visitMethod(access, name, descriptor, signature, exceptions);
 
     if (Objects.equals(name, "<init>") && Objects.equals(descriptor, "()V")) {
-      return new MyBatisConfigurationVisitor.ConstructorVisitor(ASM5, mv);
+      return new ComtopConfigurationVisitor.ConstructorVisitor(ASM5, mv);
     }
 
     return mv;
@@ -84,7 +85,7 @@ public class MyBatisConfigurationVisitor extends MethodAdapter {
     @Override
     public void visitInsn(int opcode) {
       if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-        String pClassName = MyBatisBeanReloader.class.getName().replace(DOT, SLASH);
+        String pClassName = CormBeanReloader.class.getName().replace(DOT, SLASH);
         String vClassName = className.replace(DOT, SLASH);
 
         mv.visitCode();

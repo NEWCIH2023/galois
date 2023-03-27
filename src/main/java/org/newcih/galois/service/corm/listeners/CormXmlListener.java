@@ -22,15 +22,15 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.mybatis;
+package org.newcih.galois.service.corm.listeners;
 
 import static org.newcih.galois.constants.FileType.XML_FILE;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.newcih.galois.service.FileChangedListener;
+import org.newcih.galois.service.corm.executors.CormBeanReloader;
 import org.newcih.galois.utils.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,21 +38,22 @@ import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.xml.sax.InputSource;
 
-
 /**
- * MyBatis的XML文件变更监听处理
+ * corm xml listener
  *
  * @author liuguangsheng
  * @since 1.0.0
  */
-public class MyBatisXmlListener implements FileChangedListener {
+public class CormXmlListener implements FileChangedListener {
 
-  /**
-   * The constant DOC_TYPE.
-   */
-  public static final String DOC_TYPE = "mapper";
-  private static final Logger logger = LoggerFactory.getLogger(MyBatisXmlListener.class);
-  private static final MyBatisBeanReloader reloader = MyBatisBeanReloader.getInstance();
+  private static final String DOC_TYPE = "mapper";
+  private static final Logger logger = LoggerFactory.getLogger(CormXmlListener.class);
+  private static final CormBeanReloader reloader = CormBeanReloader.getInstance();
+
+  @Override
+  public String toString() {
+    return "CormXmlListener";
+  }
 
   @Override
   public boolean isUseful(File file) {
@@ -62,7 +63,6 @@ public class MyBatisXmlListener implements FileChangedListener {
       return false;
     }
 
-    // check xml file node contains mapper
     try {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       dbf.setValidating(false);
@@ -82,7 +82,7 @@ public class MyBatisXmlListener implements FileChangedListener {
   @Override
   public void createdHandle(File file) {
     if (logger.isDebugEnabled()) {
-      logger.debug("MybatisXmlListener detect file created: {}.", file.getName());
+      logger.debug("CormXmlListener detect file created: {}.", file.getName());
     }
 
     reloader.updateBean(file);
@@ -91,7 +91,7 @@ public class MyBatisXmlListener implements FileChangedListener {
   @Override
   public void modifiedHandle(File file) {
     if (logger.isDebugEnabled()) {
-      logger.debug("MybatisXmlListener detect file modified: {}.", file.getName());
+      logger.debug("CormXmlListener detect file modified: {}.", file.getName());
     }
 
     reloader.updateBean(file);
@@ -100,10 +100,5 @@ public class MyBatisXmlListener implements FileChangedListener {
   @Override
   public void deletedHandle(File file) {
     // TODO
-  }
-
-  @Override
-  public String toString() {
-    return "MyBatisXmlListener";
   }
 }

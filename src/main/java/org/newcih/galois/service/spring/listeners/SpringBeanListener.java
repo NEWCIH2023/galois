@@ -60,13 +60,12 @@ public class SpringBeanListener implements FileChangedListener {
     byte[] classBytes = FileUtil.readFile(classFile);
 
     try {
-      Class<?> clazz = Arrays.stream(JavaUtil.getInst().getAllLoadedClasses())
+      Class<?> clazz = Arrays.stream(JavaUtil.getInstrumentation().getAllLoadedClasses())
           .filter(item -> item.getName().equals(className)).findFirst()
           .orElseThrow(NullPointerException::new);
-      logger.debug("Invoke forName method for class {}", className);
 
       ClassDefinition definition = new ClassDefinition(clazz, classBytes);
-      JavaUtil.getInst().redefineClasses(definition);
+      JavaUtil.getInstrumentation().redefineClasses(definition);
       logger.info("Redefine class file {} success.", classFile.getName());
 
 //      if (reloader.isUseful(clazz)) {
@@ -102,7 +101,7 @@ public class SpringBeanListener implements FileChangedListener {
 
   @Override
   public String toString() {
-    return "SpringBeanListener";
+    return SpringBeanListener.class.getSimpleName();
   }
 
   /**

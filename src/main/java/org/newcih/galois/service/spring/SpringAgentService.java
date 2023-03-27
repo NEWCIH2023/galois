@@ -28,10 +28,12 @@ import static org.newcih.galois.constants.ClassNameConstant.ANNOTATION_CONFIG_SE
 import static org.newcih.galois.constants.ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER;
 import static org.newcih.galois.constants.ClassNameConstant.SPRING_APPLICATION_RUN_LISTENERS;
 import static org.newcih.galois.constants.ConfConstant.RELOADER_SPRING_BOOT_ENABLE;
+import java.util.Map;
 import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.service.AgentService;
+import org.newcih.galois.service.MethodAdapter;
 import org.newcih.galois.service.PremainService;
-import org.newcih.galois.service.spring.executor.SpringBeanReloader;
+import org.newcih.galois.service.spring.executors.SpringBeanReloader;
 import org.newcih.galois.service.spring.listeners.SpringBeanListener;
 import org.newcih.galois.service.spring.visitors.ApplicationContextVisitor;
 import org.newcih.galois.service.spring.visitors.BeanDefinitionScannerVisitor;
@@ -62,6 +64,11 @@ public class SpringAgentService extends AgentService {
         new ApplicationContextVisitor());
     adapterMap.put(SPRING_APPLICATION_RUN_LISTENERS, new SpringApplicationRunListenersVisitor());
     necessaryClasses.addAll(adapterMap.keySet());
+  }
+
+  public static void registerVisitor(MethodAdapter methodAdapter) {
+    Map<String, MethodAdapter> adapterMap = getInstance().getAdapterMap();
+    adapterMap.put(methodAdapter.getClassName(), methodAdapter);
   }
 
   /**

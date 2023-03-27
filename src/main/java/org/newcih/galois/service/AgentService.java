@@ -26,7 +26,6 @@ package org.newcih.galois.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -48,10 +47,7 @@ public abstract class AgentService {
    * 对应的Bean重载的service
    */
   protected BeanReloader<?> beanReloader;
-  /**
-   * 类名到MethodAdapter的映射
-   */
-  protected Map<String, MethodAdapter> adapterMap = new HashMap<>(4);
+  protected List<MethodAdapter> methodAdapters = new ArrayList<>(32);
   /**
    * 必备的加载类名称列表
    */

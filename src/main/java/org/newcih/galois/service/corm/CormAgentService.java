@@ -26,6 +26,9 @@ package org.newcih.galois.service.corm;
 
 import static org.newcih.galois.constants.ClassNameConstant.COMTOP_CONFIGURATION;
 import org.newcih.galois.service.AgentService;
+import org.newcih.galois.service.corm.executors.CormBeanReloader;
+import org.newcih.galois.service.corm.listeners.CormXmlListener;
+import org.newcih.galois.service.corm.visitors.ComtopConfigurationVisitor;
 
 /**
  * corm agent service

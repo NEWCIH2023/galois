@@ -29,6 +29,9 @@ import static org.newcih.galois.constants.ConfConstant.RELOADER_MYBATIS_ENABLE;
 
 import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.service.AgentService;
+import org.newcih.galois.service.mybatis.executors.MyBatisBeanReloader;
+import org.newcih.galois.service.mybatis.listeners.MyBatisXmlListener;
+import org.newcih.galois.service.mybatis.visitors.MyBatisConfigurationVisitor;
 
 /**
  * mybatis agent service

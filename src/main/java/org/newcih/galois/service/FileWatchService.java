@@ -28,6 +28,7 @@ import static com.sun.nio.file.SensitivityWatchEventModifier.HIGH;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
+import static org.newcih.galois.constants.Constant.COMMA;
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.USER_DIR;
 import java.io.File;
@@ -38,6 +39,7 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.service.runners.FileWatchRunner;
 import org.slf4j.Logger;
@@ -124,7 +126,8 @@ public class FileWatchService {
     init();
 
     Thread watchThread = new Thread(() -> {
-      logger.info("FileWatchService Started in path {}.", rootPath);
+      logger.info("FileWatchService Started in path {} with these listeners {}", rootPath,
+          listeners.stream().map(FileChangedListener::toString).collect(Collectors.joining(COMMA)));
 
       while (true) {
         try {

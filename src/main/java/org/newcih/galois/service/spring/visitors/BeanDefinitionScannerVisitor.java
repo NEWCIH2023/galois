@@ -37,7 +37,7 @@ import static org.newcih.galois.constants.Constant.SLASH;
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.newcih.galois.service.MethodAdapter;
-import org.newcih.galois.service.spring.executor.SpringBeanReloader;
+import org.newcih.galois.service.spring.executors.SpringBeanReloader;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 
 /**

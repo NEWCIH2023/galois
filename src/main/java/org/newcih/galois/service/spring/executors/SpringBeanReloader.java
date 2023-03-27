@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.spring.executor;
+package org.newcih.galois.service.spring.executors;
 
 import java.lang.reflect.Modifier;
 import org.newcih.galois.service.BeanReloader;
