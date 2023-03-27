@@ -22,49 +22,33 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent.mybatis;
+package org.newcih.galois.service.runners;
 
-import static org.newcih.galois.constants.ClassNameConstant.MYBATIS_CONFIGURATION;
-import static org.newcih.galois.constants.ConfConstant.RELOADER_MYBATIS_ENABLE;
-
-import org.newcih.galois.conf.GlobalConfiguration;
-import org.newcih.galois.service.agent.AgentService;
+import org.newcih.galois.service.FileWatchService;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * mybatis agent service
+ * file watch runner
  *
  * @author liuguangsheng
- * @since 1.0.0
+ * @see org.newcih.galois.service.FileWatchService
  */
-public class MyBatisAgentService extends AgentService {
+public class FileWatchRunner extends AbstractRunner {
 
-  private static final MyBatisAgentService myBatisAgentService = new MyBatisAgentService();
-  private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
-
-  private MyBatisAgentService() {
-    adapterMap.put(MYBATIS_CONFIGURATION, new MyBatisConfigurationVisitor());
-    necessaryClasses.addAll(adapterMap.keySet());
-  }
-
-  @Override
-  public boolean isUseful() {
-    return super.isUseful() && globalConfig.getBoolean(RELOADER_MYBATIS_ENABLE);
-  }
+  private final FileWatchService fileWatchService;
 
   /**
-   * get instance
+   * Instantiates a new File watch runner.
    *
-   * @return {@link MyBatisAgentService}
-   * @see MyBatisAgentService
+   * @param fileWatchService the file watch service
    */
-  public static MyBatisAgentService getInstance() {
-    return myBatisAgentService;
+  public FileWatchRunner(FileWatchService fileWatchService) {
+    this.fileWatchService = fileWatchService;
   }
 
   @Override
-  public void init() {
-    super.init();
-    listeners.add(new MyBatisXmlListener());
-    beanReloader = MyBatisBeanReloader.getInstance();
+  public void started(ConfigurableApplicationContext context) {
+    fileWatchService.start();
   }
+
 }

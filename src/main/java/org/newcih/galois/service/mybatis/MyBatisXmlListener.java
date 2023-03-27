@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent.mybatis;
+package org.newcih.galois.service.mybatis;
 
 import static org.newcih.galois.constants.FileType.XML_FILE;
 

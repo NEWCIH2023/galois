@@ -22,96 +22,93 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent.mybatis;
+package org.newcih.galois.service.corm;
 
 import static org.newcih.galois.constants.Constant.ID;
 import static org.newcih.galois.constants.Constant.NAMESPACE;
 
+import com.comtop.corm.builder.xml.XMLMapperBuilder;
+import com.comtop.corm.builder.xml.XMLMapperEntityResolver;
+import com.comtop.corm.parsing.XNode;
+import com.comtop.corm.parsing.XPathParser;
+import com.comtop.corm.resource.core.io.FileSystemResource;
+import com.comtop.corm.session.Configuration;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import org.apache.ibatis.binding.MapperRegistry;
-import org.apache.ibatis.builder.xml.XMLMapperBuilder;
-import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
-import org.apache.ibatis.executor.keygen.SelectKeyGenerator;
-import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.parsing.XNode;
-import org.apache.ibatis.parsing.XPathParser;
-import org.apache.ibatis.session.Configuration;
-import org.newcih.galois.service.agent.BeanReloader;
+import org.newcih.galois.service.BeanReloader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * MyBatis的Mapper重新加载服务类，适用于 >= 3.2.0版本
+ * Corm Bean Reloader Service
  *
  * @author liuguangsheng
  * @since 1.0.0
  */
-public class MyBatisBeanReloader implements BeanReloader<File> {
+public class CormBeanReloader implements BeanReloader<File> {
 
-  private static final MyBatisBeanReloader mybatisBeanReloder = new MyBatisBeanReloader();
-  private static final Logger logger = LoggerFactory.getLogger(MyBatisBeanReloader.class);
+  /**
+   * The constant mybatisBeanReloder.
+   */
+  public static final CormBeanReloader mybatisBeanReloder = new CormBeanReloader();
+  private static final Logger logger = LoggerFactory.getLogger(CormBeanReloader.class);
   /**
    * The Configuration.
    */
   protected Configuration configuration;
-  private static final List<String> CHILD_NAMES = Arrays.asList("association", "collection",
-      "case");
 
-  private MyBatisBeanReloader() {
+  private CormBeanReloader() {
   }
 
   /**
-   * 获取单例实例
+   * get instance
    *
-   * @return the instance
+   * @return {@link CormBeanReloader}
+   * @see CormBeanReloader
    */
-  public static MyBatisBeanReloader getInstance() {
+  public static CormBeanReloader getInstance() {
     return mybatisBeanReloder;
   }
 
   /**
    * 更新bean实例
+   *
+   * @param mapperFile mapper xml file
    */
   @Override
-  public void updateBean(File xmlFile) {
+  public void updateBean(File mapperFile) {
     if (configuration == null) {
-      logger.error("MybatisBeanReloader not prepare ready. Configuration object is null.");
+      logger.error("CormBeanRealoder not prepare ready. Configuration object is null.");
       return;
     }
 
-    try (FileInputStream fis = new FileInputStream(xmlFile)) {
-      Properties properties = configuration.getVariables();
-      XPathParser parser = new XPathParser(fis, true, properties, new XMLMapperEntityResolver());
+    try (FileInputStream fis = new FileInputStream(mapperFile)) {
+      Properties variables = configuration.getVariables();
+      XPathParser parser = new XPathParser(fis, true, variables, new XMLMapperEntityResolver());
       XNode context = parser.evalNode("/mapper");
       String namespace = context.getStringAttribute(NAMESPACE);
-      // clear cache
-      clearMapperRegistry(namespace);
-      clearLoadedResources(xmlFile.getName());
+
+      // clear mapper cache
+      clearLoadedResources(mapperFile.getName());
       clearCachedNames(namespace);
       clearParameterMap(context.evalNodes("/mapper/parameterMap"), namespace);
       clearResultMap(context.evalNodes("/mapper/resultMap"), namespace);
-      clearKeyGenerators(context.evalNodes("insert|update|select|delete"), namespace);
       clearSqlElement(context.evalNodes("/mapper/sql"), namespace);
-      // reparse mybatis mapper xml file
-      reloadXML(xmlFile);
+      // reload mapper by xml file
+      reloadXML(mapperFile);
     } catch (Exception e) {
       logger.error("Reload mybatis mapper by xml file fail.", e);
     }
 
-    logger.info("Reload mybatis mapper by xml file {} success.", xmlFile.getName());
+    logger.info("Reload mybatis mapper by xml file {} success.", mapperFile.getName());
   }
 
   @Override
@@ -120,41 +117,15 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
   }
 
   /**
-   * reload xml
+   * reload xml file
    *
-   * @param xmlFile xmlFile
+   * @param mapperFile mapperFile
    */
-  private void reloadXML(File xmlFile) throws IOException {
-    InputStream is = Files.newInputStream(xmlFile.toPath());
-    XMLMapperBuilder builder = new XMLMapperBuilder(is, configuration, xmlFile.getName(),
-        configuration.getSqlFragments());
+  private void reloadXML(File mapperFile) throws IOException {
+    InputStream is = Files.newInputStream(mapperFile.toPath());
+    XMLMapperBuilder builder = new XMLMapperBuilder(is, configuration, mapperFile.getName(),
+        configuration.getSqlFragments(), new FileSystemResource(mapperFile));
     builder.parse();
-  }
-
-  /**
-   * clear mapper registry
-   *
-   * @param namespace namespace
-   */
-  @SuppressWarnings("unchecked")
-  private void clearMapperRegistry(String namespace)
-      throws NoSuchFieldException, IllegalAccessException {
-    Field field = MapperRegistry.class.getDeclaredField("knownMappers");
-    field.setAccessible(true);
-    Map<Class<?>, Object> mapConfig = (Map<Class<?>, Object>) field.get(
-        configuration.getMapperRegistry());
-    Class<?> refreshKey = null;
-
-    for (Map.Entry<Class<?>, Object> item : mapConfig.entrySet()) {
-      if (item.getKey().getName().contains(namespace)) {
-        refreshKey = item.getKey();
-        break;
-      }
-    }
-
-    if (refreshKey != null) {
-      mapConfig.remove(refreshKey);
-    }
   }
 
   /**
@@ -216,7 +187,8 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
    */
   private void clearResultMap(XNode xNode, String namespace) {
     for (XNode child : xNode.getChildren()) {
-      if (CHILD_NAMES.contains(child.getName())) {
+      if (Objects.equals("association", child.getName()) || Objects.equals("collection",
+          child.getName()) || Objects.equals("case", child.getName())) {
         if (child.getStringAttribute("select") == null) {
           configuration.getResultMapNames().remove(child.getStringAttribute(ID,
               child.getValueBasedIdentifier()));
@@ -228,35 +200,8 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
             clearResultMap(child, namespace);
           }
         }
+
       }
-    }
-  }
-
-  /**
-   * clear key generators
-   *
-   * @param list      list
-   * @param namespace namespace
-   */
-  private void clearKeyGenerators(List<XNode> list, String namespace) {
-    for (XNode xNode : list) {
-      String id = xNode.getStringAttribute(ID);
-      configuration.getKeyGeneratorNames().remove(id + SelectKeyGenerator.SELECT_KEY_SUFFIX);
-      configuration.getKeyGeneratorNames()
-          .remove(namespace + "." + id + SelectKeyGenerator.SELECT_KEY_SUFFIX);
-
-      Collection<MappedStatement> mappedStatements = configuration.getMappedStatements();
-      List<MappedStatement> tempStatements = new ArrayList<>(64);
-
-      for (MappedStatement statement : mappedStatements) {
-        if (statement != null) {
-          if (Objects.equals(statement.getId(), namespace + "." + id)) {
-            tempStatements.add(statement);
-          }
-        }
-      }
-
-      mappedStatements.removeAll(tempStatements);
     }
   }
 
@@ -275,10 +220,9 @@ public class MyBatisBeanReloader implements BeanReloader<File> {
   }
 
   /**
-   * get configuration
+   * Gets configuration.
    *
-   * @return {@link Configuration}
-   * @see Configuration
+   * @return the configuration
    */
   public Configuration getConfiguration() {
     return configuration;

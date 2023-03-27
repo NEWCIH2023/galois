@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent.corm;
+package org.newcih.galois.service.corm;
 
 import static org.newcih.galois.constants.FileType.XML_FILE;
 import java.io.ByteArrayInputStream;

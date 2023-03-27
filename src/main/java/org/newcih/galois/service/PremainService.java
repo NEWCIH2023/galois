@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent;
+package org.newcih.galois.service;
 
 import static java.util.stream.Collectors.joining;
 import static org.newcih.galois.constants.Constant.DOT;
@@ -37,11 +37,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.newcih.galois.conf.GlobalConfiguration;
-import org.newcih.galois.service.BannerService;
-import org.newcih.galois.service.FileChangedListener;
-import org.newcih.galois.service.FileWatchService;
-import org.newcih.galois.service.agent.corm.CormAgentService;
-import org.newcih.galois.service.agent.mybatis.MyBatisAgentService;
+import org.newcih.galois.service.corm.CormAgentService;
+import org.newcih.galois.service.mybatis.MyBatisAgentService;
 import org.newcih.galois.utils.JavaUtil;
 import org.newcih.galois.utils.StringUtil;
 import org.slf4j.Logger;
@@ -123,6 +120,17 @@ public class PremainService {
   }
 
   /**
+   * get agent services
+   *
+   * @return {@link Collection}
+   * @see Collection
+   * @see AgentService
+   */
+  public static Collection<AgentService> getAgentServices() {
+    return agentServiceMap.values();
+  }
+
+  /**
    * custom class file transformer
    *
    * @author liuguangsheng
@@ -165,5 +173,6 @@ public class PremainService {
       return null;
     }
   }
+
 
 }

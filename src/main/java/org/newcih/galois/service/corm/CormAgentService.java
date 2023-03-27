@@ -22,30 +22,41 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent;
+package org.newcih.galois.service.corm;
+
+import static org.newcih.galois.constants.ClassNameConstant.COMTOP_CONFIGURATION;
+import org.newcih.galois.service.AgentService;
 
 /**
- * 类实例对象重载服务
+ * corm agent service
  *
- * @param <T> the type parameter
  * @author liuguangsheng
  * @since 1.0.0
  */
-public interface BeanReloader<T> {
+public class CormAgentService extends AgentService {
+
+  private final static CormAgentService cormAgentService = new CormAgentService();
+
+  private CormAgentService() {
+    adapterMap.put(COMTOP_CONFIGURATION, new ComtopConfigurationVisitor());
+    necessaryClasses.addAll(adapterMap.keySet());
+  }
 
   /**
-   * 使框架重新加载类实例对象
+   * get instance
    *
-   * @param object 待更新的实例对象
+   * @return {@link CormAgentService}
+   * @see CormAgentService
    */
-  void updateBean(T object);
+  public static CormAgentService getInstance() {
+    return cormAgentService;
+  }
 
-  /**
-   * Is useful boolean.
-   *
-   * @param object 用来判断当前实例对象是否可以被框架重新加载
-   * @return 验证结果 boolean
-   */
-  boolean isUseful(T object);
+  @Override
+  public void init() {
+    super.init();
+    listeners.add(new CormXmlListener());
+    beanReloader = CormBeanReloader.getInstance();
+  }
 
 }

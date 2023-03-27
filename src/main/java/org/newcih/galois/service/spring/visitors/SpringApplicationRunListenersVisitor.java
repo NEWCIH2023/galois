@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent.spring;
+package org.newcih.galois.service.spring.visitors;
 
 import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
@@ -36,10 +36,12 @@ import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
 import static org.newcih.galois.constants.ClassNameConstant.SPRING_APPLICATION_RUN_LISTENERS;
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SLASH;
-
+import java.util.List;
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
-import org.newcih.galois.service.agent.MethodAdapter;
+import org.newcih.galois.service.MethodAdapter;
+import org.newcih.galois.service.spring.executor.SpringRunnerManager;
+import org.springframework.boot.SpringApplicationRunListener;
 
 /**
  * spring application run listeners visitor
@@ -82,7 +84,7 @@ public class SpringApplicationRunListenersVisitor extends MethodAdapter {
     @Override
     public void visitInsn(int opcode) {
       if (opcode >= IRETURN && opcode <= RETURN) {
-        String vClassName = SpringAgentService.class.getName().replace(DOT, SLASH);
+        String vClassName = SpringRunnerManager.class.getName().replace(DOT, SLASH);
         String pClassName = className.replace(DOT, SLASH);
 
         mv.visitCode();
@@ -100,5 +102,10 @@ public class SpringApplicationRunListenersVisitor extends MethodAdapter {
 
       super.visitInsn(opcode);
     }
+  }
+
+  public static interface NecessaryMethods {
+
+    List<SpringApplicationRunListener> getRunners();
   }
 }

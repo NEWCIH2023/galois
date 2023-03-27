@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,38 +22,37 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.runner;
+package org.newcih.galois.service.runners;
 
-import org.newcih.galois.service.FileWatchService;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ConfigurableBootstrapContext;
 import org.springframework.boot.SpringApplicationRunListener;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
- * 需要兼容 SpringBoot 2.0.3版本，该版本的 SpringApplicationRunListener 接口全是抽象方法，没有默认default实现
+ * 兼容2.0.3与2.5.5版本的SpringBoot，在低版本中，这个接口没有任何默认实现，而在2.5.5版本中的SpringBoot，这个接口的所有方法都有默认实现
  *
  * @author liuguangsheng
- * @see org.newcih.galois.service.FileWatchService
- */
-public class FileWatchRunner implements SpringApplicationRunListener {
-
-  private final FileWatchService fileWatchService;
+ **/
+public abstract class AbstractRunner implements SpringApplicationRunListener {
 
   /**
-   * Instantiates a new File watch runner.
-   *
-   * @param fileWatchService the file watch service
+   * the rank mean which runer will run first if got a higher rank value
    */
-  public FileWatchRunner(FileWatchService fileWatchService) {
-    this.fileWatchService = fileWatchService;
-  }
+  protected int rank;
 
   @Override
   public void starting(ConfigurableBootstrapContext bootstrapContext) {
     // TODO
   }
 
+  /**
+   * Called immediately when the run method has first started. Can be used for very early
+   * initialization.
+   */
   @Override
   public void starting() {
     // TODO
@@ -65,37 +64,82 @@ public class FileWatchRunner implements SpringApplicationRunListener {
     // TODO
   }
 
+  /**
+   * Called once the environment has been prepared, but before the {@link ApplicationContext} has
+   * been created.
+   *
+   * @param environment the environment
+   */
   @Override
   public void environmentPrepared(ConfigurableEnvironment environment) {
     // TODO
   }
 
+  /**
+   * Called once the {@link ApplicationContext} has been created and prepared, but before sources
+   * have been loaded.
+   *
+   * @param context the application context
+   */
   @Override
   public void contextPrepared(ConfigurableApplicationContext context) {
     // TODO
-
   }
 
+  /**
+   * Called once the application context has been loaded but before it has been refreshed.
+   *
+   * @param context the application context
+   */
   @Override
   public void contextLoaded(ConfigurableApplicationContext context) {
     // TODO
-
   }
 
+  /**
+   * The context has been refreshed and the application has started but
+   * {@link CommandLineRunner CommandLineRunners} and {@link ApplicationRunner ApplicationRunners}
+   * have not been called.
+   *
+   * @param context the application context.
+   * @since 2.0.0
+   */
   @Override
   public void started(ConfigurableApplicationContext context) {
-    fileWatchService.start();
+    // TODO
   }
 
+  /**
+   * Called immediately before the run method finishes, when the application context has been
+   * refreshed and all {@link CommandLineRunner CommandLineRunners} and
+   * {@link ApplicationRunner ApplicationRunners} have been called.
+   *
+   * @param context the application context.
+   * @since 2.0.0
+   */
   @Override
   public void running(ConfigurableApplicationContext context) {
     // TODO
-
   }
 
+  /**
+   * Called when a failure occurs when running the application.
+   *
+   * @param context   the application context or {@code null} if a failure occurred before the
+   *                  context was created
+   * @param exception the failure
+   * @since 2.0.0
+   */
   @Override
   public void failed(ConfigurableApplicationContext context, Throwable exception) {
     // TODO
+  }
 
+  public int getRank() {
+    return rank;
+  }
+
+  public void setRank(int rank) {
+    this.rank = rank;
   }
 }

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,38 +22,39 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent.spring;
+package org.newcih.galois.service.spring.visitors;
 
 import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
 import static jdk.internal.org.objectweb.asm.Opcodes.ATHROW;
+import static jdk.internal.org.objectweb.asm.Opcodes.CHECKCAST;
 import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
 import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
-import static org.newcih.galois.constants.ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER;
+import static org.newcih.galois.constants.ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT;
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SLASH;
-
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
-import org.newcih.galois.service.agent.MethodAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.newcih.galois.service.MethodAdapter;
+import org.newcih.galois.service.spring.executor.SpringBeanReloader;
+import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
+
 
 /**
- * bean definition scanner visitor
+ * 用于SpringBoot上下文嵌入的Visitor类
  *
  * @author liuguangsheng
  * @since 1.0.0
  */
-public class BeanDefinitionScannerVisitor extends MethodAdapter {
+public class ApplicationContextVisitor extends MethodAdapter {
 
   /**
-   * Instantiates a new Bean definition scanner visitor.
+   * Instantiates a new Application context visitor.
    */
-  public BeanDefinitionScannerVisitor() {
-    super(CLASS_PATH_BEAN_DEFINITION_SCANNER);
+  public ApplicationContextVisitor() {
+    super(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT);
   }
 
   @Override
@@ -61,25 +62,25 @@ public class BeanDefinitionScannerVisitor extends MethodAdapter {
       String[] exceptions) {
     MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
 
-    if (Objects.equals("doScan", name)) {
-      return new DoScanMethodVisitor(ASM5, mv);
+    if (Objects.equals("<init>", name) && Objects.equals(descriptor, "()V")) {
+      return new ConstructorVisiter(ASM5, mv);
     }
 
     return mv;
   }
 
   /**
-   * The type Do scan method visitor.
+   * The type Constructor visiter.
    */
-  class DoScanMethodVisitor extends MethodVisitor {
+  class ConstructorVisiter extends MethodVisitor {
 
     /**
-     * Instantiates a new Do scan method visitor.
+     * Instantiates a new Constructor visiter.
      *
      * @param api           the api
      * @param methodVisitor the method visitor
      */
-    public DoScanMethodVisitor(int api, MethodVisitor methodVisitor) {
+    public ConstructorVisiter(int api, MethodVisitor methodVisitor) {
       super(api, methodVisitor);
     }
 
@@ -89,16 +90,21 @@ public class BeanDefinitionScannerVisitor extends MethodAdapter {
         String pClassName = SpringBeanReloader.class.getName().replace(DOT, SLASH);
         String vClassName = className.replace(DOT, SLASH);
 
-        mv.visitCode();
         mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";",
             false);
         mv.visitVarInsn(ALOAD, 0);
-        mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setScanner", "(L" + vClassName + ";)V",
+        mv.visitTypeInsn(CHECKCAST, vClassName);
+        mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setContext", "(L" + vClassName + ";)V",
             false);
       }
 
       super.visitInsn(opcode);
     }
+  }
+
+  public interface NecessaryMethods {
+
+    void setContext(AnnotationConfigServletWebServerApplicationContext context);
   }
 
 }

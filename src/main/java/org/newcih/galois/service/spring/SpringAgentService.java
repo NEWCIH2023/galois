@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent.spring;
+package org.newcih.galois.service.spring;
 
 import static org.newcih.galois.constants.ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT;
 import static org.newcih.galois.constants.ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER;
@@ -33,9 +33,14 @@ import java.util.ArrayList;
 import java.util.List;
 import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.service.FileWatchService;
-import org.newcih.galois.service.agent.AgentService;
-import org.newcih.galois.service.agent.PremainService;
-import org.newcih.galois.service.runner.FileWatchRunner;
+import org.newcih.galois.service.AgentService;
+import org.newcih.galois.service.PremainService;
+import org.newcih.galois.service.runners.FileWatchRunner;
+import org.newcih.galois.service.spring.listeners.SpringBeanListener;
+import org.newcih.galois.service.spring.executor.SpringBeanReloader;
+import org.newcih.galois.service.spring.visitors.ApplicationContextVisitor;
+import org.newcih.galois.service.spring.visitors.BeanDefinitionScannerVisitor;
+import org.newcih.galois.service.spring.visitors.SpringApplicationRunListenersVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplicationRunListener;

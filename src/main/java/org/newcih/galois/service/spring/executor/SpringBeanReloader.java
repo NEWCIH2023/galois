@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,12 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent.spring;
+package org.newcih.galois.service.spring.executor;
 
 import java.lang.reflect.Modifier;
-import org.newcih.galois.service.agent.BeanReloader;
+import org.newcih.galois.service.BeanReloader;
+import org.newcih.galois.service.spring.visitors.ApplicationContextVisitor;
+import org.newcih.galois.service.spring.visitors.BeanDefinitionScannerVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -38,7 +40,8 @@ import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
  * @author liuguangsheng
  * @since 1.0.0
  */
-public class SpringBeanReloader implements BeanReloader<Class<?>> {
+public class SpringBeanReloader implements BeanReloader<Class<?>>,
+    ApplicationContextVisitor.NecessaryMethods, BeanDefinitionScannerVisitor.NecessaryMethods {
 
   private static final Logger logger = LoggerFactory.getLogger(SpringBeanReloader.class);
   private static final SpringBeanReloader springBeanReloader = new SpringBeanReloader();
@@ -119,6 +122,7 @@ public class SpringBeanReloader implements BeanReloader<Class<?>> {
    *
    * @param scanner the scanner
    */
+  @Override
   public void setScanner(ClassPathBeanDefinitionScanner scanner) {
     this.scanner = scanner;
   }
@@ -137,6 +141,7 @@ public class SpringBeanReloader implements BeanReloader<Class<?>> {
    *
    * @param context the context
    */
+  @Override
   public void setContext(AnnotationConfigServletWebServerApplicationContext context) {
     this.context = context;
   }

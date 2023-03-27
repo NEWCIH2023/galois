@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,41 +22,30 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent.corm;
-
-import static org.newcih.galois.constants.ClassNameConstant.COMTOP_CONFIGURATION;
-import org.newcih.galois.service.agent.AgentService;
+package org.newcih.galois.service;
 
 /**
- * corm agent service
+ * 类实例对象重载服务
  *
+ * @param <T> the type parameter
  * @author liuguangsheng
  * @since 1.0.0
  */
-public class CormAgentService extends AgentService {
-
-  private final static CormAgentService cormAgentService = new CormAgentService();
-
-  private CormAgentService() {
-    adapterMap.put(COMTOP_CONFIGURATION, new ComtopConfigurationVisitor());
-    necessaryClasses.addAll(adapterMap.keySet());
-  }
+public interface BeanReloader<T> {
 
   /**
-   * get instance
+   * 使框架重新加载类实例对象
    *
-   * @return {@link CormAgentService}
-   * @see CormAgentService
+   * @param object 待更新的实例对象
    */
-  public static CormAgentService getInstance() {
-    return cormAgentService;
-  }
+  void updateBean(T object);
 
-  @Override
-  public void init() {
-    super.init();
-    listeners.add(new CormXmlListener());
-    beanReloader = CormBeanReloader.getInstance();
-  }
+  /**
+   * Is useful boolean.
+   *
+   * @param object 用来判断当前实例对象是否可以被框架重新加载
+   * @return 验证结果 boolean
+   */
+  boolean isUseful(T object);
 
 }

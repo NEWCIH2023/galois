@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.agent.corm;
+package org.newcih.galois.service.spring.visitors;
 
 import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
@@ -31,72 +31,78 @@ import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
 import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
+import static org.newcih.galois.constants.ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER;
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SLASH;
-
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
-import org.newcih.galois.constants.ClassNameConstant;
-import org.newcih.galois.service.agent.MethodAdapter;
+import org.newcih.galois.service.MethodAdapter;
+import org.newcih.galois.service.spring.executor.SpringBeanReloader;
+import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 
 /**
- * comtop configuration visitor
+ * bean definition scanner visitor
  *
  * @author liuguangsheng
  * @since 1.0.0
  */
-public class ComtopConfigurationVisitor extends MethodAdapter {
+public class BeanDefinitionScannerVisitor extends MethodAdapter {
 
   /**
-   * Instantiates a new Comtop configuration visitor.
+   * Instantiates a new Bean definition scanner visitor.
    */
-  public ComtopConfigurationVisitor() {
-    super(ClassNameConstant.COMTOP_CONFIGURATION);
+  public BeanDefinitionScannerVisitor() {
+    super(CLASS_PATH_BEAN_DEFINITION_SCANNER);
   }
 
   @Override
   public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
       String[] exceptions) {
-    MethodVisitor mv = cv.visitMethod(access, name, descriptor, signature, exceptions);
+    MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
 
-    if (Objects.equals(name, "<init>") && Objects.equals(descriptor, "()V")) {
-      return new ComtopConfigurationVisitor.ConstructorVisitor(ASM5, mv);
+    if (Objects.equals("doScan", name)) {
+      return new DoScanMethodVisitor(ASM5, mv);
     }
 
     return mv;
   }
 
   /**
-   * The type Constructor visitor.
+   * The type Do scan method visitor.
    */
-  class ConstructorVisitor extends MethodVisitor {
+  class DoScanMethodVisitor extends MethodVisitor {
 
     /**
-     * Instantiates a new Constructor visitor.
+     * Instantiates a new Do scan method visitor.
      *
-     * @param api the api
-     * @param mv  the mv
+     * @param api           the api
+     * @param methodVisitor the method visitor
      */
-    public ConstructorVisitor(int api, MethodVisitor mv) {
-      super(api, mv);
+    public DoScanMethodVisitor(int api, MethodVisitor methodVisitor) {
+      super(api, methodVisitor);
     }
 
     @Override
     public void visitInsn(int opcode) {
       if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-        String pClassName = CormBeanReloader.class.getName().replace(DOT, SLASH);
+        String pClassName = SpringBeanReloader.class.getName().replace(DOT, SLASH);
         String vClassName = className.replace(DOT, SLASH);
 
         mv.visitCode();
         mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";",
             false);
         mv.visitVarInsn(ALOAD, 0);
-        mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setConfiguration", "(L" + vClassName + ";)V",
+        mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setScanner", "(L" + vClassName + ";)V",
             false);
-        mv.visitEnd();
       }
 
       super.visitInsn(opcode);
     }
   }
+
+  public static interface NecessaryMethods {
+
+    void setScanner(ClassPathBeanDefinitionScanner scanner);
+  }
+
 }

@@ -32,7 +32,7 @@ import jdk.internal.org.objectweb.asm.util.ASMifier;
 import jdk.internal.org.objectweb.asm.util.Printer;
 import jdk.internal.org.objectweb.asm.util.Textifier;
 import jdk.internal.org.objectweb.asm.util.TraceClassVisitor;
-import org.newcih.galois.service.agent.spring.SpringAgentService;
+import org.newcih.galois.service.spring.SpringAgentService;
 import org.newcih.galois.utils.StringUtil;
 import org.springframework.boot.SpringApplicationRunListener;
 

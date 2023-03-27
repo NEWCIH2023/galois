@@ -158,7 +158,7 @@
             <manifestEntries>
               <Build-Time>${maven.build.timestamp}</Build-Time>
               <Galois-Version>${version}</Galois-Version>
-              <Premain-Class>org.newcih.galois.service.agent.PremainService</Premain-Class>
+              <Premain-Class>org.newcih.galois.service.PremainService</Premain-Class>
               <Can-Redefine-Classes>true</Can-Redefine-Classes>
               <Can-Retransform-Classes>true</Can-Retransform-Classes>
             </manifestEntries>
