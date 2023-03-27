@@ -43,7 +43,7 @@ public class AgentServiceInitRunner extends AbstractRunner {
    * @param agentServiceList the agent service list
    */
   public AgentServiceInitRunner(Collection<AgentService> agentServiceList) {
-    this.rank = FileWatchRunner.RANK + 1;
+    setRank(FileWatchRunner.RANK + 1);
     this.agentServices = agentServiceList;
   }
 

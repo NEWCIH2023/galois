@@ -103,8 +103,6 @@ public class FileWatchService {
 
   /**
    * begin file monitor service
-   *
-   * @param rootPath the root path
    */
   public void start() {
     init();

@@ -47,7 +47,7 @@ public class FileWatchRunner extends AbstractRunner {
    * @param fileWatchService the file watch service
    */
   public FileWatchRunner(FileWatchService fileWatchService) {
-    this.rank = RANK;
+    setRank(RANK);
     this.fileWatchService = fileWatchService;
   }
 
