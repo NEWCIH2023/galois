@@ -30,6 +30,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import org.newcih.galois.service.spring.visitors.SpringApplicationRunListenersVisitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplicationRunListener;
 
 /**
@@ -41,6 +43,7 @@ public class SpringRunnerManager implements SpringApplicationRunListenersVisitor
 
   private final Map<Integer, SpringApplicationRunListener> runnerMap = new HashMap<>(32);
   private static final SpringRunnerManager instance = new SpringRunnerManager();
+  private static final Logger logger = LoggerFactory.getLogger(SpringRunnerManager.class);
 
   /**
    * Gets instance.
@@ -72,10 +75,14 @@ public class SpringRunnerManager implements SpringApplicationRunListenersVisitor
 
   @Override
   public List<SpringApplicationRunListener> getRunners() {
-    return runnerMap.entrySet().stream()
+    List<SpringApplicationRunListener> result = runnerMap.entrySet().stream()
         .sorted((e1, e2) -> e2.getKey().compareTo(e1.getKey()))
         .map(Entry::getValue)
         .collect(Collectors.toList());
+
+    logger.info("Now register these run listener in ordered: {}", result);
+
+    return result;
   }
 
 }

@@ -39,6 +39,8 @@ import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.List;
 import org.newcih.galois.conf.GlobalConfiguration;
+import org.newcih.galois.service.runners.FileWatchRunner;
+import org.newcih.galois.service.spring.executor.SpringRunnerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,8 +58,25 @@ public class FileWatchService {
   private WatchService watchService;
   private static final String rootPath = globalConfig.getString(USER_DIR);
   private static final FileWatchService instance = new FileWatchService();
+  private static final SpringRunnerManager runnerManager = SpringRunnerManager.getInstance();
+
+  static {
+    String rootPath = globalConfig.getString(USER_DIR);
+    FileWatchService fileWatchService = getInstance();
+    fileWatchService.setRootPath(rootPath);
+    runnerManager.addRunner(new FileWatchRunner(fileWatchService));
+  }
 
   private FileWatchService() {
+  }
+
+  /**
+   * Gets instance.
+   *
+   * @return the instance
+   */
+  public static FileWatchService getInstance() {
+    return instance;
   }
 
   /**
