@@ -31,8 +31,8 @@ import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import org.newcih.galois.service.runners.AgentServiceInitRunner;
 import org.newcih.galois.utils.JavaUtil;
 import org.newcih.galois.utils.StringUtil;
 import org.slf4j.Logger;
@@ -48,9 +48,11 @@ public class PremainService {
 
   private static final Logger logger = LoggerFactory.getLogger(PremainService.class);
   private static final Map<String, AgentService> agentServiceMap = new HashMap<>(8);
-  private static final FileWatchService fileWatchService = FileWatchService.getInstance();
+  private static final AgentServiceInitRunner initRunner = new AgentServiceInitRunner();
+  private static final SpringRunnerManager runManager = SpringRunnerManager.getInstance();
 
   static {
+    runManager.addRunner(initRunner);
   }
 
   /**
@@ -82,9 +84,13 @@ public class PremainService {
    * @param agentService the agent service
    */
   public static void registerAgentService(String serviceName, AgentService agentService) {
+    if (agentServiceMap.containsKey(serviceName)) {
+      return;
+    }
+
     agentServiceMap.put(serviceName, agentService);
-    List<FileChangedListener> listeners = agentService.getListeners();
-    fileWatchService.registerListeners(listeners);
+    // register spring runner
+    initRunner.addAgentService(agentService);
   }
 
   /**
@@ -113,15 +119,10 @@ public class PremainService {
       }
 
       String newClassName = className.replace(SLASH, DOT);
-
       Collection<AgentService> agentServices = agentServiceMap.values();
-      for (AgentService agentService : agentServices) {
-        boolean checkedClass = agentService.checkAgentEnable(newClassName);
-        if (agentService.isUseful() && !agentService.isInited()) {
-          agentService.init();
-          fileWatchService.registerListeners(agentService.getListeners());
-        }
 
+      for (AgentService agentService : agentServices) {
+        boolean checkedClass = agentService.checkNecessaryClass(newClassName);
         // checkedClass表示当前加载的类newClassName是否有对应的MethodAdapter，当为false时，表示没有对应的MethodAdapter，
         // 这时候就直接跳过
         if (!checkedClass) {
@@ -129,7 +130,6 @@ public class PremainService {
         }
 
         MethodAdapter adapter = agentService.getAdapterMap().get(newClassName);
-
         if (logger.isDebugEnabled()) {
           logger.debug("Instrumentation had retransformed class {}.", newClassName);
         }

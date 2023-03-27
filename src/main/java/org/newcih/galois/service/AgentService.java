@@ -83,7 +83,7 @@ public abstract class AgentService {
    * @param loadedClassName loaded class name
    * @return 项目是否加载了对应的类名的类 boolean
    */
-  public boolean checkAgentEnable(String loadedClassName) {
+  public boolean checkNecessaryClass(String loadedClassName) {
     if (necessaryClasses.contains(loadedClassName)) {
       enabled++;
       return true;
@@ -169,14 +169,5 @@ public abstract class AgentService {
    */
   public int getEnabled() {
     return enabled;
-  }
-
-  /**
-   * Is inited boolean.
-   *
-   * @return the boolean
-   */
-  public boolean isInited() {
-    return inited;
   }
 }
