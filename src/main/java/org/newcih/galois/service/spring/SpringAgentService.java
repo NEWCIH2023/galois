@@ -27,7 +27,6 @@ package org.newcih.galois.service.spring;
 import static org.newcih.galois.constants.ConfConstant.RELOADER_SPRING_BOOT_ENABLE;
 import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.service.AgentService;
-import org.newcih.galois.service.annotation.Agent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +36,6 @@ import org.slf4j.LoggerFactory;
  * @author liuguangsheng
  * @since 1.0.0
  */
-@Agent("SpringAgentService")
 public class SpringAgentService extends AgentService {
 
   private static final Logger logger = LoggerFactory.getLogger(SpringAgentService.class);

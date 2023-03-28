@@ -39,7 +39,6 @@ import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
  * Spring的Bean重载服务
  *
  * @author liuguangsheng
- * @since 1.0.0
  */
 @LazyBean(value = "SpringBeanReloader", manager = SpringAgentService.class)
 public class SpringBeanReloader implements BeanReloader<Class<?>>,
