@@ -29,9 +29,9 @@ import java.io.File;
 import java.lang.instrument.ClassDefinition;
 import java.util.Arrays;
 import org.newcih.galois.service.FileChangedListener;
-import org.newcih.galois.service.spring.SpringAgentService;
+import org.newcih.galois.service.annotation.LazyBean;
+import org.newcih.galois.utils.ClassUtil;
 import org.newcih.galois.utils.FileUtil;
-import org.newcih.galois.utils.JavaUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,8 +40,8 @@ import org.slf4j.LoggerFactory;
  * Spring的Bean变动监听器
  *
  * @author liuguangsheng
- * @since 1.0.0
  */
+@LazyBean("SpringBeanListener")
 public class SpringBeanListener implements FileChangedListener {
 
   private static final Logger logger = LoggerFactory.getLogger(SpringBeanListener.class);
@@ -51,26 +51,22 @@ public class SpringBeanListener implements FileChangedListener {
     return FileUtil.validFileType(file, CLASS_FILE);
   }
 
-  static {
-    SpringAgentService.getInstance().addLazyInit(SpringBeanListener.class);
-  }
-
   /**
    * file changed handle
    *
    * @param classFile classFile
    */
   private void fileChangedHandle(File classFile) {
-    String className = JavaUtil.getClassNameFromClass(classFile);
+    String className = ClassUtil.getClassNameFromClass(classFile);
     byte[] classBytes = FileUtil.readFile(classFile);
 
     try {
-      Class<?> clazz = Arrays.stream(JavaUtil.getInstrumentation().getAllLoadedClasses())
+      Class<?> clazz = Arrays.stream(ClassUtil.getInstrumentation().getAllLoadedClasses())
           .filter(item -> item.getName().equals(className)).findFirst()
           .orElseThrow(NullPointerException::new);
 
       ClassDefinition definition = new ClassDefinition(clazz, classBytes);
-      JavaUtil.getInstrumentation().redefineClasses(definition);
+      ClassUtil.getInstrumentation().redefineClasses(definition);
       logger.info("Redefine class file {} success.", classFile.getName());
 
 //      if (reloader.isUseful(clazz)) {

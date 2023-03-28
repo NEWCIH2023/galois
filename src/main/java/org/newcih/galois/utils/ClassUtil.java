@@ -28,15 +28,31 @@ package org.newcih.galois.utils;
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SLASH;
 import static org.newcih.galois.constants.FileType.CLASS_FILE;
+import static org.springframework.core.io.support.ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX;
+import static org.springframework.util.ClassUtils.convertClassNameToResourcePath;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.instrument.Instrumentation;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import jdk.internal.org.objectweb.asm.ClassReader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
+import org.springframework.core.type.classreading.MetadataReader;
+import org.springframework.core.type.classreading.MetadataReaderFactory;
+import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.springframework.core.type.filter.TypeFilter;
+import org.springframework.util.SystemPropertyUtils;
 
 /**
  * java util
@@ -44,7 +60,7 @@ import jdk.internal.org.objectweb.asm.ClassReader;
  * @author liuguangsheng
  * @since 1.0.0
  */
-public class JavaUtil {
+public class ClassUtil {
 
   private static final String compileDir;
   private static final Pattern packagePattern = Pattern.compile("^package +(\\S+);");
@@ -67,6 +83,79 @@ public class JavaUtil {
   }
 
   /**
+   * Scan annotation class set.
+   *
+   * @param basePackage the base package
+   * @param annotations the annotations
+   * @return the set
+   */
+  public static Set<Class<?>> scanAnnotationClass(String basePackage,
+      Class<? extends Annotation>... annotations) {
+    List<TypeFilter> includeFilters = new ArrayList<>(16);
+    for (Class<? extends Annotation> annotation : annotations) {
+      includeFilters.add(new AnnotationTypeFilter(annotation));
+    }
+
+    return scanPackageClass(basePackage, includeFilters, null);
+  }
+
+  /**
+   * Scan package class set. base on spring tool
+   *
+   * @param basePackage     the base package
+   * @param includeFileters include fileters
+   * @param excludeFilters  exclude filters
+   * @return the set
+   */
+  public static Set<Class<?>> scanPackageClass(String basePackage, List<TypeFilter> includeFileters,
+      List<TypeFilter> excludeFilters) {
+    ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+    MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(
+        resourcePatternResolver);
+    Set<Class<?>> result = new HashSet<>(128);
+
+    try {
+      String base = SystemPropertyUtils.resolvePlaceholders(basePackage);
+      String searchPath = CLASSPATH_ALL_URL_PREFIX +
+          convertClassNameToResourcePath(base) + "/**/*.class";
+      Resource[] resources = resourcePatternResolver.getResources(searchPath);
+      for (Resource resource : resources) {
+        if (resource.isReadable()) {
+          MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(resource);
+          boolean flag = false;
+
+          if (includeFileters != null && !includeFileters.isEmpty()) {
+            for (TypeFilter filter : includeFileters) {
+              if (filter.match(metadataReader, metadataReaderFactory)) {
+                flag = true;
+                break;
+              }
+            }
+          }
+
+          if (excludeFilters != null && !excludeFilters.isEmpty()) {
+            for (TypeFilter filter : excludeFilters) {
+              if (filter.match(metadataReader, metadataReaderFactory)) {
+                flag = false;
+                break;
+              }
+            }
+          }
+
+          if (flag) {
+            result.add(Class.forName(metadataReader.getClassMetadata().getClassName()));
+          }
+        }
+      }
+
+    } catch (IOException | ClassNotFoundException e) {
+      throw new RuntimeException(e);
+    }
+
+    return result;
+  }
+
+  /**
    * Gets instrumentation.
    *
    * @return the instrumentation
@@ -81,7 +170,7 @@ public class JavaUtil {
    * @param instrumentation the instrumentation
    */
   public static void setInstrumentation(Instrumentation instrumentation) {
-    JavaUtil.instrumentation = instrumentation;
+    ClassUtil.instrumentation = instrumentation;
   }
 
   /**

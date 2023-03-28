@@ -33,7 +33,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.newcih.galois.service.runners.AgentInitializeRunner;
-import org.newcih.galois.utils.JavaUtil;
+import org.newcih.galois.utils.ClassUtil;
 import org.newcih.galois.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +70,7 @@ public class PremainService {
     try {
       ClassFileTransformer custom = new CustomTransformer();
       inst.addTransformer(custom, true);
-      JavaUtil.setInstrumentation(inst);
+      ClassUtil.setInstrumentation(inst);
       BannerService.printBanner();
     } catch (Throwable e) {
       logger.error("Start Premain Service fail.", e);
