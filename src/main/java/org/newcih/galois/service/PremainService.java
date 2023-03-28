@@ -30,8 +30,10 @@ import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import org.newcih.galois.service.runners.AgentInitializeRunner;
 import org.newcih.galois.utils.ClassUtil;
 import org.newcih.galois.utils.StringUtil;
@@ -52,6 +54,8 @@ public class PremainService {
   private static final SpringRunnerManager runManager = SpringRunnerManager.getInstance();
 
   static {
+    Set<Class<?>> agentClasses = ClassUtil.scanBaseClass("org.newcih.galois.service",
+        Collections.singletonList(AgentService.class));
     runManager.addRunner(initRunner);
   }
 

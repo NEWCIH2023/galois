@@ -51,6 +51,7 @@ import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.core.type.filter.TypeFilter;
 import org.springframework.util.SystemPropertyUtils;
 
@@ -83,6 +84,22 @@ public class ClassUtil {
   }
 
   /**
+   * Scan base class set.
+   *
+   * @param basePackage the base package
+   * @param baseClasses the base classes
+   * @return the set
+   */
+  public static Set<Class<?>> scanBaseClass(String basePackage, List<Class<?>> baseClasses) {
+    List<TypeFilter> includeFilters = new ArrayList<>(16);
+    for (Class<?> baseClass : baseClasses) {
+      includeFilters.add(new AssignableTypeFilter(baseClass));
+    }
+
+    return scanPackageClass(basePackage, includeFilters, null);
+  }
+
+  /**
    * Scan annotation class set.
    *
    * @param basePackage the base package
@@ -90,7 +107,7 @@ public class ClassUtil {
    * @return the set
    */
   public static Set<Class<?>> scanAnnotationClass(String basePackage,
-      Class<? extends Annotation>... annotations) {
+      List<Class<? extends Annotation>> annotations) {
     List<TypeFilter> includeFilters = new ArrayList<>(16);
     for (Class<? extends Annotation> annotation : annotations) {
       includeFilters.add(new AnnotationTypeFilter(annotation));
