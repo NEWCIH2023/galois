@@ -44,27 +44,8 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>,
     ApplicationContextVisitor.NecessaryMethods, BeanDefinitionScannerVisitor.NecessaryMethods {
 
   private static final Logger logger = LoggerFactory.getLogger(SpringBeanReloader.class);
-  private static final SpringBeanReloader springBeanReloader = new SpringBeanReloader();
-  /**
-   * The Scanner.
-   */
   protected ClassPathBeanDefinitionScanner scanner;
-  /**
-   * The Context.
-   */
   protected AnnotationConfigServletWebServerApplicationContext context;
-
-  private SpringBeanReloader() {
-  }
-
-  /**
-   * 获取单例实例
-   *
-   * @return the instance
-   */
-  public static SpringBeanReloader getInstance() {
-    return springBeanReloader;
-  }
 
   /**
    * 更新Spring管理的bean对象
@@ -106,6 +87,14 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>,
 
     String[] beanTypeNames = getContext().getBeanNamesForType(clazz);
     return beanTypeNames.length > 0;
+  }
+
+  /**
+   * Lazy init after all necessary class was loaded
+   */
+  @Override
+  public void lazyInit() {
+    SpringAgentService.getInstance().setBeanReloader(new SpringBeanReloader());
   }
 
   /**

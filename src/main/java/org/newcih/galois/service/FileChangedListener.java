@@ -32,7 +32,7 @@ import java.io.File;
  * @author liuguangsheng
  * @since 1.0.0
  */
-public interface FileChangedListener {
+public interface FileChangedListener extends LazyInit {
 
   /**
    * is listener useful for this file object
@@ -62,4 +62,10 @@ public interface FileChangedListener {
    * @param file the changed file
    */
   void deletedHandle(File file);
+
+  /**
+   * Lazy init after all necessary class was loaded.
+   */
+  @Override
+  void lazyInit();
 }

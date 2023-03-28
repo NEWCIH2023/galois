@@ -28,7 +28,6 @@ import static org.newcih.galois.constants.ConfConstant.RELOADER_SPRING_BOOT_ENAB
 import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.service.AgentService;
 import org.newcih.galois.service.PremainService;
-import org.newcih.galois.service.spring.listeners.SpringBeanListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,18 +39,12 @@ import org.slf4j.LoggerFactory;
  */
 public class SpringAgentService extends AgentService {
 
-  private static final SpringAgentService springAgent = new SpringAgentService();
   private static final Logger logger = LoggerFactory.getLogger(SpringAgentService.class);
   private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
+  private static final SpringAgentService instance = new SpringAgentService();
 
   static {
-    SpringAgentService service = SpringAgentService.getInstance();
-    PremainService.registerAgentService(SpringAgentService.class.getSimpleName(), service);
-  }
-
-  private SpringAgentService() {
-    registerFileChangedListener(new SpringBeanListener());
-    setBeanReloader(SpringBeanReloader.getInstance());
+    PremainService.registerAgentService(getInstance());
   }
 
   /**
@@ -65,12 +58,12 @@ public class SpringAgentService extends AgentService {
   }
 
   /**
-   * get instance
+   * Get instance spring agent service.
    *
-   * @return {@link SpringAgentService}
-   * @see SpringAgentService
+   * @return the spring agent service
    */
   public static SpringAgentService getInstance() {
-    return springAgent;
+    return instance;
   }
+
 }

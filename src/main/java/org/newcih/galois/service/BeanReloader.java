@@ -31,7 +31,7 @@ package org.newcih.galois.service;
  * @author liuguangsheng
  * @since 1.0.0
  */
-public interface BeanReloader<T> {
+public interface BeanReloader<T> extends LazyInit {
 
   /**
    * 使框架重新加载类实例对象
@@ -48,4 +48,9 @@ public interface BeanReloader<T> {
    */
   boolean isUseful(T object);
 
+  /**
+   * Lazy init after all necessary class was loaded
+   */
+  @Override
+  void lazyInit();
 }

@@ -32,8 +32,7 @@ import java.security.ProtectionDomain;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import org.newcih.galois.service.runners.AgentServiceInitRunner;
+import org.newcih.galois.service.runners.AgentInitializeRunner;
 import org.newcih.galois.utils.JavaUtil;
 import org.newcih.galois.utils.StringUtil;
 import org.slf4j.Logger;
@@ -49,7 +48,7 @@ public class PremainService {
 
   private static final Logger logger = LoggerFactory.getLogger(PremainService.class);
   private static final Map<String, AgentService> agentServiceMap = new HashMap<>(8);
-  private static final AgentServiceInitRunner initRunner = new AgentServiceInitRunner();
+  private static final AgentInitializeRunner initRunner = new AgentInitializeRunner();
   private static final SpringRunnerManager runManager = SpringRunnerManager.getInstance();
 
   static {
@@ -81,10 +80,10 @@ public class PremainService {
   /**
    * Register agent service.
    *
-   * @param serviceName  the service name
    * @param agentService the agent service
    */
-  public static void registerAgentService(String serviceName, AgentService agentService) {
+  public static void registerAgentService(AgentService agentService) {
+    String serviceName = agentService.getClass().getSimpleName();
     if (agentServiceMap.containsKey(serviceName)) {
       return;
     }
@@ -123,19 +122,14 @@ public class PremainService {
       Collection<AgentService> agentServices = agentServiceMap.values();
 
       for (AgentService agentService : agentServices) {
-        boolean checkedClass = agentService.checkNecessaryClass(newClassName);
+        boolean isNecessaryClass = agentService.checkNecessaryClass(newClassName);
         // checkedClass表示当前加载的类newClassName是否有对应的MethodAdapter，当为false时，表示没有对应的MethodAdapter，
         // 这时候就直接跳过
-        if (!checkedClass) {
+        if (!isNecessaryClass) {
           continue;
         }
 
-        MethodAdapter adapter = agentService.getMethodAdapters();
-
-        if (logger.isDebugEnabled()) {
-          logger.debug("Instrumentation had retransformed class {}.", newClassName);
-        }
-
+        MethodAdapter adapter = agentService.getMethodAdapterMap().get(newClassName);
         return adapter.transform();
       }
 

@@ -27,7 +27,6 @@ package org.newcih.galois.service.mybatis;
 import static org.newcih.galois.constants.ConfConstant.RELOADER_MYBATIS_ENABLE;
 import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.service.AgentService;
-import org.newcih.galois.service.mybatis.listeners.MyBatisXmlListener;
 
 /**
  * mybatis agent service
@@ -55,9 +54,5 @@ public class MyBatisAgentService extends AgentService {
     return myBatisAgentService;
   }
 
-  @Override
-  public void init() {
-    listeners.add(new MyBatisXmlListener());
-    beanReloader = MyBatisBeanReloader.getInstance();
-  }
+
 }

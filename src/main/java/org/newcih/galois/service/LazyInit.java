@@ -22,46 +22,19 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service.runners;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import org.newcih.galois.service.AgentService;
-import org.newcih.galois.service.FileWatchService;
-import org.springframework.context.ConfigurableApplicationContext;
+package org.newcih.galois.service;
 
 /**
- * agent service init runner
+ * The interface Lazy init.
  *
  * @author liuguangsheng
+ * @since 1.0.0
  */
-public class AgentServiceInitRunner extends AbstractRunner {
-
-  private final Collection<AgentService> agentServices = new ArrayList<>(32);
-  private static final FileWatchService fileWatchService = FileWatchService.getInstance();
+public interface LazyInit {
 
   /**
-   * Instantiates a new Agent service init runner.
+   * Lazy init after all necessary class was loaded.
    */
-  public AgentServiceInitRunner() {
-    setRank(FileWatchRunner.RANK + 1);
-  }
+  void lazyInit();
 
-  /**
-   * Add agent service.
-   *
-   * @param agentService the agent service
-   */
-  public void addAgentService(AgentService agentService) {
-    this.agentServices.add(agentService);
-  }
-
-  @Override
-  public void started(ConfigurableApplicationContext context) {
-    agentServices.stream()
-        .filter(AgentService::isUseful)
-        .forEach(agentService -> {
-          fileWatchService.registerListeners(agentService.getListeners());
-        });
-  }
 }

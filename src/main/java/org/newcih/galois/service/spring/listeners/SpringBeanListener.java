@@ -29,6 +29,7 @@ import java.io.File;
 import java.lang.instrument.ClassDefinition;
 import java.util.Arrays;
 import org.newcih.galois.service.FileChangedListener;
+import org.newcih.galois.service.spring.SpringAgentService;
 import org.newcih.galois.utils.FileUtil;
 import org.newcih.galois.utils.JavaUtil;
 import org.slf4j.Logger;
@@ -114,4 +115,11 @@ public class SpringBeanListener implements FileChangedListener {
 
   }
 
+  /**
+   * Lazy init after all necessary class was loaded.
+   */
+  @Override
+  public void lazyInit() {
+    SpringAgentService.getInstance().registerFileChangedListener(new SpringBeanListener());
+  }
 }
