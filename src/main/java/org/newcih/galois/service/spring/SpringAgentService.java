@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
  * spring agent service
  *
  * @author liuguangsheng
- * @since 1.0.0
  */
 public class SpringAgentService extends AgentService {
 

@@ -78,33 +78,6 @@ public class PremainService {
   }
 
   /**
-   * Register agent service.
-   *
-   * @param agentService the agent service
-   */
-  public static void registerAgentService(AgentService agentService) {
-    String serviceName = agentService.getClass().getSimpleName();
-    if (agentServiceMap.containsKey(serviceName)) {
-      return;
-    }
-
-    agentServiceMap.put(serviceName, agentService);
-    // register spring runner
-    initRunner.addAgentService(agentService);
-  }
-
-  /**
-   * get agent services
-   *
-   * @return {@link Collection}
-   * @see Collection
-   * @see AgentService
-   */
-  public static Collection<AgentService> getAgentServices() {
-    return agentServiceMap.values();
-  }
-
-  /**
    * custom class file transformer
    *
    * @author liuguangsheng
@@ -123,8 +96,8 @@ public class PremainService {
 
       for (AgentService agentService : agentServices) {
         boolean isNecessaryClass = agentService.checkNecessaryClass(newClassName);
-        // checkedClass表示当前加载的类newClassName是否有对应的MethodAdapter，当为false时，表示没有对应的MethodAdapter，
-        // 这时候就直接跳过
+        // checkedClass表示当前加载的类newClassName是否有对应的MethodAdapter，当为false时，
+        // 表示没有对应的MethodAdapter，这时候就直接跳过
         if (!isNecessaryClass) {
           continue;
         }
@@ -136,6 +109,4 @@ public class PremainService {
       return null;
     }
   }
-
-
 }
