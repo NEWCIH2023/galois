@@ -26,6 +26,7 @@ package org.newcih.galois.service.spring;
 
 import java.lang.reflect.Modifier;
 import org.newcih.galois.service.BeanReloader;
+import org.newcih.galois.service.annotation.LazyBean;
 import org.newcih.galois.service.spring.visitors.ApplicationContextVisitor;
 import org.newcih.galois.service.spring.visitors.BeanDefinitionScannerVisitor;
 import org.slf4j.Logger;
@@ -40,6 +41,7 @@ import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
  * @author liuguangsheng
  * @since 1.0.0
  */
+@LazyBean(value = "SpringBeanReloader", belongTo = SpringAgentService.class)
 public class SpringBeanReloader implements BeanReloader<Class<?>>,
     ApplicationContextVisitor.NecessaryMethods, BeanDefinitionScannerVisitor.NecessaryMethods {
 
@@ -87,16 +89,6 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>,
 
     String[] beanTypeNames = getContext().getBeanNamesForType(clazz);
     return beanTypeNames.length > 0;
-  }
-
-  /**
-   * Lazy init after all necessary class was loaded
-   *
-   * @return
-   */
-  @Override
-  public Class lazyInit() {
-    return SpringBeanReloader.class;
   }
 
   /**

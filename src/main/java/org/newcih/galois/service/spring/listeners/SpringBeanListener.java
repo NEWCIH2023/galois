@@ -30,6 +30,7 @@ import java.lang.instrument.ClassDefinition;
 import java.util.Arrays;
 import org.newcih.galois.service.FileChangedListener;
 import org.newcih.galois.service.annotation.LazyBean;
+import org.newcih.galois.service.spring.SpringAgentService;
 import org.newcih.galois.utils.ClassUtil;
 import org.newcih.galois.utils.FileUtil;
 import org.slf4j.Logger;
@@ -41,7 +42,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author liuguangsheng
  */
-@LazyBean("SpringBeanListener")
+@LazyBean(value = "SpringBeanListener", belongTo = SpringAgentService.class)
 public class SpringBeanListener implements FileChangedListener {
 
   private static final Logger logger = LoggerFactory.getLogger(SpringBeanListener.class);

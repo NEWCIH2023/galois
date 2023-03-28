@@ -30,20 +30,30 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import org.newcih.galois.service.AgentService;
 
 /**
  * mark a service as lazy bean which will be inited after spring boot started
  *
  * @author liuguangsheng
- **/
+ */
 @Documented
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface LazyBean {
 
+  /**
+   * Value string.
+   *
+   * @return the string
+   */
   String value();
 
-  Class<?> type();
-
+  /**
+   * Belong to class.
+   *
+   * @return the class
+   */
+  Class<? extends AgentService> belongTo();
 }

@@ -32,7 +32,7 @@ import java.io.File;
  * @author liuguangsheng
  * @since 1.0.0
  */
-public interface FileChangedListener extends LazyInitializer {
+public interface FileChangedListener {
 
   /**
    * is listener useful for this file object
