@@ -30,7 +30,6 @@ import org.newcih.galois.service.AgentService;
 import org.newcih.galois.service.BeanReloader;
 import org.newcih.galois.service.FileChangedListener;
 import org.newcih.galois.service.FileWatchService;
-import org.newcih.galois.service.LazyInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;

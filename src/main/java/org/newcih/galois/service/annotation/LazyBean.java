@@ -55,5 +55,5 @@ public @interface LazyBean {
    *
    * @return the class
    */
-  Class<? extends AgentService> belongTo();
+  Class<? extends AgentService> manager();
 }

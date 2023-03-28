@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author liuguangsheng
  */
-@LazyBean(value = "SpringBeanListener", belongTo = SpringAgentService.class)
+@LazyBean(value = "SpringBeanListener", manager = SpringAgentService.class)
 public class SpringBeanListener implements FileChangedListener {
 
   private static final Logger logger = LoggerFactory.getLogger(SpringBeanListener.class);

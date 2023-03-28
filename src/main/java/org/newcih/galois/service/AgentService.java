@@ -60,7 +60,6 @@ public abstract class AgentService {
    * 是否启用该AgentService，当该变量值与necessaryClasses的大小一致时，表示该AgentService启用
    */
   private int enabled;
-  private List<Class<? extends LazyInitializer>> lazyInitializers = new ArrayList<>(32);
 
   /**
    * 当前AgentService是否可启用
@@ -174,22 +173,5 @@ public abstract class AgentService {
     return enabled;
   }
 
-  /**
-   * Gets lazy initializers.
-   *
-   * @return the lazy initializers
-   */
-  public List<Class<? extends LazyInitializer>> getLazyInitializers() {
-    return lazyInitializers;
-  }
-
-  /**
-   * Sets lazy initializers.
-   *
-   * @param lazyInitializer the lazy initializer
-   */
-  public void addLazyInitializer(Class<? extends LazyInitializer> lazyInitializer) {
-    this.lazyInitializers.add(lazyInitializer);
-  }
 }
 

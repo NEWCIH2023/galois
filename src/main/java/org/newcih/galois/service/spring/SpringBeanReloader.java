@@ -41,7 +41,7 @@ import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
  * @author liuguangsheng
  * @since 1.0.0
  */
-@LazyBean(value = "SpringBeanReloader", belongTo = SpringAgentService.class)
+@LazyBean(value = "SpringBeanReloader", manager = SpringAgentService.class)
 public class SpringBeanReloader implements BeanReloader<Class<?>>,
     ApplicationContextVisitor.NecessaryMethods, BeanDefinitionScannerVisitor.NecessaryMethods {
 
