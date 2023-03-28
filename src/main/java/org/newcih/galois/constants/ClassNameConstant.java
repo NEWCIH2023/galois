@@ -32,6 +32,7 @@ package org.newcih.galois.constants;
  */
 public final class ClassNameConstant {
 
+  public static final String SERVICE_PACKAGE = "org.newcih.galois.service";
   /**
    * The constant COMTOP_CONFIGURATION.
    */

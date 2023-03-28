@@ -24,6 +24,7 @@
 
 package org.newcih.galois.service;
 
+import static org.newcih.galois.constants.ClassNameConstant.SERVICE_PACKAGE;
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SLASH;
 import java.lang.instrument.ClassFileTransformer;
@@ -54,7 +55,7 @@ public class PremainService {
   private static final SpringRunnerManager runManager = SpringRunnerManager.getInstance();
 
   static {
-    Set<Class<?>> agentClasses = ClassUtil.scanBaseClass("org.newcih.galois.service",
+    Set<Class<?>> agentClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE,
         Collections.singletonList(AgentService.class));
     runManager.addRunner(initRunner);
   }
