@@ -50,7 +50,9 @@ public interface BeanReloader<T> extends LazyInit {
 
   /**
    * Lazy init after all necessary class was loaded
+   *
+   * @return
    */
   @Override
-  void lazyInit();
+  Class<? extends BeanReloader<?>> lazyInit();
 }

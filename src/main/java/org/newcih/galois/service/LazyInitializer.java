@@ -28,13 +28,7 @@ package org.newcih.galois.service;
  * The interface Lazy init.
  *
  * @author liuguangsheng
- * @since 1.0.0
  */
-public interface LazyInit {
-
-  /**
-   * Lazy init after all necessary class was loaded.
-   */
-  void lazyInit();
+public interface LazyInitializer {
 
 }

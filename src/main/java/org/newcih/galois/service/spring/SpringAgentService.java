@@ -65,5 +65,4 @@ public class SpringAgentService extends AgentService {
   public static SpringAgentService getInstance() {
     return instance;
   }
-
 }

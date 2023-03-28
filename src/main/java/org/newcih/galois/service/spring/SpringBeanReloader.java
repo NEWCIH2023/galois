@@ -91,10 +91,12 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>,
 
   /**
    * Lazy init after all necessary class was loaded
+   *
+   * @return
    */
   @Override
-  public void lazyInit() {
-    SpringAgentService.getInstance().setBeanReloader(new SpringBeanReloader());
+  public Class lazyInit() {
+    return SpringBeanReloader.class;
   }
 
   /**

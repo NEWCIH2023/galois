@@ -27,8 +27,12 @@ package org.newcih.galois.service.runners;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.newcih.galois.service.AgentService;
+import org.newcih.galois.service.BeanReloader;
 import org.newcih.galois.service.FileChangedListener;
 import org.newcih.galois.service.FileWatchService;
+import org.newcih.galois.service.LazyInitializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
@@ -40,6 +44,7 @@ public class AgentInitializeRunner extends AbstractRunner {
 
   private final Collection<AgentService> agentServices = new ArrayList<>(32);
   private static final FileWatchService fileWatchService = FileWatchService.getInstance();
+  private static final Logger logger = LoggerFactory.getLogger(AgentInitializeRunner.class);
 
   /**
    * Instantiates a new Agent service init runner.
@@ -62,9 +67,20 @@ public class AgentInitializeRunner extends AbstractRunner {
     agentServices.stream()
         .filter(AgentService::isUseful)
         .forEach(agentService -> {
-          agentService.getListeners().forEach(FileChangedListener::lazyInit);
-          agentService.getBeanReloader().lazyInit();
-          fileWatchService.registerListeners(agentService.getListeners());
+          try {
+            for (Class<? extends LazyInitializer> initializer : agentService.getLazyInitializers()) {
+              Object bean = initializer.newInstance();
+              if (bean instanceof FileChangedListener) {
+                FileChangedListener listener = (FileChangedListener) bean;
+                fileWatchService.registerListener(listener);
+              } else if (bean instanceof BeanReloader) {
+                BeanReloader<?> beanReloader = (BeanReloader<?>) bean;
+                agentService.setBeanReloader(beanReloader);
+              }
+            }
+          } catch (InstantiationException | IllegalAccessException e) {
+            logger.error("Create Service Bean over newInstance method fail.", e);
+          }
         });
   }
 }

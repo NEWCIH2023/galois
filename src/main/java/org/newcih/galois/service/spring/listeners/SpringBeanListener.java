@@ -51,6 +51,10 @@ public class SpringBeanListener implements FileChangedListener {
     return FileUtil.validFileType(file, CLASS_FILE);
   }
 
+  static {
+    SpringAgentService.getInstance().addLazyInit(SpringBeanListener.class);
+  }
+
   /**
    * file changed handle
    *
@@ -113,13 +117,5 @@ public class SpringBeanListener implements FileChangedListener {
   @Override
   public void deletedHandle(File file) {
 
-  }
-
-  /**
-   * Lazy init after all necessary class was loaded.
-   */
-  @Override
-  public void lazyInit() {
-    SpringAgentService.getInstance().registerFileChangedListener(new SpringBeanListener());
   }
 }
