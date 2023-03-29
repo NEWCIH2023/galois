@@ -24,7 +24,6 @@
 
 package org.newcih.galois.service.runners;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import static org.newcih.galois.constants.ClassNameConstant.SERVICE_PACKAGE;
-import static org.newcih.galois.constants.Constant.GET_INSTANCE;
 
 /**
  * agent service init runner
@@ -71,25 +69,27 @@ public class AgentInitializeRunner extends AbstractRunner {
     @Override
     public void started(ConfigurableApplicationContext context) {
         try {
+            Set<Class<?>> fileChangedClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE, FileChangedListener.class);
+
             for (AgentService agentService : agentServices) {
                 if (!agentService.isUseful()) {
+                    logger.info("{} wasn't enable, do not init it.", agentService);
                     continue;
                 }
 
-                Set<Class<?>> fileChangedClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE, FileChangedListener.class);
                 for (Class<?> fileChangedClass : fileChangedClasses) {
                     if (Modifier.isInterface(fileChangedClass.getModifiers())) {
                         continue;
                     }
 
-                    FileChangedListener listener = (FileChangedListener) fileChangedClass.newInstance();
                     LazyBean lazyBean = fileChangedClass.getAnnotation(LazyBean.class);
-
-
+                    if (lazyBean.manager().isInstance(agentService)) {
+                        FileChangedListener listener = (FileChangedListener) fileChangedClass.newInstance();
+                        agentService.registerFileChangedListener(listener);
+                    }
                 }
             }
-        } catch (Exception e) {
-
+        } catch (Exception ignored) {
         }
     }
 }
