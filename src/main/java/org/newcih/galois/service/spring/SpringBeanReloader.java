@@ -42,89 +42,90 @@ import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
  */
 @LazyBean(value = "SpringBeanReloader", manager = SpringAgentService.class)
 public class SpringBeanReloader implements BeanReloader<Class<?>>,
-    ApplicationContextVisitor.NecessaryMethods, BeanDefinitionScannerVisitor.NecessaryMethods {
+        ApplicationContextVisitor.NecessaryMethods, BeanDefinitionScannerVisitor.NecessaryMethods {
 
-  private static final Logger logger = LoggerFactory.getLogger(SpringBeanReloader.class);
-  protected ClassPathBeanDefinitionScanner scanner;
-  protected AnnotationConfigServletWebServerApplicationContext context;
+    private static final Logger logger = LoggerFactory.getLogger(SpringBeanReloader.class);
+    protected ClassPathBeanDefinitionScanner scanner;
+    protected AnnotationConfigServletWebServerApplicationContext context;
 
-  /**
-   * 更新Spring管理的bean对象
-   *
-   * @param clazz 待更新实例的类对象类型
-   */
-  @Override
-  public void updateBean(Class<?> clazz) {
-    if (scanner == null || context == null) {
-      logger.error(
-          "SpringBeanReloader not prepare ready. BeanDefinitionScanner or ApplicationContext object is null.");
-      return;
+    /**
+     * 更新Spring管理的bean对象
+     *
+     * @param clazz 待更新实例的类对象类型
+     */
+    @Override
+    public void updateBean(Class<?> clazz) {
+        if (scanner == null || context == null) {
+            logger.error(
+                    "SpringBeanReloader not prepare ready. BeanDefinitionScanner or ApplicationContext object is null" +
+                            ".");
+            return;
+        }
+
+        DefaultListableBeanFactory factory = (DefaultListableBeanFactory) getContext().getAutowireCapableBeanFactory();
+        String beanName = factory.getBeanNamesForType(clazz)[0];
+
+        try {
+            Object bean = clazz.newInstance();
+            factory.destroySingleton(beanName);
+            factory.registerSingleton(beanName, bean);
+        } catch (InstantiationException ie) {
+            logger.error(
+                    "Can't create a new object by newInstance method, ensure that's not an abstract class.");
+        } catch (Exception e) {
+            logger.error("SpringBeanReloader update bean fail.", e);
+        }
+
+        logger.info("SpringBeanReloader reload class {} success.", clazz.getSimpleName());
     }
 
-    DefaultListableBeanFactory factory = (DefaultListableBeanFactory) getContext().getAutowireCapableBeanFactory();
-    String beanName = factory.getBeanNamesForType(clazz)[0];
+    @Override
+    public boolean isUseful(Class<?> clazz) {
+        int m = clazz.getModifiers();
+        if (Modifier.isInterface(m) || Modifier.isAbstract(m) || Modifier.isPrivate(m)
+                || Modifier.isStatic(m) || Modifier.isNative(m)) {
+            return false;
+        }
 
-    try {
-      Object bean = clazz.newInstance();
-      factory.destroySingleton(beanName);
-      factory.registerSingleton(beanName, bean);
-    } catch (InstantiationException ie) {
-      logger.error(
-          "Can't create a new object by newInstance method, ensure that's not an abstract class.");
-    } catch (Exception e) {
-      logger.error("SpringBeanReloader update bean fail.", e);
+        String[] beanTypeNames = getContext().getBeanNamesForType(clazz);
+        return beanTypeNames.length > 0;
     }
 
-    logger.info("SpringBeanReloader reload class {} success.", clazz.getSimpleName());
-  }
-
-  @Override
-  public boolean isUseful(Class<?> clazz) {
-    int m = clazz.getModifiers();
-    if (Modifier.isInterface(m) || Modifier.isAbstract(m) || Modifier.isPrivate(m)
-        || Modifier.isStatic(m) || Modifier.isNative(m)) {
-      return false;
+    /**
+     * Gets scanner.
+     *
+     * @return the scanner
+     */
+    public ClassPathBeanDefinitionScanner getScanner() {
+        return scanner;
     }
 
-    String[] beanTypeNames = getContext().getBeanNamesForType(clazz);
-    return beanTypeNames.length > 0;
-  }
+    /**
+     * Sets scanner.
+     *
+     * @param scanner the scanner
+     */
+    @Override
+    public void setScanner(ClassPathBeanDefinitionScanner scanner) {
+        this.scanner = scanner;
+    }
 
-  /**
-   * Gets scanner.
-   *
-   * @return the scanner
-   */
-  public ClassPathBeanDefinitionScanner getScanner() {
-    return scanner;
-  }
+    /**
+     * Gets context.
+     *
+     * @return the context
+     */
+    public AnnotationConfigServletWebServerApplicationContext getContext() {
+        return context;
+    }
 
-  /**
-   * Sets scanner.
-   *
-   * @param scanner the scanner
-   */
-  @Override
-  public void setScanner(ClassPathBeanDefinitionScanner scanner) {
-    this.scanner = scanner;
-  }
-
-  /**
-   * Gets context.
-   *
-   * @return the context
-   */
-  public AnnotationConfigServletWebServerApplicationContext getContext() {
-    return context;
-  }
-
-  /**
-   * Sets context.
-   *
-   * @param context the context
-   */
-  @Override
-  public void setContext(AnnotationConfigServletWebServerApplicationContext context) {
-    this.context = context;
-  }
+    /**
+     * Sets context.
+     *
+     * @param context the context
+     */
+    @Override
+    public void setContext(AnnotationConfigServletWebServerApplicationContext context) {
+        this.context = context;
+    }
 }

@@ -35,25 +35,25 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 public class FileWatchRunner extends AbstractRunner {
 
-  /**
-   * The constant RANK.
-   */
-  public static final int RANK = 1;
-  private final FileWatchService fileWatchService;
+    /**
+     * The constant RANK.
+     */
+    public static final int RANK = 1;
+    private final FileWatchService fileWatchService;
 
-  /**
-   * Instantiates a new File watch runner.
-   *
-   * @param fileWatchService the file watch service
-   */
-  public FileWatchRunner(FileWatchService fileWatchService) {
-    setRank(RANK);
-    this.fileWatchService = fileWatchService;
-  }
+    /**
+     * Instantiates a new File watch runner.
+     *
+     * @param fileWatchService the file watch service
+     */
+    public FileWatchRunner(FileWatchService fileWatchService) {
+        setRank(RANK);
+        this.fileWatchService = fileWatchService;
+    }
 
-  @Override
-  public void started(ConfigurableApplicationContext context) {
-    fileWatchService.start();
-  }
+    @Override
+    public void started(ConfigurableApplicationContext context) {
+        fileWatchService.start();
+    }
 
 }

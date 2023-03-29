@@ -24,7 +24,6 @@
 
 package org.newcih.galois.service.spring.listeners;
 
-import static org.newcih.galois.constants.FileType.CLASS_FILE;
 import java.io.File;
 import java.lang.instrument.ClassDefinition;
 import java.util.Arrays;
@@ -36,6 +35,8 @@ import org.newcih.galois.utils.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.newcih.galois.constants.FileType.CLASS_FILE;
+
 
 /**
  * Spring的Bean变动监听器
@@ -45,74 +46,74 @@ import org.slf4j.LoggerFactory;
 @LazyBean(value = "SpringBeanListener", manager = SpringAgentService.class)
 public class SpringBeanListener implements FileChangedListener {
 
-  private static final Logger logger = LoggerFactory.getLogger(SpringBeanListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(SpringBeanListener.class);
 
-  @Override
-  public boolean isUseful(File file) {
-    return FileUtil.validFileType(file, CLASS_FILE);
-  }
+    @Override
+    public boolean isUseful(File file) {
+        return FileUtil.validFileType(file, CLASS_FILE);
+    }
 
-  /**
-   * file changed handle
-   *
-   * @param classFile classFile
-   */
-  private void fileChangedHandle(File classFile) {
-    String className = ClassUtil.getClassNameFromClass(classFile);
-    byte[] classBytes = FileUtil.readFile(classFile);
+    /**
+     * file changed handle
+     *
+     * @param classFile classFile
+     */
+    private void fileChangedHandle(File classFile) {
+        String className = ClassUtil.getClassNameFromClass(classFile);
+        byte[] classBytes = FileUtil.readFile(classFile);
 
-    try {
-      Class<?> clazz = Arrays.stream(ClassUtil.getInstrumentation().getAllLoadedClasses())
-          .filter(item -> item.getName().equals(className)).findFirst()
-          .orElseThrow(NullPointerException::new);
+        try {
+            Class<?> clazz = Arrays.stream(ClassUtil.getInstrumentation().getAllLoadedClasses())
+                    .filter(item -> item.getName().equals(className)).findFirst()
+                    .orElseThrow(NullPointerException::new);
 
-      ClassDefinition definition = new ClassDefinition(clazz, classBytes);
-      ClassUtil.getInstrumentation().redefineClasses(definition);
-      logger.info("Redefine class file {} success.", classFile.getName());
+            ClassDefinition definition = new ClassDefinition(clazz, classBytes);
+            ClassUtil.getInstrumentation().redefineClasses(definition);
+            logger.info("Redefine class file {} success.", classFile.getName());
 
 //      if (reloader.isUseful(clazz)) {
 //        reloader.updateBean(clazz);
 //      }
-    } catch (Throwable e) {
-      logger.error("Reload Spring Bean fail.", e);
-    }
-  }
-
-  @Override
-  public void createdHandle(File file) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("SpringBeanListener detect class file created: {}", file.getName());
+        } catch (Throwable e) {
+            logger.error("Reload Spring Bean fail.", e);
+        }
     }
 
-    fileChangedHandle(file);
-  }
+    @Override
+    public void createdHandle(File file) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("SpringBeanListener detect class file created: {}", file.getName());
+        }
 
-  /**
-   * handler for file modifed
-   *
-   * @param file file
-   */
-  @Override
-  public void modifiedHandle(File file) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("SpringBeanListener detect class file modified: {}", file.getName());
+        fileChangedHandle(file);
     }
 
-    fileChangedHandle(file);
-  }
+    /**
+     * handler for file modifed
+     *
+     * @param file file
+     */
+    @Override
+    public void modifiedHandle(File file) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("SpringBeanListener detect class file modified: {}", file.getName());
+        }
 
-  @Override
-  public String toString() {
-    return SpringBeanListener.class.getSimpleName();
-  }
+        fileChangedHandle(file);
+    }
 
-  /**
-   * handler for file deleted
-   *
-   * @param file file
-   */
-  @Override
-  public void deletedHandle(File file) {
+    @Override
+    public String toString() {
+        return SpringBeanListener.class.getSimpleName();
+    }
 
-  }
+    /**
+     * handler for file deleted
+     *
+     * @param file file
+     */
+    @Override
+    public void deletedHandle(File file) {
+
+    }
 }

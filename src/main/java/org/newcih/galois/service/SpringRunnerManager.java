@@ -41,48 +41,48 @@ import org.springframework.boot.SpringApplicationRunListener;
  */
 public class SpringRunnerManager implements SpringApplicationRunListenersVisitor.NecessaryMethods {
 
-  private final Map<Integer, SpringApplicationRunListener> runnerMap = new HashMap<>(32);
-  private static final SpringRunnerManager instance = new SpringRunnerManager();
-  private static final Logger logger = LoggerFactory.getLogger(SpringRunnerManager.class);
+    private static final SpringRunnerManager instance = new SpringRunnerManager();
+    private static final Logger logger = LoggerFactory.getLogger(SpringRunnerManager.class);
+    private final Map<Integer, SpringApplicationRunListener> runnerMap = new HashMap<>(32);
 
-  /**
-   * Gets instance.
-   *
-   * @return the instance
-   */
-  public static SpringRunnerManager getInstance() {
-    return instance;
-  }
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
+    public static SpringRunnerManager getInstance() {
+        return instance;
+    }
 
-  /**
-   * Add runner.
-   *
-   * @param rank   the rank
-   * @param runner the runner
-   */
-  public void addRunner(Integer rank, SpringApplicationRunListener runner) {
-    runnerMap.put(rank, runner);
-  }
+    /**
+     * Add runner.
+     *
+     * @param rank   the rank
+     * @param runner the runner
+     */
+    public void addRunner(Integer rank, SpringApplicationRunListener runner) {
+        runnerMap.put(rank, runner);
+    }
 
-  /**
-   * Add runner.
-   *
-   * @param runner the runner
-   */
-  public void addRunner(SpringApplicationRunListener runner) {
-    runnerMap.put(0, runner);
-  }
+    /**
+     * Add runner.
+     *
+     * @param runner the runner
+     */
+    public void addRunner(SpringApplicationRunListener runner) {
+        runnerMap.put(0, runner);
+    }
 
-  @Override
-  public List<SpringApplicationRunListener> getRunners() {
-    List<SpringApplicationRunListener> result = runnerMap.entrySet().stream()
-        .sorted((e1, e2) -> e2.getKey().compareTo(e1.getKey()))
-        .map(Entry::getValue)
-        .collect(Collectors.toList());
+    @Override
+    public List<SpringApplicationRunListener> getRunners() {
+        List<SpringApplicationRunListener> result = runnerMap.entrySet().stream()
+                .sorted((e1, e2) -> e2.getKey().compareTo(e1.getKey()))
+                .map(Entry::getValue)
+                .collect(Collectors.toList());
 
-    logger.info("Now register these run listener in ordered: {}", result);
+        logger.info("Now register these run listener in ordered: {}", result);
 
-    return result;
-  }
+        return result;
+    }
 
 }

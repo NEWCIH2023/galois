@@ -25,11 +25,6 @@
 
 package org.newcih.galois.utils;
 
-import static org.newcih.galois.constants.Constant.DOT;
-import static org.newcih.galois.constants.Constant.SLASH;
-import static org.newcih.galois.constants.FileType.CLASS_FILE;
-import static org.springframework.core.io.support.ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX;
-import static org.springframework.util.ClassUtils.convertClassNameToResourcePath;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -55,6 +50,12 @@ import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.core.type.filter.TypeFilter;
 import org.springframework.util.SystemPropertyUtils;
 
+import static org.newcih.galois.constants.Constant.DOT;
+import static org.newcih.galois.constants.Constant.SLASH;
+import static org.newcih.galois.constants.FileType.CLASS_FILE;
+import static org.springframework.core.io.support.ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX;
+import static org.springframework.util.ClassUtils.convertClassNameToResourcePath;
+
 /**
  * java util
  *
@@ -63,215 +64,215 @@ import org.springframework.util.SystemPropertyUtils;
  */
 public class ClassUtil {
 
-  private static final String compileDir;
-  private static final Pattern packagePattern = Pattern.compile("^package +(\\S+);");
-  private static final Pattern classNamePattern = Pattern.compile("class +([\\S&&[^<]]+)");
-  /**
-   * The constant inst.
-   */
-  public static Instrumentation instrumentation;
+    private static final String compileDir;
+    private static final Pattern packagePattern = Pattern.compile("^package +(\\S+);");
+    private static final Pattern classNamePattern = Pattern.compile("class +([\\S&&[^<]]+)");
+    /**
+     * The constant inst.
+     */
+    public static Instrumentation instrumentation;
 
-  static {
-    compileDir =
-        System.getProperty("java.io.tmpdir") + File.separator + "GaloisCompile" + File.separator;
-    File directory = new File(compileDir);
-    if (!directory.exists()) {
-      try {
-        directory.mkdir();
-      } catch (Exception ignored) {
-      }
-    }
-  }
-
-  /**
-   * Scan base class set.
-   *
-   * @param basePackage the base package
-   * @param baseClasses the base classes
-   * @return the set
-   */
-  public static Set<Class<?>> scanBaseClass(String basePackage, List<Class<?>> baseClasses) {
-    List<TypeFilter> includeFilters = new ArrayList<>(16);
-    for (Class<?> baseClass : baseClasses) {
-      includeFilters.add(new AssignableTypeFilter(baseClass));
-    }
-
-    return scanPackageClass(basePackage, includeFilters, null);
-  }
-
-  /**
-   * Scan annotation class set.
-   *
-   * @param basePackage the base package
-   * @param annotations the annotations
-   * @return the set
-   */
-  public static Set<Class<?>> scanAnnotationClass(String basePackage,
-      List<Class<? extends Annotation>> annotations) {
-    List<TypeFilter> includeFilters = new ArrayList<>(16);
-    for (Class<? extends Annotation> annotation : annotations) {
-      includeFilters.add(new AnnotationTypeFilter(annotation));
-    }
-
-    return scanPackageClass(basePackage, includeFilters, null);
-  }
-
-  /**
-   * Scan package class set. base on spring tool
-   *
-   * @param basePackage     the base package
-   * @param includeFileters include fileters
-   * @param excludeFilters  exclude filters
-   * @return the set
-   */
-  public static Set<Class<?>> scanPackageClass(String basePackage, List<TypeFilter> includeFileters,
-      List<TypeFilter> excludeFilters) {
-    ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
-    MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(
-        resourcePatternResolver);
-    Set<Class<?>> result = new HashSet<>(128);
-
-    try {
-      String base = SystemPropertyUtils.resolvePlaceholders(basePackage);
-      String searchPath = CLASSPATH_ALL_URL_PREFIX +
-          convertClassNameToResourcePath(base) + "/**/*.class";
-      Resource[] resources = resourcePatternResolver.getResources(searchPath);
-      for (Resource resource : resources) {
-        if (resource.isReadable()) {
-          MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(resource);
-          boolean flag = false;
-
-          if (includeFileters != null && !includeFileters.isEmpty()) {
-            for (TypeFilter filter : includeFileters) {
-              if (filter.match(metadataReader, metadataReaderFactory)) {
-                flag = true;
-                break;
-              }
+    static {
+        compileDir =
+                System.getProperty("java.io.tmpdir") + File.separator + "GaloisCompile" + File.separator;
+        File directory = new File(compileDir);
+        if (!directory.exists()) {
+            try {
+                directory.mkdir();
+            } catch (Exception ignored) {
             }
-          }
+        }
+    }
 
-          if (excludeFilters != null && !excludeFilters.isEmpty()) {
-            for (TypeFilter filter : excludeFilters) {
-              if (filter.match(metadataReader, metadataReaderFactory)) {
-                flag = false;
-                break;
-              }
+    /**
+     * Scan base class set.
+     *
+     * @param basePackage the base package
+     * @param baseClasses the base classes
+     * @return the set
+     */
+    public static Set<Class<?>> scanBaseClass(String basePackage, List<Class<?>> baseClasses) {
+        List<TypeFilter> includeFilters = new ArrayList<>(16);
+        for (Class<?> baseClass : baseClasses) {
+            includeFilters.add(new AssignableTypeFilter(baseClass));
+        }
+
+        return scanPackageClass(basePackage, includeFilters, null);
+    }
+
+    /**
+     * Scan annotation class set.
+     *
+     * @param basePackage the base package
+     * @param annotations the annotations
+     * @return the set
+     */
+    public static Set<Class<?>> scanAnnotationClass(String basePackage,
+                                                    List<Class<? extends Annotation>> annotations) {
+        List<TypeFilter> includeFilters = new ArrayList<>(16);
+        for (Class<? extends Annotation> annotation : annotations) {
+            includeFilters.add(new AnnotationTypeFilter(annotation));
+        }
+
+        return scanPackageClass(basePackage, includeFilters, null);
+    }
+
+    /**
+     * Scan package class set. base on spring tool
+     *
+     * @param basePackage     the base package
+     * @param includeFileters include fileters
+     * @param excludeFilters  exclude filters
+     * @return the set
+     */
+    public static Set<Class<?>> scanPackageClass(String basePackage, List<TypeFilter> includeFileters,
+                                                 List<TypeFilter> excludeFilters) {
+        ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+        MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(
+                resourcePatternResolver);
+        Set<Class<?>> result = new HashSet<>(128);
+
+        try {
+            String base = SystemPropertyUtils.resolvePlaceholders(basePackage);
+            String searchPath = CLASSPATH_ALL_URL_PREFIX +
+                    convertClassNameToResourcePath(base) + "/**/*.class";
+            Resource[] resources = resourcePatternResolver.getResources(searchPath);
+            for (Resource resource : resources) {
+                if (resource.isReadable()) {
+                    MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(resource);
+                    boolean flag = false;
+
+                    if (includeFileters != null && !includeFileters.isEmpty()) {
+                        for (TypeFilter filter : includeFileters) {
+                            if (filter.match(metadataReader, metadataReaderFactory)) {
+                                flag = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (excludeFilters != null && !excludeFilters.isEmpty()) {
+                        for (TypeFilter filter : excludeFilters) {
+                            if (filter.match(metadataReader, metadataReaderFactory)) {
+                                flag = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (flag) {
+                        result.add(Class.forName(metadataReader.getClassMetadata().getClassName()));
+                    }
+                }
             }
-          }
 
-          if (flag) {
-            result.add(Class.forName(metadataReader.getClassMetadata().getClassName()));
-          }
-        }
-      }
-
-    } catch (IOException | ClassNotFoundException e) {
-      throw new RuntimeException(e);
-    }
-
-    return result;
-  }
-
-  /**
-   * Gets instrumentation.
-   *
-   * @return the instrumentation
-   */
-  public static Instrumentation getInstrumentation() {
-    return instrumentation;
-  }
-
-  /**
-   * Sets instrumentation.
-   *
-   * @param instrumentation the instrumentation
-   */
-  public static void setInstrumentation(Instrumentation instrumentation) {
-    ClassUtil.instrumentation = instrumentation;
-  }
-
-  /**
-   * get class name from class
-   *
-   * @param classFile classFile
-   * @return {@link String}
-   * @see String
-   */
-  public static String getClassNameFromClass(File classFile) {
-    try {
-      ClassReader classReader = new ClassReader(Files.newInputStream(classFile.toPath()));
-      return classReader.getClassName().replace(SLASH, DOT);
-    } catch (IOException e) {
-      return "";
-    }
-  }
-
-  /**
-   * get class name from source
-   *
-   * @param javaFile javaFile
-   * @return {@link String}
-   * @see String
-   */
-  public static String getClassNameFromSource(File javaFile) {
-    try (BufferedReader br = new BufferedReader(new FileReader(javaFile))) {
-      String tmp = "";
-      String result = "";
-
-      Matcher packageMatcher;
-      Matcher classNameMatcher;
-
-      while ((tmp = br.readLine()) != null) {
-        packageMatcher = packagePattern.matcher(tmp);
-        if (packageMatcher.find()) {
-          result = packageMatcher.group(1);
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
 
-        classNameMatcher = classNamePattern.matcher(tmp);
-        if (classNameMatcher.find()) {
-          result += DOT + classNameMatcher.group(1);
-          break;
+        return result;
+    }
+
+    /**
+     * Gets instrumentation.
+     *
+     * @return the instrumentation
+     */
+    public static Instrumentation getInstrumentation() {
+        return instrumentation;
+    }
+
+    /**
+     * Sets instrumentation.
+     *
+     * @param instrumentation the instrumentation
+     */
+    public static void setInstrumentation(Instrumentation instrumentation) {
+        ClassUtil.instrumentation = instrumentation;
+    }
+
+    /**
+     * get class name from class
+     *
+     * @param classFile classFile
+     * @return {@link String}
+     * @see String
+     */
+    public static String getClassNameFromClass(File classFile) {
+        try {
+            ClassReader classReader = new ClassReader(Files.newInputStream(classFile.toPath()));
+            return classReader.getClassName().replace(SLASH, DOT);
+        } catch (IOException e) {
+            return "";
         }
-      }
-
-      return result;
-    } catch (Exception e) {
-      return null;
-    }
-  }
-
-
-  /**
-   * Gets class file.
-   *
-   * @param clazz must include package path
-   * @return class file
-   */
-  public static File getClassFile(Class<?> clazz) {
-    return getClassFile(clazz.getName());
-  }
-
-  /**
-   * Gets class file.
-   *
-   * @param className must include package path
-   * @return class file
-   */
-  public static File getClassFile(String className) {
-    if (StringUtil.isBlank(className)) {
-      return null;
     }
 
-    return new File(compileDir + String.join(File.separator, className.split("\\."))
-        + CLASS_FILE.getFileType());
-  }
+    /**
+     * get class name from source
+     *
+     * @param javaFile javaFile
+     * @return {@link String}
+     * @see String
+     */
+    public static String getClassNameFromSource(File javaFile) {
+        try (BufferedReader br = new BufferedReader(new FileReader(javaFile))) {
+            String tmp = "";
+            String result = "";
 
-  /**
-   * compile java source code file to byte[] data
-   *
-   * @param sourceFile
-   * @return
-   */
+            Matcher packageMatcher;
+            Matcher classNameMatcher;
+
+            while ((tmp = br.readLine()) != null) {
+                packageMatcher = packagePattern.matcher(tmp);
+                if (packageMatcher.find()) {
+                    result = packageMatcher.group(1);
+                }
+
+                classNameMatcher = classNamePattern.matcher(tmp);
+                if (classNameMatcher.find()) {
+                    result += DOT + classNameMatcher.group(1);
+                    break;
+                }
+            }
+
+            return result;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+
+    /**
+     * Gets class file.
+     *
+     * @param clazz must include package path
+     * @return class file
+     */
+    public static File getClassFile(Class<?> clazz) {
+        return getClassFile(clazz.getName());
+    }
+
+    /**
+     * Gets class file.
+     *
+     * @param className must include package path
+     * @return class file
+     */
+    public static File getClassFile(String className) {
+        if (StringUtil.isBlank(className)) {
+            return null;
+        }
+
+        return new File(compileDir + String.join(File.separator, className.split("\\."))
+                + CLASS_FILE.getFileType());
+    }
+
+    /**
+     * compile java source code file to byte[] data
+     *
+     * @param sourceFile
+     * @return
+     */
 //    public static byte[] compileSource(File sourceFile) {
 //        MemoryJavaFileManager manager = new MemoryJavaFileManager(standardJavaFileManager);
 //        String sourceCode = FileUtil.readTextFile(sourceFile);

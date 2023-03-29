@@ -24,8 +24,6 @@
 
 package org.newcih.galois.utils;
 
-import static org.newcih.galois.constants.Constant.LF;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -39,6 +37,8 @@ import org.newcih.galois.constants.FileType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.newcih.galois.constants.Constant.LF;
+
 /**
  * file util
  *
@@ -47,126 +47,126 @@ import org.slf4j.LoggerFactory;
  */
 public class FileUtil {
 
-  private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
 
-  private FileUtil() {
-  }
-
-  /**
-   * check file type by file name
-   *
-   * @param file     input file
-   * @param fileType target file type
-   * @return the boolean
-   */
-  public static boolean validFileType(File file, FileType fileType) {
-    return Objects.equals(getFileType(file), fileType.getFileType());
-  }
-
-  /**
-   * get file type by filename and include dot char in result
-   *
-   * @param file input file
-   * @return the file type
-   */
-  public static String getFileType(File file) {
-    if (file == null) {
-      return "";
+    private FileUtil() {
     }
 
-    String name = file.getName();
-    int index = name.lastIndexOf(".");
-
-    if (index != -1) {
-      String fileType = name.substring(index);
-      return fileType.toLowerCase();
+    /**
+     * check file type by file name
+     *
+     * @param file     input file
+     * @param fileType target file type
+     * @return the boolean
+     */
+    public static boolean validFileType(File file, FileType fileType) {
+        return Objects.equals(getFileType(file), fileType.getFileType());
     }
 
-    return "";
-  }
+    /**
+     * get file type by filename and include dot char in result
+     *
+     * @param file input file
+     * @return the file type
+     */
+    public static String getFileType(File file) {
+        if (file == null) {
+            return "";
+        }
 
-  /**
-   * write byte array to file
-   *
-   * @param bytes the byte array
-   * @param path  target file
-   * @return the file
-   */
-  public static File writeFile(byte[] bytes, String path) {
-    if (bytes == null || bytes.length == 0) {
-      return null;
+        String name = file.getName();
+        int index = name.lastIndexOf(".");
+
+        if (index != -1) {
+            String fileType = name.substring(index);
+            return fileType.toLowerCase();
+        }
+
+        return "";
     }
 
-    try (FileOutputStream fos = new FileOutputStream(path)) {
-      fos.write(bytes, 0, bytes.length);
-    } catch (IOException e) {
-      logger.error("Write byte array to {} fail.", path, e);
+    /**
+     * write byte array to file
+     *
+     * @param bytes the byte array
+     * @param path  target file
+     * @return the file
+     */
+    public static File writeFile(byte[] bytes, String path) {
+        if (bytes == null || bytes.length == 0) {
+            return null;
+        }
+
+        try (FileOutputStream fos = new FileOutputStream(path)) {
+            fos.write(bytes, 0, bytes.length);
+        } catch (IOException e) {
+            logger.error("Write byte array to {} fail.", path, e);
+        }
+
+        return new File(path);
     }
 
-    return new File(path);
-  }
+    /**
+     * read file to byte array
+     *
+     * @param file input file
+     * @return the byte [ ]
+     */
+    public static byte[] readFile(File file) {
+        if (file == null) {
+            return new byte[0];
+        }
 
-  /**
-   * read file to byte array
-   *
-   * @param file input file
-   * @return the byte [ ]
-   */
-  public static byte[] readFile(File file) {
-    if (file == null) {
-      return new byte[0];
+        try (FileInputStream fileInputStream = new FileInputStream(file);
+             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+
+            byte[] b = new byte[1024];
+            int n;
+            while ((n = fileInputStream.read(b)) != -1) {
+                byteArrayOutputStream.write(b, 0, n);
+            }
+
+            return byteArrayOutputStream.toByteArray();
+        } catch (Exception e) {
+            logger.error("Convert binary file to byte array fail.", e);
+        }
+
+        return new byte[0];
     }
 
-    try (FileInputStream fileInputStream = new FileInputStream(file);
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+    /**
+     * get text content in file
+     *
+     * @param file input file
+     * @return the string
+     */
+    public static String readTextFile(File file) {
+        if (file == null) {
+            return "";
+        }
 
-      byte[] b = new byte[1024];
-      int n;
-      while ((n = fileInputStream.read(b)) != -1) {
-        byteArrayOutputStream.write(b, 0, n);
-      }
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            br.lines().map(line -> line + LF).forEach(sb::append);
+        } catch (Exception e) {
+            logger.error("Read text file fail.", e);
+            return "";
+        }
 
-      return byteArrayOutputStream.toByteArray();
-    } catch (Exception e) {
-      logger.error("Convert binary file to byte array fail.", e);
+        return sb.toString();
     }
 
-    return new byte[0];
-  }
+    /**
+     * read file in classpath
+     *
+     * @param relativePath relative path
+     * @return the input stream
+     */
+    public static InputStream readClassPathFile(String relativePath) {
+        if (StringUtil.isBlank(relativePath)) {
+            return null;
+        }
 
-  /**
-   * get text content in file
-   *
-   * @param file input file
-   * @return the string
-   */
-  public static String readTextFile(File file) {
-    if (file == null) {
-      return "";
+        return FileUtil.class.getClassLoader().getResourceAsStream(relativePath);
     }
-
-    StringBuilder sb = new StringBuilder();
-    try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-      br.lines().map(line -> line + LF).forEach(sb::append);
-    } catch (Exception e) {
-      logger.error("Read text file fail.", e);
-      return "";
-    }
-
-    return sb.toString();
-  }
-
-  /**
-   * read file in classpath
-   *
-   * @param relativePath relative path
-   * @return the input stream
-   */
-  public static InputStream readClassPathFile(String relativePath) {
-    if (StringUtil.isBlank(relativePath)) {
-      return null;
-    }
-
-    return FileUtil.class.getClassLoader().getResourceAsStream(relativePath);
-  }
 }

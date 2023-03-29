@@ -24,7 +24,6 @@
 
 package org.newcih.galois.service.runners;
 
-import static org.newcih.galois.constants.ClassNameConstant.SERVICE_PACKAGE;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -39,6 +38,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import static org.newcih.galois.constants.ClassNameConstant.SERVICE_PACKAGE;
+
 /**
  * agent service init runner
  *
@@ -46,43 +47,43 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 public class AgentInitializeRunner extends AbstractRunner {
 
-  private final Collection<AgentService> agentServices = new ArrayList<>(32);
-  private static final FileWatchService fileWatchService = FileWatchService.getInstance();
-  private static final Logger logger = LoggerFactory.getLogger(AgentInitializeRunner.class);
+    private static final FileWatchService fileWatchService = FileWatchService.getInstance();
+    private static final Logger logger = LoggerFactory.getLogger(AgentInitializeRunner.class);
+    private final Collection<AgentService> agentServices = new ArrayList<>(32);
 
-  /**
-   * Instantiates a new Agent service init runner.
-   */
-  public AgentInitializeRunner() {
-    setRank(FileWatchRunner.RANK + 1);
-  }
+    /**
+     * Instantiates a new Agent service init runner.
+     */
+    public AgentInitializeRunner() {
+        setRank(FileWatchRunner.RANK + 1);
+    }
 
-  /**
-   * Add agent service.
-   *
-   * @param agentService the agent service
-   */
-  public void addAgentService(AgentService agentService) {
-    this.agentServices.add(agentService);
-  }
+    /**
+     * Add agent service.
+     *
+     * @param agentService the agent service
+     */
+    public void addAgentService(AgentService agentService) {
+        this.agentServices.add(agentService);
+    }
 
-  @Override
-  public void started(ConfigurableApplicationContext context) {
-    agentServices.stream()
-        .filter(AgentService::isUseful)
-        .forEach(agentService -> {
-          Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(SERVICE_PACKAGE,
-              Collections.singletonList(LazyBean.class));
-          for (Class<?> lazyBeanFactory : lazyBeanFactorys) {
-            if (FileChangedListener.class.isAssignableFrom(lazyBeanFactory)) {
-              logger.info("Detect FileChangedListener class {}.", lazyBeanFactory);
+    @Override
+    public void started(ConfigurableApplicationContext context) {
+        agentServices.stream()
+                .filter(AgentService::isUseful)
+                .forEach(agentService -> {
+                    Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(SERVICE_PACKAGE,
+                            Collections.singletonList(LazyBean.class));
+                    for (Class<?> lazyBeanFactory : lazyBeanFactorys) {
+                        if (FileChangedListener.class.isAssignableFrom(lazyBeanFactory)) {
+                            logger.info("Detect FileChangedListener class {}.", lazyBeanFactory);
 
-            } else if (BeanReloader.class.isAssignableFrom(lazyBeanFactory)) {
-              logger.info("Detect BeanReloader class {}.", lazyBeanFactory);
+                        } else if (BeanReloader.class.isAssignableFrom(lazyBeanFactory)) {
+                            logger.info("Detect BeanReloader class {}.", lazyBeanFactory);
 
-            }
-          }
+                        }
+                    }
 
-        });
-  }
+                });
+    }
 }

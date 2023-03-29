@@ -24,14 +24,14 @@
 
 package org.newcih.galois.service;
 
-import static org.newcih.galois.constants.ConfConstant.BANNER_ENABLE;
-import static org.newcih.galois.constants.ConfConstant.GALOIS_VERSION;
-import static org.newcih.galois.constants.Constant.LF;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 import org.newcih.galois.conf.GlobalConfiguration;
+
+import static org.newcih.galois.constants.ConfConstant.BANNER_ENABLE;
+import static org.newcih.galois.constants.ConfConstant.GALOIS_VERSION;
+import static org.newcih.galois.constants.Constant.LF;
 
 /**
  * print banner when galois starting
@@ -41,104 +41,104 @@ import org.newcih.galois.conf.GlobalConfiguration;
  */
 public class BannerService {
 
-  private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
-  private static final String BANNER =
-      "  ____       _       _     \n" +
-          " / ___| __ _| | ___ (_)___ \n" +
-          "| |  _ / _` | |/ _ \\| / __|\n" +
-          "| |_| | (_| | | (_) | \\__ \\\n" +
-          " \\____|\\__,_|_|\\___/|_|___/\t\t(" + galoisVersion() + ")";
+    private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
+    private static final String BANNER =
+            "  ____       _       _     \n" +
+                    " / ___| __ _| | ___ (_)___ \n" +
+                    "| |  _ / _` | |/ _ \\| / __|\n" +
+                    "| |_| | (_| | | (_) | \\__ \\\n" +
+                    " \\____|\\__,_|_|\\___/|_|___/\t\t(" + galoisVersion() + ")";
 
-  private BannerService() {
-  }
-
-  /**
-   * print banner
-   */
-  public static void printBanner() {
-    if (!globalConfig.getBoolean(BANNER_ENABLE, true)) {
-      return;
+    private BannerService() {
     }
 
-    StringBuilder bannerBuilder = new StringBuilder();
-    bannerBuilder.append(BANNER).append(LF);
-    bannerBuilder.append(String.format(
-        " :: SpringBoot (%s) :: Spring (%s) :: MyBatis (%s)%n :: Jdk (%s)",
-        springBootVersion(), springVersion(), mybatisVersion(), jdkVersion()
-    )).append(LF);
-    System.out.println(bannerBuilder);
-  }
+    /**
+     * print banner
+     */
+    public static void printBanner() {
+        if (!globalConfig.getBoolean(BANNER_ENABLE, true)) {
+            return;
+        }
 
-  /**
-   * spring boot version
-   *
-   * @return {@link String}
-   * @see String
-   */
-  private static String springBootVersion() {
-    try {
-      Class<?> springBootVersion = Class.forName("org.springframework.boot.SpringBootVersion");
-      Method getVersion = springBootVersion.getDeclaredMethod("getVersion");
-      return (String) getVersion.invoke(null);
-    } catch (Exception e) {
-      return "-";
+        String bannerBuilder = BANNER + LF +
+                String.format(
+                        " :: SpringBoot (%s) :: Spring (%s) :: MyBatis (%s)%n :: Jdk (%s)",
+                        springBootVersion(), springVersion(), mybatisVersion(), jdkVersion()
+                ) +
+                LF;
+        System.out.println(bannerBuilder);
     }
-  }
 
-  /**
-   * spring version
-   *
-   * @return {@link String}
-   * @see String
-   */
-  private static String springVersion() {
-    try {
-      Class<?> springVersion = Class.forName("org.springframework.core.SpringVersion");
-      Method getVersion = springVersion.getDeclaredMethod("getVersion");
-      return (String) getVersion.invoke(null);
-    } catch (Exception e) {
-      return "-";
+    /**
+     * spring boot version
+     *
+     * @return {@link String}
+     * @see String
+     */
+    private static String springBootVersion() {
+        try {
+            Class<?> springBootVersion = Class.forName("org.springframework.boot.SpringBootVersion");
+            Method getVersion = springBootVersion.getDeclaredMethod("getVersion");
+            return (String) getVersion.invoke(null);
+        } catch (Exception e) {
+            return "-";
+        }
     }
-  }
 
-  /**
-   * jdk version
-   *
-   * @return {@link String}
-   * @see String
-   */
-  private static String jdkVersion() {
-    try {
-      return System.getProperty("java.version") + " " + System.getProperty("java.vm.name");
-    } catch (Exception e) {
-      return "-";
+    /**
+     * spring version
+     *
+     * @return {@link String}
+     * @see String
+     */
+    private static String springVersion() {
+        try {
+            Class<?> springVersion = Class.forName("org.springframework.core.SpringVersion");
+            Method getVersion = springVersion.getDeclaredMethod("getVersion");
+            return (String) getVersion.invoke(null);
+        } catch (Exception e) {
+            return "-";
+        }
     }
-  }
 
-  /**
-   * mybatis version
-   *
-   * @return {@link String}
-   * @see String
-   */
-  private static String mybatisVersion() {
-    try {
-      Class<?> mapperRegistry = Class.forName("org.apache.ibatis.binding.MapperRegistry");
-      Field knownMappers = mapperRegistry.getDeclaredField("knownMappers");
-      boolean flag = knownMappers.getType().equals(Map.class);
-      return flag ? ">= 3.2.0" : "<= 3.1.0";
-    } catch (Exception e) {
-      return "-";
+    /**
+     * jdk version
+     *
+     * @return {@link String}
+     * @see String
+     */
+    private static String jdkVersion() {
+        try {
+            return System.getProperty("java.version") + " " + System.getProperty("java.vm.name");
+        } catch (Exception e) {
+            return "-";
+        }
     }
-  }
 
-  /**
-   * galois version
-   *
-   * @return {@link String}
-   * @see String
-   */
-  private static String galoisVersion() {
-    return globalConfig.getString(GALOIS_VERSION, "-");
-  }
+    /**
+     * mybatis version
+     *
+     * @return {@link String}
+     * @see String
+     */
+    private static String mybatisVersion() {
+        try {
+            Class<?> mapperRegistry = Class.forName("org.apache.ibatis.binding.MapperRegistry");
+            Field knownMappers = mapperRegistry.getDeclaredField("knownMappers");
+            boolean flag = knownMappers.getType().equals(Map.class);
+            return flag ? ">= 3.2.0" : "<= 3.1.0";
+        } catch (Exception e) {
+            return "-";
+        }
+    }
+
+    /**
+     * galois version
+     *
+     * @return {@link String}
+     * @see String
+     */
+    private static String galoisVersion() {
+        return globalConfig.getString(GALOIS_VERSION, "-");
+    }
 }

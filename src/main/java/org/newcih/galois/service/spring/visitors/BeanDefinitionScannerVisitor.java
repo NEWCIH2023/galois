@@ -24,6 +24,13 @@
 
 package org.newcih.galois.service.spring.visitors;
 
+import java.util.Objects;
+import jdk.internal.org.objectweb.asm.MethodVisitor;
+import org.newcih.galois.service.MethodAdapter;
+import org.newcih.galois.service.spring.SpringAgentService;
+import org.newcih.galois.service.spring.SpringBeanReloader;
+import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
+
 import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
 import static jdk.internal.org.objectweb.asm.Opcodes.ATHROW;
@@ -34,12 +41,6 @@ import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
 import static org.newcih.galois.constants.ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER;
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SLASH;
-import java.util.Objects;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
-import org.newcih.galois.service.MethodAdapter;
-import org.newcih.galois.service.spring.SpringAgentService;
-import org.newcih.galois.service.spring.SpringBeanReloader;
-import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 
 /**
  * bean definition scanner visitor
@@ -49,65 +50,65 @@ import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
  */
 public class BeanDefinitionScannerVisitor extends MethodAdapter {
 
-  static {
-    SpringAgentService.getInstance().registerMethodAdapter(new BeanDefinitionScannerVisitor());
-  }
-
-  /**
-   * Instantiates a new Bean definition scanner visitor.
-   */
-  private BeanDefinitionScannerVisitor() {
-    super(CLASS_PATH_BEAN_DEFINITION_SCANNER);
-  }
-
-  @Override
-  public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
-      String[] exceptions) {
-    MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
-
-    if (Objects.equals("doScan", name)) {
-      return new DoScanMethodVisitor(ASM5, mv);
+    static {
+        SpringAgentService.getInstance().registerMethodAdapter(new BeanDefinitionScannerVisitor());
     }
 
-    return mv;
-  }
-
-  /**
-   * The type Do scan method visitor.
-   */
-  class DoScanMethodVisitor extends MethodVisitor {
-
     /**
-     * Instantiates a new Do scan method visitor.
-     *
-     * @param api           the api
-     * @param methodVisitor the method visitor
+     * Instantiates a new Bean definition scanner visitor.
      */
-    public DoScanMethodVisitor(int api, MethodVisitor methodVisitor) {
-      super(api, methodVisitor);
+    private BeanDefinitionScannerVisitor() {
+        super(CLASS_PATH_BEAN_DEFINITION_SCANNER);
     }
 
     @Override
-    public void visitInsn(int opcode) {
-      if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-        String pClassName = SpringBeanReloader.class.getName().replace(DOT, SLASH);
-        String vClassName = className.replace(DOT, SLASH);
+    public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
+                                     String[] exceptions) {
+        MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
 
-        mv.visitCode();
-        mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";",
-            false);
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setScanner", "(L" + vClassName + ";)V",
-            false);
-      }
+        if (Objects.equals("doScan", name)) {
+            return new DoScanMethodVisitor(ASM5, mv);
+        }
 
-      super.visitInsn(opcode);
+        return mv;
     }
-  }
 
-  public static interface NecessaryMethods {
+    public interface NecessaryMethods {
 
-    void setScanner(ClassPathBeanDefinitionScanner scanner);
-  }
+        void setScanner(ClassPathBeanDefinitionScanner scanner);
+    }
+
+    /**
+     * The type Do scan method visitor.
+     */
+    class DoScanMethodVisitor extends MethodVisitor {
+
+        /**
+         * Instantiates a new Do scan method visitor.
+         *
+         * @param api           the api
+         * @param methodVisitor the method visitor
+         */
+        public DoScanMethodVisitor(int api, MethodVisitor methodVisitor) {
+            super(api, methodVisitor);
+        }
+
+        @Override
+        public void visitInsn(int opcode) {
+            if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
+                String pClassName = SpringBeanReloader.class.getName().replace(DOT, SLASH);
+                String vClassName = className.replace(DOT, SLASH);
+
+                mv.visitCode();
+                mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";",
+                        false);
+                mv.visitVarInsn(ALOAD, 0);
+                mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setScanner", "(L" + vClassName + ";)V",
+                        false);
+            }
+
+            super.visitInsn(opcode);
+        }
+    }
 
 }

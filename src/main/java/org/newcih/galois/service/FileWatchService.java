@@ -24,13 +24,6 @@
 
 package org.newcih.galois.service;
 
-import static com.sun.nio.file.SensitivityWatchEventModifier.HIGH;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
-import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
-import static org.newcih.galois.constants.Constant.COMMA;
-import static org.newcih.galois.constants.Constant.DOT;
-import static org.newcih.galois.constants.Constant.USER_DIR;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -45,6 +38,14 @@ import org.newcih.galois.service.runners.FileWatchRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.sun.nio.file.SensitivityWatchEventModifier.HIGH;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
+import static org.newcih.galois.constants.Constant.COMMA;
+import static org.newcih.galois.constants.Constant.DOT;
+import static org.newcih.galois.constants.Constant.USER_DIR;
+
 /**
  * file monitor service based on {@link java.nio.file.WatchService}
  *
@@ -53,167 +54,168 @@ import org.slf4j.LoggerFactory;
  */
 public class FileWatchService {
 
-  private static final Logger logger = LoggerFactory.getLogger(FileWatchService.class);
-  private static final List<FileChangedListener> listeners = new ArrayList<>(16);
-  private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
-  private WatchService watchService;
-  private static final FileWatchService instance = new FileWatchService();
-  private static final SpringRunnerManager runnerManager = SpringRunnerManager.getInstance();
-  private String rootPath;
+    private static final Logger logger = LoggerFactory.getLogger(FileWatchService.class);
+    private static final List<FileChangedListener> listeners = new ArrayList<>(16);
+    private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
+    private static final FileWatchService instance = new FileWatchService();
+    private static final SpringRunnerManager runnerManager = SpringRunnerManager.getInstance();
 
-  static {
-    String rootPath = globalConfig.getString(USER_DIR);
-    FileWatchService fileWatchService = getInstance();
-    fileWatchService.setRootPath(rootPath);
-    runnerManager.addRunner(new FileWatchRunner(fileWatchService));
-  }
-
-  private FileWatchService() {
-  }
-
-  /**
-   * Gets instance.
-   *
-   * @return the instance
-   */
-  public static FileWatchService getInstance() {
-    return instance;
-  }
-
-  /**
-   * init
-   */
-  private void init() {
-    if (rootPath == null || rootPath.isEmpty()) {
-      throw new NullPointerException("Empty path for galois listener.");
+    static {
+        String rootPath = globalConfig.getString(USER_DIR);
+        FileWatchService fileWatchService = getInstance();
+        fileWatchService.setRootPath(rootPath);
+        runnerManager.addRunner(new FileWatchRunner(fileWatchService));
     }
 
-    try {
-      watchService = FileSystems.getDefault().newWatchService();
-      registerWatchService(new File(rootPath));
-    } catch (IOException e) {
-      logger.error("Start file watch service fail.", e);
-      System.exit(0);
-    }
-  }
+    private WatchService watchService;
+    private String rootPath;
 
-  /**
-   * register each child directory to monitor file changed
-   *
-   * @param dir root dir
-   */
-  private void registerWatchService(File dir) throws IOException {
-    dir.toPath().register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY}, HIGH);
-    File[] subDirs = dir.listFiles(File::isDirectory);
-    if (subDirs == null) {
-      return;
+    private FileWatchService() {
     }
 
-    String dirName;
-    for (File subDir : subDirs) {
-      dirName = subDir.getName();
-      // do not monitor hide path
-      if (!dirName.startsWith(DOT)) {
-        registerWatchService(subDir);
-      }
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
+    public static FileWatchService getInstance() {
+        return instance;
     }
-  }
 
-  /**
-   * begin file monitor service
-   */
-  public void start() {
-    init();
-
-    Thread watchThread = new Thread(() -> {
-      logger.info("FileWatchService Started in path {} with these listeners {}", rootPath,
-          listeners.stream().map(FileChangedListener::toString).collect(Collectors.joining(COMMA)));
-
-      while (true) {
-        try {
-          WatchKey watchKey = watchService.poll();
-          if (watchKey == null) {
-            continue;
-          }
-
-          for (WatchEvent<?> event : watchKey.pollEvents()) {
-            WatchEvent.Kind<?> kind = event.kind();
-            File file = new File(watchKey.watchable() + File.separator + event.context());
-
-            if (event.count() > 1 || kind == OVERFLOW || file.isDirectory()) {
-              continue;
-            }
-
-            if (logger.isTraceEnabled()) {
-              logger.trace("monitor file {} {}.", kind, file);
-            }
-
-            listeners.stream().filter(listener -> listener.isUseful(file)).forEach(listener -> {
-              if (kind == ENTRY_CREATE) {
-                listener.createdHandle(file);
-              } else if (kind == ENTRY_MODIFY) {
-                listener.modifiedHandle(file);
-              }
-            });
-          }
-
-          watchKey.reset();
-        } catch (Exception e) {
-          logger.error("File monitor handle event failed.", e);
+    /**
+     * init
+     */
+    private void init() {
+        if (rootPath == null || rootPath.isEmpty()) {
+            throw new NullPointerException("Empty path for galois listener.");
         }
-      }
-    });
 
-    watchThread.setDaemon(true);
-    watchThread.start();
-  }
-
-  /**
-   * Gets listeners.
-   *
-   * @return the listeners
-   */
-  public List<FileChangedListener> getListeners() {
-    return listeners;
-  }
-
-  /**
-   * add a new listener
-   *
-   * @param listener listener
-   */
-  public void registerListener(FileChangedListener listener) {
-    if (listener != null) {
-      listeners.add(listener);
+        try {
+            watchService = FileSystems.getDefault().newWatchService();
+            registerWatchService(new File(rootPath));
+        } catch (IOException e) {
+            logger.error("Start file watch service fail.", e);
+            System.exit(0);
+        }
     }
-  }
 
-  /**
-   * add listener list
-   *
-   * @param listeners listeners
-   */
-  public void registerListeners(List<FileChangedListener> listeners) {
-    if (listeners != null && !listeners.isEmpty()) {
-      FileWatchService.listeners.addAll(listeners);
+    /**
+     * register each child directory to monitor file changed
+     *
+     * @param dir root dir
+     */
+    private void registerWatchService(File dir) throws IOException {
+        dir.toPath().register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY}, HIGH);
+        File[] subDirs = dir.listFiles(File::isDirectory);
+        if (subDirs == null) {
+            return;
+        }
+
+        String dirName;
+        for (File subDir : subDirs) {
+            dirName = subDir.getName();
+            // do not monitor hide path
+            if (!dirName.startsWith(DOT)) {
+                registerWatchService(subDir);
+            }
+        }
     }
-  }
 
-  /**
-   * Gets root path.
-   *
-   * @return the root path
-   */
-  public String getRootPath() {
-    return rootPath;
-  }
+    /**
+     * begin file monitor service
+     */
+    public void start() {
+        init();
 
-  /**
-   * Sets root path.
-   *
-   * @param rootPath the root path
-   */
-  public void setRootPath(String rootPath) {
-    this.rootPath = rootPath;
-  }
+        Thread watchThread = new Thread(() -> {
+            logger.info("FileWatchService Started in path {} with these listeners {}", rootPath,
+                    listeners.stream().map(FileChangedListener::toString).collect(Collectors.joining(COMMA)));
+
+            while (true) {
+                try {
+                    WatchKey watchKey = watchService.poll();
+                    if (watchKey == null) {
+                        continue;
+                    }
+
+                    for (WatchEvent<?> event : watchKey.pollEvents()) {
+                        WatchEvent.Kind<?> kind = event.kind();
+                        File file = new File(watchKey.watchable() + File.separator + event.context());
+
+                        if (event.count() > 1 || kind == OVERFLOW || file.isDirectory()) {
+                            continue;
+                        }
+
+                        if (logger.isTraceEnabled()) {
+                            logger.trace("monitor file {} {}.", kind, file);
+                        }
+
+                        listeners.stream().filter(listener -> listener.isUseful(file)).forEach(listener -> {
+                            if (kind == ENTRY_CREATE) {
+                                listener.createdHandle(file);
+                            } else if (kind == ENTRY_MODIFY) {
+                                listener.modifiedHandle(file);
+                            }
+                        });
+                    }
+
+                    watchKey.reset();
+                } catch (Exception e) {
+                    logger.error("File monitor handle event failed.", e);
+                }
+            }
+        });
+
+        watchThread.setDaemon(true);
+        watchThread.start();
+    }
+
+    /**
+     * Gets listeners.
+     *
+     * @return the listeners
+     */
+    public List<FileChangedListener> getListeners() {
+        return listeners;
+    }
+
+    /**
+     * add a new listener
+     *
+     * @param listener listener
+     */
+    public void registerListener(FileChangedListener listener) {
+        if (listener != null) {
+            listeners.add(listener);
+        }
+    }
+
+    /**
+     * add listener list
+     *
+     * @param listeners listeners
+     */
+    public void registerListeners(List<FileChangedListener> listeners) {
+        if (listeners != null && !listeners.isEmpty()) {
+            FileWatchService.listeners.addAll(listeners);
+        }
+    }
+
+    /**
+     * Gets root path.
+     *
+     * @return the root path
+     */
+    public String getRootPath() {
+        return rootPath;
+    }
+
+    /**
+     * Sets root path.
+     *
+     * @param rootPath the root path
+     */
+    public void setRootPath(String rootPath) {
+        this.rootPath = rootPath;
+    }
 }

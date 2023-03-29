@@ -43,42 +43,42 @@ import org.springframework.boot.SpringApplicationRunListener;
  */
 public class PrintAsmCode {
 
-  private String log;
-  private List<SpringApplicationRunListener> listeners;
+    private String log;
+    private List<SpringApplicationRunListener> listeners;
 
-  /**
-   * Instantiates a new Print asm code.
-   */
-  public PrintAsmCode() {
-  }
-
-  /**
-   * The entry point of application.
-   *
-   * @param args the input arguments
-   * @throws IOException the io exception
-   */
-  public static void main(String[] args) throws IOException {
-    printCode(null, false);
-  }
-
-  /**
-   * Print code.
-   *
-   * @param className the class name
-   * @param asmCode   the asm code
-   * @throws IOException the io exception
-   */
-  public static void printCode(String className, boolean asmCode) throws IOException {
-    if (StringUtil.isBlank(className)) {
-      className = PrintAsmCode.class.getName();
+    /**
+     * Instantiates a new Print asm code.
+     */
+    public PrintAsmCode() {
     }
 
-    int parsingOptions = ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG;
-    Printer printer = asmCode ? new ASMifier() : new Textifier();
-    PrintWriter printWriter = new PrintWriter(System.out, true);
-    TraceClassVisitor cv = new TraceClassVisitor(null, printer, printWriter);
-    new ClassReader(className).accept(cv, parsingOptions);
-  }
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     * @throws IOException the io exception
+     */
+    public static void main(String[] args) throws IOException {
+        printCode(null, false);
+    }
+
+    /**
+     * Print code.
+     *
+     * @param className the class name
+     * @param asmCode   the asm code
+     * @throws IOException the io exception
+     */
+    public static void printCode(String className, boolean asmCode) throws IOException {
+        if (StringUtil.isBlank(className)) {
+            className = PrintAsmCode.class.getName();
+        }
+
+        int parsingOptions = ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG;
+        Printer printer = asmCode ? new ASMifier() : new Textifier();
+        PrintWriter printWriter = new PrintWriter(System.out, true);
+        TraceClassVisitor cv = new TraceClassVisitor(null, printer, printWriter);
+        new ClassReader(className).accept(cv, parsingOptions);
+    }
 
 }

@@ -24,11 +24,12 @@
 
 package org.newcih.galois.service.spring;
 
-import static org.newcih.galois.constants.ConfConstant.RELOADER_SPRING_BOOT_ENABLE;
 import org.newcih.galois.conf.GlobalConfiguration;
 import org.newcih.galois.service.AgentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.newcih.galois.constants.ConfConstant.RELOADER_SPRING_BOOT_ENABLE;
 
 /**
  * spring agent service
@@ -37,27 +38,27 @@ import org.slf4j.LoggerFactory;
  */
 public class SpringAgentService extends AgentService {
 
-  private static final Logger logger = LoggerFactory.getLogger(SpringAgentService.class);
-  private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
-  private static final SpringAgentService instance = new SpringAgentService();
+    private static final Logger logger = LoggerFactory.getLogger(SpringAgentService.class);
+    private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
+    private static final SpringAgentService instance = new SpringAgentService();
 
-  /**
-   * 当前AgentService是否可启用
-   *
-   * @return 当项目已经加载了必须的类之后，该AgentService将成为可用状态
-   */
-  @Override
-  public boolean isUseful() {
-    return super.isUseful() && globalConfig.getBoolean(RELOADER_SPRING_BOOT_ENABLE);
-  }
+    /**
+     * Get instance spring agent service.
+     *
+     * @return the spring agent service
+     */
+    public static SpringAgentService getInstance() {
+        return instance;
+    }
 
-  /**
-   * Get instance spring agent service.
-   *
-   * @return the spring agent service
-   */
-  public static SpringAgentService getInstance() {
-    return instance;
-  }
+    /**
+     * 当前AgentService是否可启用
+     *
+     * @return 当项目已经加载了必须的类之后，该AgentService将成为可用状态
+     */
+    @Override
+    public boolean isUseful() {
+        return super.isUseful() && globalConfig.getBoolean(RELOADER_SPRING_BOOT_ENABLE);
+    }
 
 }

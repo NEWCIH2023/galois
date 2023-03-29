@@ -25,7 +25,6 @@
 package org.newcih.galois.service.corm;
 
 import org.newcih.galois.service.AgentService;
-import org.newcih.galois.service.corm.listeners.CormXmlListener;
 
 /**
  * corm agent service
@@ -35,17 +34,17 @@ import org.newcih.galois.service.corm.listeners.CormXmlListener;
  */
 public class CormAgentService extends AgentService {
 
-  private final static CormAgentService cormAgentService = new CormAgentService();
+    private final static CormAgentService cormAgentService = new CormAgentService();
 
-  /**
-   * get instance
-   *
-   * @return {@link CormAgentService}
-   * @see CormAgentService
-   */
-  public static CormAgentService getInstance() {
-    return cormAgentService;
-  }
+    /**
+     * get instance
+     *
+     * @return {@link CormAgentService}
+     * @see CormAgentService
+     */
+    public static CormAgentService getInstance() {
+        return cormAgentService;
+    }
 //
 //  @Override
 //  public void init() {
