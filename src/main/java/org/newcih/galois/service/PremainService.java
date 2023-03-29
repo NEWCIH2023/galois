@@ -31,11 +31,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.ProtectionDomain;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.newcih.galois.service.annotation.AsmVisitor;
 import org.newcih.galois.service.runners.AgentInitializeRunner;
 import org.newcih.galois.utils.ClassUtil;
 import org.newcih.galois.utils.StringUtil;
@@ -63,6 +63,7 @@ public class PremainService {
 
     static {
         scanAgentService();
+        scanAsmVisitor();
 
         logger.info("Register {} agentServices as list [{}].", agentServiceMap.keySet().size(),
                 agentServiceMap.values().stream()
@@ -152,6 +153,20 @@ public class PremainService {
     private static void scanAsmVisitor() {
         try {
             Set<Class<?>> visitorClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE, MethodAdapter.class);
+            for (Class<?> visitorClass : visitorClasses) {
+                if (Modifier.isAbstract(visitorClass.getModifiers())) {
+                    continue;
+                }
+
+                MethodAdapter methodAdapter = (MethodAdapter) visitorClass.newInstance();
+                AsmVisitor visitor = visitorClass.getAnnotation(AsmVisitor.class);
+                Method getInstanceMethod = visitor.manager().getMethod(GET_INSTANCE);
+                AgentService agentService = (AgentService) getInstanceMethod.invoke(null);
+                agentService.registerMethodAdapter(methodAdapter);
+            }
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
+                 InvocationTargetException e) {
+            throw new RuntimeException(e);
         }
     }
 }

@@ -26,7 +26,6 @@ package org.newcih.galois.service.runners;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
 import org.newcih.galois.service.AgentService;
 import org.newcih.galois.service.BeanReloader;
@@ -73,8 +72,7 @@ public class AgentInitializeRunner extends AbstractRunner {
                 .filter(AgentService::isUseful)
                 .forEach(agentService -> {
 
-                    Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(SERVICE_PACKAGE,
-                            Collections.singletonList(LazyBean.class));
+                    Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(SERVICE_PACKAGE, LazyBean.class);
                     for (Class<?> lazyBeanFactory : lazyBeanFactorys) {
                         if (FileChangedListener.class.isAssignableFrom(lazyBeanFactory)) {
                             logger.info("Detect FileChangedListener class {}.", lazyBeanFactory);
