@@ -62,25 +62,7 @@ public class PremainService {
     private static final SpringRunnerManager runManager = SpringRunnerManager.getInstance();
 
     static {
-        // scan agent service over abstract class named AgentService
-        try {
-            Set<Class<?>> agentClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE,
-                    Collections.singletonList(AgentService.class));
-            logger.debug("Find agent class as list [{}].", agentClasses);
-
-            for (Class<?> agentClass : agentClasses) {
-                if (Modifier.isAbstract(agentClass.getModifiers())) {
-                    continue;
-                }
-
-                Method getInstanceMethod = agentClass.getMethod(GET_INSTANCE);
-                AgentService agentService = (AgentService) getInstanceMethod.invoke(null);
-                agentServiceMap.put(agentClass.getName(), agentService);
-                initRunner.addAgentService(agentService);
-            }
-        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
+        scanAgentService();
 
         logger.info("Register {} agentServices as list [{}].", agentServiceMap.keySet().size(),
                 agentServiceMap.values().stream()
@@ -143,6 +125,33 @@ public class PremainService {
             }
 
             return null;
+        }
+    }
+
+    private static void scanAgentService() {
+        // scan agent service over abstract class named AgentService
+        try {
+            Set<Class<?>> agentClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE, AgentService.class);
+            logger.debug("Find agent class as list [{}].", agentClasses);
+
+            for (Class<?> agentClass : agentClasses) {
+                if (Modifier.isAbstract(agentClass.getModifiers())) {
+                    continue;
+                }
+
+                Method getInstanceMethod = agentClass.getMethod(GET_INSTANCE);
+                AgentService agentService = (AgentService) getInstanceMethod.invoke(null);
+                agentServiceMap.put(agentClass.getName(), agentService);
+                initRunner.addAgentService(agentService);
+            }
+        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void scanAsmVisitor() {
+        try {
+            Set<Class<?>> visitorClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE, MethodAdapter.class);
         }
     }
 }

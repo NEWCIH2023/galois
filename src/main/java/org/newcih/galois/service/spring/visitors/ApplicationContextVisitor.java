@@ -27,6 +27,7 @@ package org.newcih.galois.service.spring.visitors;
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.newcih.galois.service.MethodAdapter;
+import org.newcih.galois.service.annotation.AsmVisitor;
 import org.newcih.galois.service.spring.SpringAgentService;
 import org.newcih.galois.service.spring.SpringBeanReloader;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
@@ -50,12 +51,8 @@ import static org.newcih.galois.constants.Constant.SLASH;
  * @author liuguangsheng
  * @since 1.0.0
  */
+@AsmVisitor(value = "ApplicationContextVisitor", manager = SpringAgentService.class)
 public class ApplicationContextVisitor extends MethodAdapter {
-
-    static {
-        System.out.println("invoke static");
-        SpringAgentService.getInstance().registerMethodAdapter(new ApplicationContextVisitor());
-    }
 
     /**
      * Instantiates a new Application context visitor.
@@ -102,12 +99,10 @@ public class ApplicationContextVisitor extends MethodAdapter {
                 String pClassName = SpringBeanReloader.class.getName().replace(DOT, SLASH);
                 String vClassName = className.replace(DOT, SLASH);
 
-                mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";",
-                        false);
+                mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";", false);
                 mv.visitVarInsn(ALOAD, 0);
                 mv.visitTypeInsn(CHECKCAST, vClassName);
-                mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setContext", "(L" + vClassName + ";)V",
-                        false);
+                mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setContext", "(L" + vClassName + ";)V", false);
             }
 
             super.visitInsn(opcode);

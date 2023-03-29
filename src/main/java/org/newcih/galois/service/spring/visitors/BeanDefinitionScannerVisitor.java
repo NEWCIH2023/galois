@@ -27,6 +27,7 @@ package org.newcih.galois.service.spring.visitors;
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.newcih.galois.service.MethodAdapter;
+import org.newcih.galois.service.annotation.AsmVisitor;
 import org.newcih.galois.service.spring.SpringAgentService;
 import org.newcih.galois.service.spring.SpringBeanReloader;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
@@ -48,11 +49,8 @@ import static org.newcih.galois.constants.Constant.SLASH;
  * @author liuguangsheng
  * @since 1.0.0
  */
+@AsmVisitor(value = "BeanDefinitionScannerVisitor", manager = SpringAgentService.class)
 public class BeanDefinitionScannerVisitor extends MethodAdapter {
-
-    static {
-        SpringAgentService.getInstance().registerMethodAdapter(new BeanDefinitionScannerVisitor());
-    }
 
     /**
      * Instantiates a new Bean definition scanner visitor.

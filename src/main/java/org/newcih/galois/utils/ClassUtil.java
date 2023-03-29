@@ -73,8 +73,7 @@ public class ClassUtil {
     public static Instrumentation instrumentation;
 
     static {
-        compileDir =
-                System.getProperty("java.io.tmpdir") + File.separator + "GaloisCompile" + File.separator;
+        compileDir = System.getProperty("java.io.tmpdir") + File.separator + "GaloisCompile" + File.separator;
         File directory = new File(compileDir);
         if (!directory.exists()) {
             try {
@@ -91,7 +90,7 @@ public class ClassUtil {
      * @param baseClasses the base classes
      * @return the set
      */
-    public static Set<Class<?>> scanBaseClass(String basePackage, List<Class<?>> baseClasses) {
+    public static Set<Class<?>> scanBaseClass(String basePackage, Class<?>... baseClasses) {
         List<TypeFilter> includeFilters = new ArrayList<>(16);
         for (Class<?> baseClass : baseClasses) {
             includeFilters.add(new AssignableTypeFilter(baseClass));
@@ -107,8 +106,8 @@ public class ClassUtil {
      * @param annotations the annotations
      * @return the set
      */
-    public static Set<Class<?>> scanAnnotationClass(String basePackage,
-                                                    List<Class<? extends Annotation>> annotations) {
+    @SafeVarargs
+    public static Set<Class<?>> scanAnnotationClass(String basePackage, Class<? extends Annotation>... annotations) {
         List<TypeFilter> includeFilters = new ArrayList<>(16);
         for (Class<? extends Annotation> annotation : annotations) {
             includeFilters.add(new AnnotationTypeFilter(annotation));
@@ -128,14 +127,12 @@ public class ClassUtil {
     public static Set<Class<?>> scanPackageClass(String basePackage, List<TypeFilter> includeFileters,
                                                  List<TypeFilter> excludeFilters) {
         ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
-        MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(
-                resourcePatternResolver);
+        MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(resourcePatternResolver);
         Set<Class<?>> result = new HashSet<>(128);
 
         try {
             String base = SystemPropertyUtils.resolvePlaceholders(basePackage);
-            String searchPath = CLASSPATH_ALL_URL_PREFIX +
-                    convertClassNameToResourcePath(base) + "/**/*.class";
+            String searchPath = CLASSPATH_ALL_URL_PREFIX + convertClassNameToResourcePath(base) + "/**/*.class";
             Resource[] resources = resourcePatternResolver.getResources(searchPath);
             for (Resource resource : resources) {
                 if (resource.isReadable()) {
@@ -263,8 +260,7 @@ public class ClassUtil {
             return null;
         }
 
-        return new File(compileDir + String.join(File.separator, className.split("\\."))
-                + CLASS_FILE.getFileType());
+        return new File(compileDir + String.join(File.separator, className.split("\\.")) + CLASS_FILE.getFileType());
     }
 
     /**
