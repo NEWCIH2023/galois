@@ -72,6 +72,7 @@ public class AgentInitializeRunner extends AbstractRunner {
         agentServices.stream()
                 .filter(AgentService::isUseful)
                 .forEach(agentService -> {
+
                     Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(SERVICE_PACKAGE,
                             Collections.singletonList(LazyBean.class));
                     for (Class<?> lazyBeanFactory : lazyBeanFactorys) {

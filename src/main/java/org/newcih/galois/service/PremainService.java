@@ -26,6 +26,7 @@ package org.newcih.galois.service;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
+import java.lang.reflect.Modifier;
 import java.security.ProtectionDomain;
 import java.util.Collection;
 import java.util.Collections;
@@ -65,6 +66,10 @@ public class PremainService {
             logger.debug("Find agent class as list [{}].", agentClasses);
 
             for (Class<?> agentClass : agentClasses) {
+                if (Modifier.isAbstract(agentClass.getModifiers())) {
+                    continue;
+                }
+
                 AgentService agentService = (AgentService) agentClass.newInstance();
                 agentServiceMap.put(agentClass.getName(), agentService);
                 initRunner.addAgentService(agentService);

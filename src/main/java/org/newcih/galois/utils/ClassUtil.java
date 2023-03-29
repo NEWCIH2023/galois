@@ -91,8 +91,7 @@ public class ClassUtil {
      * @param baseClasses the base classes
      * @return the set
      */
-    public static Set<Class<?>> scanBaseClass(String basePackage, List<Class<?>> baseClasses,
-                                              boolean includeAbstractClass) {
+    public static Set<Class<?>> scanBaseClass(String basePackage, List<Class<?>> baseClasses) {
         List<TypeFilter> includeFilters = new ArrayList<>(16);
         for (Class<?> baseClass : baseClasses) {
             includeFilters.add(new AssignableTypeFilter(baseClass));
