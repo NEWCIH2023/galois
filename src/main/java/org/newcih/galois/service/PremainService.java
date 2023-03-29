@@ -25,6 +25,7 @@
 package org.newcih.galois.service;
 
 import static org.newcih.galois.constants.ClassNameConstant.SERVICE_PACKAGE;
+import static org.newcih.galois.constants.Constant.COMMA;
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SLASH;
 import java.lang.instrument.ClassFileTransformer;
@@ -35,6 +36,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.newcih.galois.service.runners.AgentInitializeRunner;
 import org.newcih.galois.utils.ClassUtil;
 import org.newcih.galois.utils.StringUtil;
@@ -55,8 +57,26 @@ public class PremainService {
   private static final SpringRunnerManager runManager = SpringRunnerManager.getInstance();
 
   static {
-    Set<Class<?>> agentClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE,
-        Collections.singletonList(AgentService.class));
+
+    // scan agent service over abstract class named AgentService
+    try {
+      Set<Class<?>> agentClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE,
+          Collections.singletonList(AgentService.class));
+      for (Class<?> agentClass : agentClasses) {
+        AgentService agentService = (AgentService) agentClass.newInstance();
+        agentServiceMap.put(agentClass.getName(), agentService);
+        initRunner.addAgentService(agentService);
+      }
+    } catch (InstantiationException | IllegalAccessException e) {
+      throw new RuntimeException(e);
+    }
+
+    logger.info("Register {} agentServices as list [{}].", agentServiceMap.keySet().size(),
+        agentServiceMap.values().stream()
+            .map(AgentService::toString)
+            .collect(Collectors.joining(COMMA)));
+
+    // register agent service initializer runner
     runManager.addRunner(initRunner);
   }
 

@@ -46,11 +46,11 @@ public class CormAgentService extends AgentService {
   public static CormAgentService getInstance() {
     return cormAgentService;
   }
-
-  @Override
-  public void init() {
-    registerFileChangedListener(new CormXmlListener());
-    beanReloader = CormBeanReloader.getInstance();
-  }
+//
+//  @Override
+//  public void init() {
+//    registerFileChangedListener(new CormXmlListener());
+//    beanReloader = CormBeanReloader.getInstance();
+//  }
 
 }

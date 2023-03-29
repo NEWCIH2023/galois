@@ -24,12 +24,17 @@
 
 package org.newcih.galois.service.runners;
 
+import static org.newcih.galois.constants.ClassNameConstant.SERVICE_PACKAGE;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
 import org.newcih.galois.service.AgentService;
 import org.newcih.galois.service.BeanReloader;
 import org.newcih.galois.service.FileChangedListener;
 import org.newcih.galois.service.FileWatchService;
+import org.newcih.galois.service.annotation.LazyBean;
+import org.newcih.galois.utils.ClassUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -66,20 +71,18 @@ public class AgentInitializeRunner extends AbstractRunner {
     agentServices.stream()
         .filter(AgentService::isUseful)
         .forEach(agentService -> {
-          try {
-            for (Class<? extends LazyInitializer> initializer : agentService.getLazyInitializers()) {
-              Object bean = initializer.newInstance();
-              if (bean instanceof FileChangedListener) {
-                FileChangedListener listener = (FileChangedListener) bean;
-                fileWatchService.registerListener(listener);
-              } else if (bean instanceof BeanReloader) {
-                BeanReloader<?> beanReloader = (BeanReloader<?>) bean;
-                agentService.setBeanReloader(beanReloader);
-              }
+          Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(SERVICE_PACKAGE,
+              Collections.singletonList(LazyBean.class));
+          for (Class<?> lazyBeanFactory : lazyBeanFactorys) {
+            if (FileChangedListener.class.isAssignableFrom(lazyBeanFactory)) {
+              logger.info("Detect FileChangedListener class {}.", lazyBeanFactory);
+
+            } else if (BeanReloader.class.isAssignableFrom(lazyBeanFactory)) {
+              logger.info("Detect BeanReloader class {}.", lazyBeanFactory);
+
             }
-          } catch (InstantiationException | IllegalAccessException e) {
-            logger.error("Create Service Bean over newInstance method fail.", e);
           }
+
         });
   }
 }

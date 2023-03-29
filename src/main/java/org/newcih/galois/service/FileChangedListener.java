@@ -25,6 +25,7 @@
 package org.newcih.galois.service;
 
 import java.io.File;
+import org.newcih.galois.service.annotation.LazyBean;
 
 /**
  * file monitor service interface

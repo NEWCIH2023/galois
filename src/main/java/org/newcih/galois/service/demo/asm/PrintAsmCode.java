@@ -32,7 +32,6 @@ import jdk.internal.org.objectweb.asm.util.ASMifier;
 import jdk.internal.org.objectweb.asm.util.Printer;
 import jdk.internal.org.objectweb.asm.util.Textifier;
 import jdk.internal.org.objectweb.asm.util.TraceClassVisitor;
-import org.newcih.galois.service.spring.SpringAgentService;
 import org.newcih.galois.utils.StringUtil;
 import org.springframework.boot.SpringApplicationRunListener;
 
@@ -80,15 +79,6 @@ public class PrintAsmCode {
     PrintWriter printWriter = new PrintWriter(System.out, true);
     TraceClassVisitor cv = new TraceClassVisitor(null, printer, printWriter);
     new ClassReader(className).accept(cv, parsingOptions);
-  }
-
-  /**
-   * Gets test.
-   *
-   * @param log the log
-   */
-  public void getTest(String log) {
-    this.listeners.addAll(SpringAgentService.getInstance().getRunners());
   }
 
 }
