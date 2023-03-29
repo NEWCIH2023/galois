@@ -58,7 +58,6 @@ public class PremainService {
     private static final SpringRunnerManager runManager = SpringRunnerManager.getInstance();
 
     static {
-
         // scan agent service over abstract class named AgentService
         try {
             Set<Class<?>> agentClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE,
