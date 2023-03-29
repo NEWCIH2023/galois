@@ -24,11 +24,12 @@
 
 package org.newcih.galois.service.runners;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import org.newcih.galois.service.AgentService;
-import org.newcih.galois.service.BeanReloader;
 import org.newcih.galois.service.FileChangedListener;
 import org.newcih.galois.service.FileWatchService;
 import org.newcih.galois.service.annotation.LazyBean;
@@ -38,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import static org.newcih.galois.constants.ClassNameConstant.SERVICE_PACKAGE;
+import static org.newcih.galois.constants.Constant.GET_INSTANCE;
 
 /**
  * agent service init runner
@@ -68,21 +70,26 @@ public class AgentInitializeRunner extends AbstractRunner {
 
     @Override
     public void started(ConfigurableApplicationContext context) {
-        agentServices.stream()
-                .filter(AgentService::isUseful)
-                .forEach(agentService -> {
+        try {
+            for (AgentService agentService : agentServices) {
+                if (!agentService.isUseful()) {
+                    continue;
+                }
 
-                    Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(SERVICE_PACKAGE, LazyBean.class);
-                    for (Class<?> lazyBeanFactory : lazyBeanFactorys) {
-                        if (FileChangedListener.class.isAssignableFrom(lazyBeanFactory)) {
-                            logger.info("Detect FileChangedListener class {}.", lazyBeanFactory);
-
-                        } else if (BeanReloader.class.isAssignableFrom(lazyBeanFactory)) {
-                            logger.info("Detect BeanReloader class {}.", lazyBeanFactory);
-
-                        }
+                Set<Class<?>> fileChangedClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE, FileChangedListener.class);
+                for (Class<?> fileChangedClass : fileChangedClasses) {
+                    if (Modifier.isInterface(fileChangedClass.getModifiers())) {
+                        continue;
                     }
 
-                });
+                    FileChangedListener listener = (FileChangedListener) fileChangedClass.newInstance();
+                    LazyBean lazyBean = fileChangedClass.getAnnotation(LazyBean.class);
+
+
+                }
+            }
+        } catch (Exception e) {
+
+        }
     }
 }
