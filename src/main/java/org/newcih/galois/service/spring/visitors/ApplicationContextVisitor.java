@@ -57,7 +57,7 @@ public class ApplicationContextVisitor extends MethodAdapter {
     /**
      * Instantiates a new Application context visitor.
      */
-    private ApplicationContextVisitor() {
+    public ApplicationContextVisitor() {
         super(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT);
     }
 

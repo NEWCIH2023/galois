@@ -47,6 +47,11 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>,
     private static final Logger logger = LoggerFactory.getLogger(SpringBeanReloader.class);
     protected ClassPathBeanDefinitionScanner scanner;
     protected AnnotationConfigServletWebServerApplicationContext context;
+    private static final SpringBeanReloader instance = new SpringBeanReloader();
+
+    public static SpringBeanReloader getInstance() {
+        return instance;
+    }
 
     /**
      * 更新Spring管理的bean对象
@@ -128,4 +133,5 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>,
     public void setContext(AnnotationConfigServletWebServerApplicationContext context) {
         this.context = context;
     }
+
 }

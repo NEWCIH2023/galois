@@ -55,7 +55,7 @@ public class BeanDefinitionScannerVisitor extends MethodAdapter {
     /**
      * Instantiates a new Bean definition scanner visitor.
      */
-    private BeanDefinitionScannerVisitor() {
+    public BeanDefinitionScannerVisitor() {
         super(CLASS_PATH_BEAN_DEFINITION_SCANNER);
     }
 

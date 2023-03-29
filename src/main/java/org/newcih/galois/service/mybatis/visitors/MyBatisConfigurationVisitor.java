@@ -28,6 +28,7 @@ import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.apache.ibatis.session.Configuration;
 import org.newcih.galois.service.MethodAdapter;
+import org.newcih.galois.service.annotation.AsmVisitor;
 import org.newcih.galois.service.mybatis.MyBatisAgentService;
 import org.newcih.galois.service.mybatis.MyBatisBeanReloader;
 
@@ -48,16 +49,13 @@ import static org.newcih.galois.constants.Constant.SLASH;
  * @author liuguangsheng
  * @since 1.0.0
  */
+@AsmVisitor(value = "MyBatisConfigurationVisitor", manager = MyBatisAgentService.class)
 public class MyBatisConfigurationVisitor extends MethodAdapter {
-
-    static {
-        MyBatisAgentService.getInstance().registerMethodAdapter(new MyBatisConfigurationVisitor());
-    }
 
     /**
      * Instantiates a new My batis configuration visitor.
      */
-    private MyBatisConfigurationVisitor() {
+    public MyBatisConfigurationVisitor() {
         super(MYBATIS_CONFIGURATION);
     }
 

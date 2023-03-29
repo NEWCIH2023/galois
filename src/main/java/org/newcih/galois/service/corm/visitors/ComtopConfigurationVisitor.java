@@ -27,8 +27,8 @@ package org.newcih.galois.service.corm.visitors;
 import com.comtop.corm.session.Configuration;
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
-import org.newcih.galois.constants.ClassNameConstant;
 import org.newcih.galois.service.MethodAdapter;
+import org.newcih.galois.service.annotation.AsmVisitor;
 import org.newcih.galois.service.corm.CormAgentService;
 import org.newcih.galois.service.corm.CormBeanReloader;
 
@@ -39,6 +39,7 @@ import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
 import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
+import static org.newcih.galois.constants.ClassNameConstant.COMTOP_CONFIGURATION;
 import static org.newcih.galois.constants.Constant.DOT;
 import static org.newcih.galois.constants.Constant.SLASH;
 
@@ -48,17 +49,14 @@ import static org.newcih.galois.constants.Constant.SLASH;
  * @author liuguangsheng
  * @since 1.0.0
  */
+@AsmVisitor(value = "ComtopConfigurationVisitor", manager = CormAgentService.class)
 public class ComtopConfigurationVisitor extends MethodAdapter {
-
-    static {
-        CormAgentService.getInstance().registerMethodAdapter(new ComtopConfigurationVisitor());
-    }
 
     /**
      * Instantiates a new Comtop configuration visitor.
      */
-    private ComtopConfigurationVisitor() {
-        super(ClassNameConstant.COMTOP_CONFIGURATION);
+    public ComtopConfigurationVisitor() {
+        super(COMTOP_CONFIGURATION);
     }
 
     @Override
@@ -100,11 +98,9 @@ public class ComtopConfigurationVisitor extends MethodAdapter {
                 String vClassName = className.replace(DOT, SLASH);
 
                 mv.visitCode();
-                mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";",
-                        false);
+                mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";", false);
                 mv.visitVarInsn(ALOAD, 0);
-                mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setConfiguration", "(L" + vClassName + ";)V",
-                        false);
+                mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setConfiguration", "(L" + vClassName + ";)V", false);
                 mv.visitEnd();
             }
 
