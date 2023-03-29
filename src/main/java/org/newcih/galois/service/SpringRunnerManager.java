@@ -81,7 +81,6 @@ public class SpringRunnerManager implements SpringApplicationRunListenersVisitor
                 .collect(Collectors.toList());
 
         logger.info("Now register these run listener in ordered: {}", result);
-
         return result;
     }
 

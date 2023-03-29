@@ -26,6 +26,8 @@ package org.newcih.galois.service;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.ProtectionDomain;
 import java.util.Collection;
@@ -43,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import static org.newcih.galois.constants.ClassNameConstant.SERVICE_PACKAGE;
 import static org.newcih.galois.constants.Constant.COMMA;
 import static org.newcih.galois.constants.Constant.DOT;
+import static org.newcih.galois.constants.Constant.GET_INSTANCE;
 import static org.newcih.galois.constants.Constant.SLASH;
 
 /**
@@ -70,11 +73,12 @@ public class PremainService {
                     continue;
                 }
 
-                AgentService agentService = (AgentService) agentClass.newInstance();
+                Method getInstanceMethod = agentClass.getMethod(GET_INSTANCE);
+                AgentService agentService = (AgentService) getInstanceMethod.invoke(null);
                 agentServiceMap.put(agentClass.getName(), agentService);
                 initRunner.addAgentService(agentService);
             }
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
 

@@ -53,6 +53,7 @@ import static org.newcih.galois.constants.Constant.SLASH;
 public class ApplicationContextVisitor extends MethodAdapter {
 
     static {
+        System.out.println("invoke static");
         SpringAgentService.getInstance().registerMethodAdapter(new ApplicationContextVisitor());
     }
 
