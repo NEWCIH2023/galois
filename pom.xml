@@ -108,7 +108,6 @@
             <properties>
                 <galois.version>${version}</galois.version>
                 <print-asm-code.enable>true</print-asm-code.enable>
-                <error.log.enable>true</error.log.enable>
                 <build.type>develop</build.type>
             </properties>
             <activation>
@@ -120,7 +119,6 @@
             <properties>
                 <galois.version>${version}</galois.version>
                 <print-asm-code.enable>false</print-asm-code.enable>
-                <error.log.enable>false</error.log.enable>
                 <build.type>release</build.type>
             </properties>
         </profile>
