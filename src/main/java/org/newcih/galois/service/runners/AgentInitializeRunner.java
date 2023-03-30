@@ -63,6 +63,7 @@ public class AgentInitializeRunner extends AbstractRunner {
         try {
             Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(SERVICE_PACKAGE, LazyBean.class);
             Set<AgentService> agentServices = ClassUtil.scanBaseClass(SERVICE_PACKAGE, AgentService.class).stream()
+                    .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
                     .map(clazz -> (AgentService) ClassUtil.getInstance(clazz))
                     .collect(Collectors.toSet());
 
@@ -74,15 +75,16 @@ public class AgentInitializeRunner extends AbstractRunner {
 
                 for (Class<?> lazyBeanFactory : lazyBeanFactorys) {
                     int modifiers = lazyBeanFactory.getModifiers();
-                    if (Modifier.isInterface(modifiers) || Modifier.isAbstract(modifiers)) {
+                    LazyBean lazyBean = lazyBeanFactory.getAnnotation(LazyBean.class);
+                    if (Modifier.isInterface(modifiers) || Modifier.isAbstract(modifiers) || !lazyBean.manager().equals(agentService.getClass())) {
                         continue;
                     }
 
-                    if (lazyBeanFactory.isAssignableFrom(BeanReloader.class)) {
-                        BeanReloader<?> beanReloader = (BeanReloader<?>) lazyBeanFactory.newInstance();
+                    if (BeanReloader.class.isAssignableFrom(lazyBeanFactory)) {
+                        BeanReloader<?> beanReloader = (BeanReloader<?>) ClassUtil.getInstance(lazyBeanFactory);
                         agentService.setBeanReloader(beanReloader);
-                    } else if (lazyBeanFactory.isAssignableFrom(FileChangedListener.class)) {
-                        FileChangedListener listener = (FileChangedListener) lazyBeanFactory.newInstance();
+                    } else if (FileChangedListener.class.isAssignableFrom(lazyBeanFactory)) {
+                        FileChangedListener listener = (FileChangedListener) ClassUtil.getInstance(lazyBeanFactory);
                         agentService.registerFileChangedListener(listener);
                         fileWatchService.registerListener(listener);
                     }
