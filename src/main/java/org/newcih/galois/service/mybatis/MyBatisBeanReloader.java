@@ -56,7 +56,7 @@ import static org.newcih.galois.constants.Constant.ID;
 import static org.newcih.galois.constants.Constant.NAMESPACE;
 
 /**
- * MyBatis的Mapper重新加载服务类，适用于 >= 3.2.0版本
+ * MyBatis的Mapper重新加载服务类，适用于3.2.0或以上版本
  *
  * @author liuguangsheng
  * @since 1.0.0
