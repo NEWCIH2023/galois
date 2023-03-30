@@ -51,7 +51,6 @@ public class FileWatchRunner extends AbstractRunner {
     @Override
     public void started(ConfigurableApplicationContext context) {
         logger.info("{} is Running.", getClass().getSimpleName());
-
         fileWatchService.start();
     }
 
