@@ -33,6 +33,14 @@ package org.newcih.galois.constants;
 public class ConfConstant {
 
     /**
+     * The constant BUILD_TYPE.
+     */
+    public static final String BUILD_TYPE = "build.type";
+    /**
+     * The constant ERROR_LOG_ENABLE.
+     */
+    public static final String ERROR_LOG_ENABLE = "error.log.enable";
+    /**
      * The constant LOGGING_ENABLE.
      */
     public static final String LOGGING_ENABLE = "logging.enable";
