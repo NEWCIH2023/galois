@@ -37,7 +37,7 @@ import org.newcih.galois.conf.GlobalConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.sun.nio.file.SensitivityWatchEventModifier.HIGH;
+import static com.sun.nio.file.SensitivityWatchEventModifier.MEDIUM;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
@@ -96,7 +96,7 @@ public class FileWatchService {
      * @param dir root dir
      */
     private void registerWatchService(File dir) throws IOException {
-        dir.toPath().register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY}, HIGH);
+        dir.toPath().register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY}, MEDIUM);
         File[] subDirs = dir.listFiles(File::isDirectory);
         if (subDirs == null) {
             return;
