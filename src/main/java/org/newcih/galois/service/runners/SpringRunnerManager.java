@@ -24,10 +24,8 @@
 
 package org.newcih.galois.service.runners;
 
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import org.newcih.galois.service.spring.visitors.SpringApplicationRunListenersVisitor;
@@ -44,7 +42,7 @@ public class SpringRunnerManager implements SpringApplicationRunListenersVisitor
 
     private static final SpringRunnerManager instance = new SpringRunnerManager();
     private static final Logger logger = LoggerFactory.getLogger(SpringRunnerManager.class);
-    private final Map<SpringApplicationRunListener, Integer> runnerMap = new HashMap<>(32);
+    private final List<SpringApplicationRunListener> runners = new ArrayList<>();
 
     /**
      * Gets instance.
@@ -79,7 +77,8 @@ public class SpringRunnerManager implements SpringApplicationRunListenersVisitor
     @Override
     public List<SpringApplicationRunListener> getRunners() {
         List<SpringApplicationRunListener> result = runnerMap.entrySet().stream()
-                .sorted(Comparator.comparingInt(Entry::getValue).reversed())
+                .peek(System.out::println)
+                .sorted()
                 .map(Entry::getKey)
                 .collect(Collectors.toList());
 

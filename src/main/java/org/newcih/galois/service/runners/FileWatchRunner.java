@@ -46,8 +46,6 @@ public class FileWatchRunner extends AbstractRunner {
 
     /**
      * Instantiates a new File watch runner.
-     *
-     * @param fileWatchService the file watch service
      */
     public FileWatchRunner() {
         setRank(RANK);
