@@ -41,6 +41,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import jdk.internal.org.objectweb.asm.ClassReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -67,6 +69,7 @@ import static org.springframework.util.ClassUtils.convertClassNameToResourcePath
  */
 public class ClassUtil {
 
+    public static final Logger logger = LoggerFactory.getLogger(ClassUtil.class);
     private static final String compileDir;
     private static final Pattern packagePattern = Pattern.compile("^package +(\\S+);");
     private static final Pattern classNamePattern = Pattern.compile("class +([\\S&&[^<]]+)");
@@ -80,7 +83,10 @@ public class ClassUtil {
         File directory = new File(compileDir);
         if (!directory.exists()) {
             try {
-                directory.mkdir();
+                boolean mkdirFlag = directory.mkdir();
+                if (!mkdirFlag) {
+                    logger.warn("Create temp compile directory fail.");
+                }
             } catch (Exception ignored) {
             }
         }
