@@ -24,6 +24,7 @@
 
 package org.newcih.galois.service.runners;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +79,7 @@ public class SpringRunnerManager implements SpringApplicationRunListenersVisitor
     @Override
     public List<SpringApplicationRunListener> getRunners() {
         List<SpringApplicationRunListener> result = runnerMap.entrySet().stream()
-                .sorted((e1, e2) -> e1.getValue().compareTo(e2.getValue()))
+                .sorted(Comparator.comparingInt(Entry::getValue).reversed())
                 .map(Entry::getKey)
                 .collect(Collectors.toList());
 
