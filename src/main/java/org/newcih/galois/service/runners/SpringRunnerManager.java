@@ -78,7 +78,7 @@ public class SpringRunnerManager implements SpringApplicationRunListenersVisitor
     @Override
     public List<SpringApplicationRunListener> getRunners() {
         List<SpringApplicationRunListener> result = runnerMap.entrySet().stream()
-                .sorted(Entry.comparingByValue())
+                .sorted((e1, e2) -> e1.getValue().compareTo(e2.getValue()))
                 .map(Entry::getKey)
                 .collect(Collectors.toList());
 
