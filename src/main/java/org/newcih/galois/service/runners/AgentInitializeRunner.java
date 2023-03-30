@@ -33,6 +33,7 @@ import org.newcih.galois.service.FileChangedListener;
 import org.newcih.galois.service.FileWatchService;
 import org.newcih.galois.service.annotation.LazyBean;
 import org.newcih.galois.utils.ClassUtil;
+import org.newcih.galois.utils.GaloisLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -47,7 +48,7 @@ import static org.newcih.galois.constants.ClassNameConstant.SERVICE_PACKAGE;
 public class AgentInitializeRunner extends AbstractRunner {
 
     private static final FileWatchService fileWatchService = FileWatchService.getInstance();
-    private static final Logger logger = LoggerFactory.getLogger(AgentInitializeRunner.class);
+    private static final Logger logger = GaloisLog.g
 
     /**
      * Instantiates a new Agent service init runner.
