@@ -38,9 +38,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class FileWatchRunner extends AbstractRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(FileWatchRunner.class);
-    /**
-     * The constant RANK.
-     */
     public static final int RANK = 1;
     private static final FileWatchService fileWatchService = FileWatchService.getInstance();
 

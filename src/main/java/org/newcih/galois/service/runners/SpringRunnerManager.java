@@ -25,8 +25,8 @@
 package org.newcih.galois.service.runners;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import org.newcih.galois.service.spring.visitors.SpringApplicationRunListenersVisitor;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ public class SpringRunnerManager implements SpringApplicationRunListenersVisitor
 
     private static final SpringRunnerManager instance = new SpringRunnerManager();
     private static final Logger logger = LoggerFactory.getLogger(SpringRunnerManager.class);
-    private final List<SpringApplicationRunListener> runners = new ArrayList<>();
+    private final List<AbstractRunner> runners = new ArrayList<>();
 
     /**
      * Gets instance.
@@ -56,30 +56,18 @@ public class SpringRunnerManager implements SpringApplicationRunListenersVisitor
     /**
      * Add runner.
      *
-     * @param rank   the rank
-     * @param runner the runner
-     */
-    public void addRunner(AbstractRunner runner, Integer rank) {
-        runnerMap.put(runner, rank);
-    }
-
-    /**
-     * Add runner.
-     *
      * @param runner the runner
      */
     public void addRunner(AbstractRunner runner) {
         if (runner != null) {
-            runnerMap.put(runner, 0);
+            runners.add(runner);
         }
     }
 
     @Override
     public List<SpringApplicationRunListener> getRunners() {
-        List<SpringApplicationRunListener> result = runnerMap.entrySet().stream()
-                .peek(System.out::println)
-                .sorted()
-                .map(Entry::getKey)
+        List<SpringApplicationRunListener> result = runners.stream()
+                .sorted(Comparator.comparingInt(AbstractRunner::getRank).reversed())
                 .collect(Collectors.toList());
 
         logger.info("Now register these runner in ordered: {}", result);
