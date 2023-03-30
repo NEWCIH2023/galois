@@ -26,17 +26,17 @@ package org.newcih.galois.service;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.ProtectionDomain;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.newcih.galois.service.annotation.AsmVisitor;
-import org.newcih.galois.service.runners.AgentInitializeRunner;
+import org.newcih.galois.service.runners.AbstractRunner;
+import org.newcih.galois.service.runners.SpringRunnerManager;
 import org.newcih.galois.utils.ClassUtil;
 import org.newcih.galois.utils.StringUtil;
 import org.slf4j.Logger;
@@ -45,7 +45,6 @@ import org.slf4j.LoggerFactory;
 import static org.newcih.galois.constants.ClassNameConstant.SERVICE_PACKAGE;
 import static org.newcih.galois.constants.Constant.COMMA;
 import static org.newcih.galois.constants.Constant.DOT;
-import static org.newcih.galois.constants.Constant.GET_INSTANCE;
 import static org.newcih.galois.constants.Constant.SLASH;
 
 /**
@@ -58,20 +57,15 @@ public class PremainService {
 
     private static final Logger logger = LoggerFactory.getLogger(PremainService.class);
     private static final Map<String, AgentService> agentServiceMap = new HashMap<>(8);
-    private static final AgentInitializeRunner initRunner = new AgentInitializeRunner();
     private static final SpringRunnerManager runManager = SpringRunnerManager.getInstance();
 
     static {
         scanAgentService();
         scanAsmVisitor();
+        scanRunner();
 
         logger.info("Register {} agentServices as list [{}].", agentServiceMap.keySet().size(),
-                agentServiceMap.values().stream()
-                        .map(AgentService::toString)
-                        .collect(Collectors.joining(COMMA)));
-
-        // register agent service initializer runner
-        runManager.addRunner(initRunner);
+                agentServiceMap.values().stream().map(AgentService::toString).collect(Collectors.joining(COMMA)));
     }
 
     /**
@@ -131,42 +125,44 @@ public class PremainService {
 
     private static void scanAgentService() {
         // scan agent service over abstract class named AgentService
-        try {
-            Set<Class<?>> agentClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE, AgentService.class);
-            logger.debug("Find agent class as list [{}].", agentClasses);
+        Set<Class<?>> agentClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE, AgentService.class);
 
-            for (Class<?> agentClass : agentClasses) {
-                if (Modifier.isAbstract(agentClass.getModifiers())) {
-                    continue;
-                }
-
-                Method getInstanceMethod = agentClass.getMethod(GET_INSTANCE);
-                AgentService agentService = (AgentService) getInstanceMethod.invoke(null);
-                agentServiceMap.put(agentClass.getName(), agentService);
-                initRunner.addAgentService(agentService);
+        for (Class<?> agentClass : agentClasses) {
+            if (Modifier.isAbstract(agentClass.getModifiers())) {
+                continue;
             }
-        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            throw new RuntimeException(e);
+
+            Optional.ofNullable(ClassUtil.getInstance(agentClass)).ifPresent(object -> {
+                AgentService agentService = (AgentService) object;
+                agentServiceMap.put(agentClass.getName(), agentService);
+            });
         }
     }
 
     private static void scanAsmVisitor() {
-        try {
-            Set<Class<?>> visitorClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE, MethodAdapter.class);
-            for (Class<?> visitorClass : visitorClasses) {
-                if (Modifier.isAbstract(visitorClass.getModifiers())) {
-                    continue;
-                }
-
-                MethodAdapter methodAdapter = (MethodAdapter) visitorClass.newInstance();
-                AsmVisitor visitor = visitorClass.getAnnotation(AsmVisitor.class);
-                Method getInstanceMethod = visitor.manager().getMethod(GET_INSTANCE);
-                AgentService agentService = (AgentService) getInstanceMethod.invoke(null);
-                agentService.registerMethodAdapter(methodAdapter);
+        Set<Class<?>> visitorClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE, MethodAdapter.class);
+        for (Class<?> visitorClass : visitorClasses) {
+            if (Modifier.isAbstract(visitorClass.getModifiers())) {
+                continue;
             }
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
-                 InvocationTargetException e) {
-            throw new RuntimeException(e);
+
+            MethodAdapter methodAdapter = (MethodAdapter) ClassUtil.getInstance(visitorClass);
+            AsmVisitor visitor = visitorClass.getAnnotation(AsmVisitor.class);
+
+            Optional.ofNullable(ClassUtil.getInstance(visitor.manager())).ifPresent(object -> ((AgentService) object).registerMethodAdapter(methodAdapter));
         }
+    }
+
+    private static void scanRunner() {
+        Set<Class<?>> runnerClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE, AbstractRunner.class);
+        for (Class<?> runnerClass : runnerClasses) {
+            if (Modifier.isAbstract(runnerClass.getModifiers())) {
+                continue;
+            }
+
+            Optional.ofNullable(ClassUtil.getInstance(runnerClass))
+                    .ifPresent(object -> runManager.addRunner((AbstractRunner) object));
+        }
+
     }
 }

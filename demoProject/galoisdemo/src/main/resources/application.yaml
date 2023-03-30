@@ -12,4 +12,4 @@ spring:
 mybatis:
   mapper-locations: classpath:mapper/*.xml
 server:
-    port: 9839
+  port: 9839

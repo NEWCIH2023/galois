@@ -25,10 +25,10 @@
 package org.newcih.galois.service.runners;
 
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.newcih.galois.service.AgentService;
+import org.newcih.galois.service.BeanReloader;
 import org.newcih.galois.service.FileChangedListener;
 import org.newcih.galois.service.FileWatchService;
 import org.newcih.galois.service.annotation.LazyBean;
@@ -48,7 +48,6 @@ public class AgentInitializeRunner extends AbstractRunner {
 
     private static final FileWatchService fileWatchService = FileWatchService.getInstance();
     private static final Logger logger = LoggerFactory.getLogger(AgentInitializeRunner.class);
-    private final Collection<AgentService> agentServices = new ArrayList<>(32);
 
     /**
      * Instantiates a new Agent service init runner.
@@ -57,19 +56,15 @@ public class AgentInitializeRunner extends AbstractRunner {
         setRank(FileWatchRunner.RANK + 1);
     }
 
-    /**
-     * Add agent service.
-     *
-     * @param agentService the agent service
-     */
-    public void addAgentService(AgentService agentService) {
-        this.agentServices.add(agentService);
-    }
-
     @Override
     public void started(ConfigurableApplicationContext context) {
+        logger.info("{} is Running.", getClass().getSimpleName());
+
         try {
-            Set<Class<?>> fileChangedClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE, FileChangedListener.class);
+            Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(SERVICE_PACKAGE, LazyBean.class);
+            Set<AgentService> agentServices = ClassUtil.scanBaseClass(SERVICE_PACKAGE, AgentService.class).stream()
+                    .map(clazz -> (AgentService) ClassUtil.getInstance(clazz))
+                    .collect(Collectors.toSet());
 
             for (AgentService agentService : agentServices) {
                 if (!agentService.isUseful()) {
@@ -77,15 +72,19 @@ public class AgentInitializeRunner extends AbstractRunner {
                     continue;
                 }
 
-                for (Class<?> fileChangedClass : fileChangedClasses) {
-                    if (Modifier.isInterface(fileChangedClass.getModifiers())) {
+                for (Class<?> lazyBeanFactory : lazyBeanFactorys) {
+                    int modifiers = lazyBeanFactory.getModifiers();
+                    if (Modifier.isInterface(modifiers) || Modifier.isAbstract(modifiers)) {
                         continue;
                     }
 
-                    LazyBean lazyBean = fileChangedClass.getAnnotation(LazyBean.class);
-                    if (lazyBean.manager().isInstance(agentService)) {
-                        FileChangedListener listener = (FileChangedListener) fileChangedClass.newInstance();
+                    if (lazyBeanFactory.isAssignableFrom(BeanReloader.class)) {
+                        BeanReloader<?> beanReloader = (BeanReloader<?>) lazyBeanFactory.newInstance();
+                        agentService.setBeanReloader(beanReloader);
+                    } else if (lazyBeanFactory.isAssignableFrom(FileChangedListener.class)) {
+                        FileChangedListener listener = (FileChangedListener) lazyBeanFactory.newInstance();
                         agentService.registerFileChangedListener(listener);
+                        fileWatchService.registerListener(listener);
                     }
                 }
             }

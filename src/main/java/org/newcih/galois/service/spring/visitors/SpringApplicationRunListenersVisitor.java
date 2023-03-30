@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.newcih.galois.service.MethodAdapter;
-import org.newcih.galois.service.SpringRunnerManager;
+import org.newcih.galois.service.runners.SpringRunnerManager;
 import org.newcih.galois.service.annotation.AsmVisitor;
 import org.newcih.galois.service.spring.SpringAgentService;
 import org.springframework.boot.SpringApplicationRunListener;

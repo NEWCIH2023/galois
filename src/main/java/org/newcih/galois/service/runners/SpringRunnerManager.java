@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.newcih.galois.service;
+package org.newcih.galois.service.runners;
 
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +43,7 @@ public class SpringRunnerManager implements SpringApplicationRunListenersVisitor
 
     private static final SpringRunnerManager instance = new SpringRunnerManager();
     private static final Logger logger = LoggerFactory.getLogger(SpringRunnerManager.class);
-    private final Map<Integer, SpringApplicationRunListener> runnerMap = new HashMap<>(32);
+    private final Map<SpringApplicationRunListener, Integer> runnerMap = new HashMap<>(32);
 
     /**
      * Gets instance.
@@ -60,8 +60,8 @@ public class SpringRunnerManager implements SpringApplicationRunListenersVisitor
      * @param rank   the rank
      * @param runner the runner
      */
-    public void addRunner(Integer rank, SpringApplicationRunListener runner) {
-        runnerMap.put(rank, runner);
+    public void addRunner(AbstractRunner runner, Integer rank) {
+        runnerMap.put(runner, rank);
     }
 
     /**
@@ -69,18 +69,20 @@ public class SpringRunnerManager implements SpringApplicationRunListenersVisitor
      *
      * @param runner the runner
      */
-    public void addRunner(SpringApplicationRunListener runner) {
-        runnerMap.put(0, runner);
+    public void addRunner(AbstractRunner runner) {
+        if (runner != null) {
+            runnerMap.put(runner, 0);
+        }
     }
 
     @Override
     public List<SpringApplicationRunListener> getRunners() {
         List<SpringApplicationRunListener> result = runnerMap.entrySet().stream()
-                .sorted((e1, e2) -> e2.getKey().compareTo(e1.getKey()))
-                .map(Entry::getValue)
+                .sorted(Entry.comparingByValue())
+                .map(Entry::getKey)
                 .collect(Collectors.toList());
 
-        logger.info("Now register these run listener in ordered: {}", result);
+        logger.info("Now register these runner in ordered: {}", result);
         return result;
     }
 

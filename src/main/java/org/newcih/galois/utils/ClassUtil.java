@@ -31,6 +31,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.instrument.Instrumentation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -51,6 +53,7 @@ import org.springframework.core.type.filter.TypeFilter;
 import org.springframework.util.SystemPropertyUtils;
 
 import static org.newcih.galois.constants.Constant.DOT;
+import static org.newcih.galois.constants.Constant.GET_INSTANCE;
 import static org.newcih.galois.constants.Constant.SLASH;
 import static org.newcih.galois.constants.FileType.CLASS_FILE;
 import static org.springframework.core.io.support.ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX;
@@ -80,6 +83,29 @@ public class ClassUtil {
                 directory.mkdir();
             } catch (Exception ignored) {
             }
+        }
+    }
+
+    /**
+     * Get instance object.
+     *
+     * @param clazz the clazz
+     * @return the object
+     */
+    public static Object getInstance(Class<?> clazz) {
+        try {
+            // is static method getInstance exists?
+            Method getInstanceMethod = clazz.getMethod(GET_INSTANCE);
+            return getInstanceMethod.invoke(null);
+            // or invoke newInstance method
+        } catch (NoSuchMethodException e) {
+            try {
+                return clazz.newInstance();
+            } catch (InstantiationException | IllegalAccessException ex) {
+                return null;
+            }
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            return null;
         }
     }
 

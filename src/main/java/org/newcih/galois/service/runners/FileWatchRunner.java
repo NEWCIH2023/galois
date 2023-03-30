@@ -25,6 +25,8 @@
 package org.newcih.galois.service.runners;
 
 import org.newcih.galois.service.FileWatchService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
@@ -35,24 +37,26 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 public class FileWatchRunner extends AbstractRunner {
 
+    private static final Logger logger = LoggerFactory.getLogger(FileWatchRunner.class);
     /**
      * The constant RANK.
      */
     public static final int RANK = 1;
-    private final FileWatchService fileWatchService;
+    private static final FileWatchService fileWatchService = FileWatchService.getInstance();
 
     /**
      * Instantiates a new File watch runner.
      *
      * @param fileWatchService the file watch service
      */
-    public FileWatchRunner(FileWatchService fileWatchService) {
+    public FileWatchRunner() {
         setRank(RANK);
-        this.fileWatchService = fileWatchService;
     }
 
     @Override
     public void started(ConfigurableApplicationContext context) {
+        logger.info("{} is Running.", getClass().getSimpleName());
+
         fileWatchService.start();
     }
 
