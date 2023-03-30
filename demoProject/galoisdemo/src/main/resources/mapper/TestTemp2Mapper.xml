@@ -150,7 +150,7 @@
         NAME = #{record.name,jdbcType=VARCHAR},
       </if>
     </set>
-    <if test="_parameter != null">
+    <if test="_parameter != ''">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>

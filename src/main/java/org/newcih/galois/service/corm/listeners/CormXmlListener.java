@@ -29,6 +29,8 @@ import java.io.File;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.newcih.galois.service.FileChangedListener;
+import org.newcih.galois.service.annotation.LazyBean;
+import org.newcih.galois.service.corm.CormAgentService;
 import org.newcih.galois.service.corm.CormBeanReloader;
 import org.newcih.galois.utils.FileUtil;
 import org.slf4j.Logger;
@@ -45,6 +47,7 @@ import static org.newcih.galois.constants.FileType.XML_FILE;
  * @author liuguangsheng
  * @since 1.0.0
  */
+@LazyBean(value = "CormXmlListener", manager = CormAgentService.class)
 public class CormXmlListener implements FileChangedListener {
 
     private static final String DOC_TYPE = "mapper";

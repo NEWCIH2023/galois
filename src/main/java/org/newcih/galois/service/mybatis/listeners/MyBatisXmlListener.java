@@ -29,6 +29,8 @@ import java.io.File;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.newcih.galois.service.FileChangedListener;
+import org.newcih.galois.service.annotation.LazyBean;
+import org.newcih.galois.service.mybatis.MyBatisAgentService;
 import org.newcih.galois.service.mybatis.MyBatisBeanReloader;
 import org.newcih.galois.utils.FileUtil;
 import org.slf4j.Logger;
@@ -46,6 +48,7 @@ import static org.newcih.galois.constants.FileType.XML_FILE;
  * @author liuguangsheng
  * @since 1.0.0
  */
+@LazyBean(value = "MyBatisXmlListener", manager = MyBatisAgentService.class)
 public class MyBatisXmlListener implements FileChangedListener {
 
     /**

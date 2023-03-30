@@ -41,6 +41,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import org.newcih.galois.service.BeanReloader;
+import org.newcih.galois.service.annotation.LazyBean;
 import org.newcih.galois.service.corm.visitors.ComtopConfigurationVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,7 @@ import static org.newcih.galois.constants.Constant.NAMESPACE;
  * @author liuguangsheng
  * @since 1.0.0
  */
+@LazyBean(value = "CormBeanReloader", manager = CormAgentService.class)
 public class CormBeanReloader implements BeanReloader<File>,
         ComtopConfigurationVisitor.NecessaryMethods {
 

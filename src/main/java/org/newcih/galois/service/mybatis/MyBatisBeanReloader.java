@@ -47,6 +47,7 @@ import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.parsing.XPathParser;
 import org.apache.ibatis.session.Configuration;
 import org.newcih.galois.service.BeanReloader;
+import org.newcih.galois.service.annotation.LazyBean;
 import org.newcih.galois.service.mybatis.visitors.MyBatisConfigurationVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,8 +61,8 @@ import static org.newcih.galois.constants.Constant.NAMESPACE;
  * @author liuguangsheng
  * @since 1.0.0
  */
-public class MyBatisBeanReloader implements BeanReloader<File>,
-        MyBatisConfigurationVisitor.NecessaryMethods {
+@LazyBean(value = "MyBatisBeanReloader", manager = MyBatisAgentService.class)
+public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigurationVisitor.NecessaryMethods {
 
     private static final MyBatisBeanReloader mybatisBeanReloder = new MyBatisBeanReloader();
     private static final Logger logger = LoggerFactory.getLogger(MyBatisBeanReloader.class);
