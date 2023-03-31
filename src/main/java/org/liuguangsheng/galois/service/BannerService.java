@@ -27,6 +27,7 @@ package org.liuguangsheng.galois.service;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
+import jdk.nashorn.internal.runtime.regexp.joni.constants.AsmConstants;
 import org.liuguangsheng.galois.conf.GlobalConfiguration;
 
 import static org.liuguangsheng.galois.constants.ConfConstant.BANNER_ENABLE;
@@ -141,6 +142,7 @@ public class BannerService {
      * @see String
      */
     private static String galoisVersion() {
+        AsmConstants.
         return String.format("%s.%s", globalConfig.getString(GALOIS_VERSION, HYPHEN),
                 globalConfig.getString(BUILD_TYPE));
     }
