@@ -27,7 +27,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.newcih</groupId>
+    <groupId>org.liuguangsheng</groupId>
     <artifactId>galois</artifactId>
     <version>0.4.3-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -171,7 +171,7 @@
                         <manifestEntries>
                             <Build-Time>${maven.build.timestamp}</Build-Time>
                             <Galois-Version>${version}</Galois-Version>
-                            <Premain-Class>org.newcih.galois.service.PremainService</Premain-Class>
+                            <Premain-Class>org.liuguangsheng.galois.service.PremainService</Premain-Class>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
                             <Creator>NEWCIH</Creator>
