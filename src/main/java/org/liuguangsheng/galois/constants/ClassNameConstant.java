@@ -32,7 +32,7 @@ package org.liuguangsheng.galois.constants;
  */
 public final class ClassNameConstant {
 
-    public static final String SERVICE_PACKAGE = "org.newcih.galois.service";
+    public static final String SERVICE_PACKAGE = "org.liuguangsheng.galois.service";
     /**
      * The constant CT_CONFIGURATION.
      */
