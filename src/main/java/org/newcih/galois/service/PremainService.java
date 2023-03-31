@@ -64,7 +64,7 @@ public class PremainService {
         scanAsmVisitor();
         scanRunner();
 
-        logger.info("Register {} agentServices as list [{}].", agentServiceMap.keySet().size(),
+        logger.info("Scan {} agentServices as list [{}].", agentServiceMap.keySet().size(),
                 agentServiceMap.values().stream().map(AgentService::toString).collect(Collectors.joining(COMMA)));
     }
 

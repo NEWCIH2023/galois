@@ -32,6 +32,7 @@ import org.newcih.galois.conf.GlobalConfiguration;
 import static org.newcih.galois.constants.ConfConstant.BANNER_ENABLE;
 import static org.newcih.galois.constants.ConfConstant.BUILD_TYPE;
 import static org.newcih.galois.constants.ConfConstant.GALOIS_VERSION;
+import static org.newcih.galois.constants.Constant.HYPHEN;
 import static org.newcih.galois.constants.Constant.LF;
 
 /**
@@ -140,6 +141,6 @@ public class BannerService {
      * @see String
      */
     private static String galoisVersion() {
-        return globalConfig.getString(GALOIS_VERSION, "-") + "_" + globalConfig.getString(BUILD_TYPE);
+        return globalConfig.getString(GALOIS_VERSION, HYPHEN) + HYPHEN + globalConfig.getString(BUILD_TYPE);
     }
 }

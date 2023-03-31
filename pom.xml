@@ -23,7 +23,8 @@
   ~ SOFTWARE.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.newcih</groupId>
@@ -106,7 +107,9 @@
             <properties>
                 <galois.version>${version}</galois.version>
                 <print-asm-code.enable>true</print-asm-code.enable>
-                <build.type>develop</build.type>
+                <reloader.mybatis.enable>true</reloader.mybatis.enable>
+                <reloader.spring.boot.enable>true</reloader.spring.boot.enable>
+                <build.type>DEVELOP</build.type>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -117,7 +120,9 @@
             <properties>
                 <galois.version>${version}</galois.version>
                 <print-asm-code.enable>false</print-asm-code.enable>
-                <build.type>release</build.type>
+                <reloader.mybatis.enable>true</reloader.mybatis.enable>
+                <reloader.spring.boot.enable>false</reloader.spring.boot.enable>
+                <build.type>RELEASE</build.type>
             </properties>
         </profile>
     </profiles>
@@ -169,6 +174,7 @@
                             <Premain-Class>org.newcih.galois.service.PremainService</Premain-Class>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
+                            <Creator>NEWCIH</Creator>
                         </manifestEntries>
                     </archive>
                 </configuration>
