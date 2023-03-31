@@ -26,7 +26,6 @@ package org.liuguangsheng.galois.service.spring.listeners;
 
 import java.io.File;
 import java.lang.instrument.ClassDefinition;
-import java.util.Arrays;
 import org.liuguangsheng.galois.service.FileChangedListener;
 import org.liuguangsheng.galois.service.annotation.LazyBean;
 import org.liuguangsheng.galois.service.spring.SpringAgentService;
@@ -59,21 +58,14 @@ public class SpringBeanListener implements FileChangedListener {
      * @param classFile classFile
      */
     private void fileChangedHandle(File classFile) {
-        String className = ClassUtil.getClassNameFromClass(classFile);
-        byte[] classBytes = FileUtil.readFile(classFile);
 
         try {
-            Class<?> clazz = Arrays.stream(ClassUtil.getInstrumentation().getAllLoadedClasses())
-                    .filter(item -> item.getName().equals(className)).findFirst()
-                    .orElseThrow(NullPointerException::new);
-
+            String className = ClassUtil.getClassNameFromClass(classFile);
+            byte[] classBytes = FileUtil.readFile(classFile);
+            Class<?> clazz = Class.forName(className);
             ClassDefinition definition = new ClassDefinition(clazz, classBytes);
             ClassUtil.getInstrumentation().redefineClasses(definition);
             logger.info("Redefine class file {} success.", classFile.getName());
-
-//      if (reloader.isUseful(clazz)) {
-//        reloader.updateBean(clazz);
-//      }
         } catch (Throwable e) {
             logger.error("Reload Spring Bean fail.", e);
         }

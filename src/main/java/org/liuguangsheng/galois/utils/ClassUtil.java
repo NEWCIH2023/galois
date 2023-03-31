@@ -227,13 +227,9 @@ public class ClassUtil {
      * @return {@link String}
      * @see String
      */
-    public static String getClassNameFromClass(File classFile) {
-        try {
-            ClassReader classReader = new ClassReader(Files.newInputStream(classFile.toPath()));
-            return classReader.getClassName().replace(SLASH, DOT);
-        } catch (IOException e) {
-            return "";
-        }
+    public static String getClassNameFromClass(File classFile) throws IOException {
+        ClassReader classReader = new ClassReader(Files.newInputStream(classFile.toPath()));
+        return classReader.getClassName().replace(SLASH, DOT);
     }
 
     /**
