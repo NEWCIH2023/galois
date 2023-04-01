@@ -142,7 +142,6 @@ public class BannerService {
      * @see String
      */
     private static String galoisVersion() {
-        AsmConstants.
         return String.format("%s.%s", globalConfig.getString(GALOIS_VERSION, HYPHEN),
                 globalConfig.getString(BUILD_TYPE));
     }

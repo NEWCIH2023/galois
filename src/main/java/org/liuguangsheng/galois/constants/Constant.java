@@ -31,6 +31,10 @@ package org.liuguangsheng.galois.constants;
  * @since 1.0.0
  */
 public class Constant {
+    /**
+     * The constant APPLICATION.
+     */
+    public static final String APPLICATION = "application";
 
     /**
      * The constant USER_DIR.

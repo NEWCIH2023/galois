@@ -27,6 +27,8 @@ package org.liuguangsheng.galois.service.runners;
 import org.liuguangsheng.galois.service.FileWatchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
@@ -50,6 +52,12 @@ public class FileWatchRunner extends AbstractRunner {
 
     @Override
     public void started(ConfigurableApplicationContext context) {
+        logger.info("{} with context {} is {}", getClass().getSimpleName(), context.getId(), "started");
+
+        if (!isApplicationContext(context)) {
+            return;
+        }
+
         logger.info("{} is Running.", getClass().getSimpleName());
         fileWatchService.start();
     }

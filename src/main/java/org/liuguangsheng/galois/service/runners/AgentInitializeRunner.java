@@ -27,7 +27,6 @@ package org.liuguangsheng.galois.service.runners;
 import java.lang.reflect.Modifier;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.liuguangsheng.galois.constants.ClassNameConstant;
 import org.liuguangsheng.galois.service.AgentService;
 import org.liuguangsheng.galois.service.BeanReloader;
 import org.liuguangsheng.galois.service.FileChangedListener;
@@ -37,6 +36,8 @@ import org.liuguangsheng.galois.utils.ClassUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
+
+import static org.liuguangsheng.galois.constants.ClassNameConstant.SERVICE_PACKAGE;
 
 /**
  * agent service init runner
@@ -57,16 +58,17 @@ public class AgentInitializeRunner extends AbstractRunner {
 
     @Override
     public void started(ConfigurableApplicationContext context) {
+        logger.info("{} with context {} is {}", getClass().getSimpleName(), context.getId(), "started");
+
+        if (!isApplicationContext(context)) {
+            return;
+        }
+
         logger.info("{} is Running.", getClass().getSimpleName());
 
-        logger.error("isActive {}", context.isActive());
-        logger.error("isRunning {}", context.isRunning());
-
         try {
-            Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(ClassNameConstant.SERVICE_PACKAGE,
-                    LazyBean.class);
-            Set<AgentService> agentServices = ClassUtil.scanBaseClass(ClassNameConstant.SERVICE_PACKAGE,
-                            AgentService.class)
+            Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(SERVICE_PACKAGE, LazyBean.class);
+            Set<AgentService> agentServices = ClassUtil.scanBaseClass(SERVICE_PACKAGE, AgentService.class)
                     .stream()
                     .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
                     .map(clazz -> (AgentService) ClassUtil.getInstance(clazz))
