@@ -32,6 +32,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplicationRunListener;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
 
 import static org.liuguangsheng.galois.constants.Constant.APPLICATION;
 
@@ -41,12 +42,25 @@ import static org.liuguangsheng.galois.constants.Constant.APPLICATION;
  * @author liuguangsheng
  */
 public abstract class AbstractRunner implements SpringApplicationRunListener {
+    /**
+     * The constant logger.
+     */
     public static final Logger logger = LoggerFactory.getLogger(AbstractRunner.class);
 
     /**
      * the rank mean which runer will run first if got a higher rank value
      */
     protected int rank;
+
+    @Override
+    public void starting() {
+        // TODO
+    }
+
+    @Override
+    public void environmentPrepared(ConfigurableEnvironment environment) {
+        // TODO
+    }
 
     /**
      * Called once the {@link ApplicationContext} has been created and prepared, but
