@@ -26,9 +26,11 @@ package org.newcih.galoisdemo;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication()
 @MapperScan(basePackages = "org.newcih.galoisdemo.dao")
+@EnableDiscoveryClient
 public class GaloisdemoApplication {
 
     public static void main(String[] args) {
