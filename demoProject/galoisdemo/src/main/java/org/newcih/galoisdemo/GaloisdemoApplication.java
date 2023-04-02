@@ -34,20 +34,6 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 public class GaloisdemoApplication {
 
     public static void main(String[] args) {
-//        ClassLoader appClassLoader = GaloisdemoApplication.class.getClassLoader();
-//        ClassLoader springClassLoader = GaloisdemoApplication.class.getClassLoader();
-//
-//        try {
-//            Class<?> app = appClassLoader.loadClass("org.newcih.galois.service.SpringBootLifeCycle");
-//            Class<?> spring = springClassLoader.loadClass("org.newcih.galois.service.SpringBootLifeCycle");
-//            System.out.println(appClassLoader);
-//            System.out.println(springClassLoader);
-//            System.out.println(app);
-//            System.out.println(spring);
-//        } catch (Exception e) {
-//
-//        }
-//
         SpringApplication.run(GaloisdemoApplication.class, args);
     }
 

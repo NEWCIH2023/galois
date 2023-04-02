@@ -55,11 +55,13 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
     @Override
     public void starting() {
         // TODO
+        logger.info("{} ###[{}]### {}", getClass().getSimpleName(), this, "starting");
     }
 
     @Override
     public void environmentPrepared(ConfigurableEnvironment environment) {
         // TODO
+        logger.info("{} ###[{}-{}]### {}", getClass().getSimpleName(), this, environment, "environmentPrepared");
     }
 
     /**
