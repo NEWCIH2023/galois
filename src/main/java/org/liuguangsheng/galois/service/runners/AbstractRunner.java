@@ -56,12 +56,15 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
     public void starting() {
         // TODO
         logger.info("{} ###[{}]### {}", getClass().getSimpleName(), this, "starting");
+        System.out.printf("%s ###[%s]### %s%n", getClass().getSimpleName(), this, "starting");
     }
 
     @Override
     public void environmentPrepared(ConfigurableEnvironment environment) {
         // TODO
         logger.info("{} ###[{}-{}]### {}", getClass().getSimpleName(), this, environment, "environmentPrepared");
+        System.out.printf("%s ###[%s-%s]### %s%n", getClass().getSimpleName(), this, environment,
+                "environmentPrepared");
     }
 
     /**
