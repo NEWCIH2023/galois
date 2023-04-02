@@ -27,7 +27,6 @@ package org.liuguangsheng.galois.service;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
-import jdk.nashorn.internal.runtime.regexp.joni.constants.AsmConstants;
 import org.liuguangsheng.galois.conf.GlobalConfiguration;
 
 import static org.liuguangsheng.galois.constants.ConfConstant.BANNER_ENABLE;
@@ -50,7 +49,7 @@ public class BannerService {
                     " / ___| __ _| | ___ (_)___ \n" +
                     "| |  _ / _` | |/ _ \\| / __|\n" +
                     "| |_| | (_| | | (_) | \\__ \\\n" +
-                    " \\____|\\__,_|_|\\___/|_|___/\t\t(" + galoisVersion() + ")";
+                    " \\____|\\__,_|_|\\___/|_|___/\t\t" + galoisVersion();
 
     private BannerService() {
     }
@@ -142,7 +141,7 @@ public class BannerService {
      * @see String
      */
     private static String galoisVersion() {
-        return String.format("%s.%s", globalConfig.getString(GALOIS_VERSION, HYPHEN),
+        return String.format("%s (%s)", globalConfig.getString(GALOIS_VERSION, HYPHEN),
                 globalConfig.getString(BUILD_TYPE));
     }
 }
