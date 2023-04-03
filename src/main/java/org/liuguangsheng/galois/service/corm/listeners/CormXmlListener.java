@@ -77,7 +77,7 @@ public class CormXmlListener implements FileChangedListener {
             Document document = db.parse(file);
             DocumentType documentType = document.getDoctype();
             return documentType != null && documentType.toString().contains(DOC_TYPE);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("Parse xml file fail. Check it's file type.", e);
             return false;
         }

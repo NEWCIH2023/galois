@@ -40,9 +40,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import org.liuguangsheng.galois.service.corm.visitors.ComtopConfigurationVisitor;
 import org.liuguangsheng.galois.service.BeanReloader;
 import org.liuguangsheng.galois.service.annotation.LazyBean;
+import org.liuguangsheng.galois.service.corm.visitors.ComtopConfigurationVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,7 +108,7 @@ public class CormBeanReloader implements BeanReloader<File>,
             clearSqlElement(context.evalNodes("/mapper/sql"), namespace);
             // reload mapper by xml file
             reloadXML(mapperFile);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("Reload mybatis mapper by xml file fail.", e);
         }
 

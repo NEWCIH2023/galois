@@ -28,10 +28,10 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import org.liuguangsheng.galois.service.mybatis.MyBatisBeanReloader;
 import org.liuguangsheng.galois.service.FileChangedListener;
 import org.liuguangsheng.galois.service.annotation.LazyBean;
 import org.liuguangsheng.galois.service.mybatis.MyBatisAgentService;
+import org.liuguangsheng.galois.service.mybatis.MyBatisBeanReloader;
 import org.liuguangsheng.galois.utils.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +77,7 @@ public class MyBatisXmlListener implements FileChangedListener {
             Document document = db.parse(file);
             DocumentType documentType = document.getDoctype();
             return documentType != null && documentType.toString().contains(DOC_TYPE);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("Parse xml file fail. Check it's file type.", e);
             return false;
         }
