@@ -173,7 +173,7 @@
                             <Premain-Class>org.liuguangsheng.galois.service.PremainService</Premain-Class>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
-                            <Creator>NEWCIH</Creator>
+                            <Creator>LiuGuangSheng</Creator>
                         </manifestEntries>
                     </archive>
                 </configuration>
