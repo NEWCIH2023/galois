@@ -75,7 +75,7 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationCo
             factory.registerSingleton(beanName, bean);
         } catch (InstantiationException ie) {
             logger.error("Can't create a new object by newInstance method, ensure that's not an abstract class.");
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("SpringBeanReloader update bean fail.", e);
         }
 

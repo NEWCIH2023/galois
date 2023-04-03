@@ -41,6 +41,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import jdk.internal.org.objectweb.asm.ClassReader;
+import org.liuguangsheng.galois.service.NewClassLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -69,10 +70,14 @@ import static org.springframework.util.ClassUtils.convertClassNameToResourcePath
  */
 public class ClassUtil {
 
+    /**
+     * The constant logger.
+     */
     public static final Logger logger = LoggerFactory.getLogger(ClassUtil.class);
     private static final String compileDir;
     private static final Pattern packagePattern = Pattern.compile("^package +(\\S+);");
     private static final Pattern classNamePattern = Pattern.compile("class +([\\S&&[^<]]+)");
+
     /**
      * The constant inst.
      */
@@ -225,6 +230,7 @@ public class ClassUtil {
      *
      * @param classFile classFile
      * @return {@link String}
+     * @throws IOException the io exception
      * @see String
      */
     public static String getClassNameFromClass(File classFile) throws IOException {
