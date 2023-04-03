@@ -25,10 +25,10 @@
 package org.liuguangsheng.galois.service.spring;
 
 import java.lang.reflect.Modifier;
-import org.liuguangsheng.galois.service.spring.visitors.ApplicationContextVisitor;
-import org.liuguangsheng.galois.service.spring.visitors.BeanDefinitionScannerVisitor;
 import org.liuguangsheng.galois.service.BeanReloader;
 import org.liuguangsheng.galois.service.annotation.LazyBean;
+import org.liuguangsheng.galois.service.spring.visitors.ApplicationContextVisitor;
+import org.liuguangsheng.galois.service.spring.visitors.BeanDefinitionScannerVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -41,8 +41,8 @@ import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
  * @author liuguangsheng
  */
 @LazyBean(value = "SpringBeanReloader", manager = SpringAgentService.class)
-public class SpringBeanReloader implements BeanReloader<Class<?>>,
-        ApplicationContextVisitor.NecessaryMethods, BeanDefinitionScannerVisitor.NecessaryMethods {
+public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationContextVisitor.NecessaryMethods,
+        BeanDefinitionScannerVisitor.NecessaryMethods {
 
     private static final Logger logger = LoggerFactory.getLogger(SpringBeanReloader.class);
     protected ClassPathBeanDefinitionScanner scanner;
@@ -61,9 +61,8 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>,
     @Override
     public void updateBean(Class<?> clazz) {
         if (scanner == null || context == null) {
-            logger.error(
-                    "SpringBeanReloader not prepare ready. BeanDefinitionScanner or ApplicationContext object is null" +
-                            ".");
+            logger.warn("SpringBeanReloader not prepare ready. BeanDefinitionScanner or ApplicationContext object is "
+                    + "null.");
             return;
         }
 
@@ -75,8 +74,7 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>,
             factory.destroySingleton(beanName);
             factory.registerSingleton(beanName, bean);
         } catch (InstantiationException ie) {
-            logger.error(
-                    "Can't create a new object by newInstance method, ensure that's not an abstract class.");
+            logger.error("Can't create a new object by newInstance method, ensure that's not an abstract class.");
         } catch (Exception e) {
             logger.error("SpringBeanReloader update bean fail.", e);
         }
@@ -87,8 +85,7 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>,
     @Override
     public boolean isUseful(Class<?> clazz) {
         int m = clazz.getModifiers();
-        if (Modifier.isInterface(m) || Modifier.isAbstract(m) || Modifier.isPrivate(m)
-                || Modifier.isStatic(m) || Modifier.isNative(m)) {
+        if (Modifier.isInterface(m) || Modifier.isAbstract(m) || Modifier.isPrivate(m) || Modifier.isStatic(m) || Modifier.isNative(m)) {
             return false;
         }
 
