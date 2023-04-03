@@ -26,8 +26,6 @@ package org.liuguangsheng.galois.service.spring;
 
 import org.liuguangsheng.galois.conf.GlobalConfiguration;
 import org.liuguangsheng.galois.service.AgentService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.liuguangsheng.galois.constants.ConfConstant.RELOADER_SPRING_BOOT_ENABLE;
 
@@ -38,7 +36,6 @@ import static org.liuguangsheng.galois.constants.ConfConstant.RELOADER_SPRING_BO
  */
 public class SpringAgentService extends AgentService {
 
-    private static final Logger logger = LoggerFactory.getLogger(SpringAgentService.class);
     private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
     private static final SpringAgentService instance = new SpringAgentService();
 

@@ -58,13 +58,12 @@ public class AgentInitializeRunner extends AbstractRunner {
 
     @Override
     public void started(ConfigurableApplicationContext context) {
-        logger.info("{} with context {} is {}", getClass().getSimpleName(), context.getId(), "started");
-
-        if (!isApplicationContext(context)) {
+        if (!isCanInvoke()) {
             return;
         }
 
-        logger.info("{} is Running.", getClass().getSimpleName());
+        logger.info("{} with context {} is {}", getClass().getSimpleName(), context.getId(), "started");
+
         try {
             Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(SERVICE_PACKAGE, LazyBean.class);
             Set<AgentService> agentServices = ClassUtil.scanBaseClass(SERVICE_PACKAGE, AgentService.class)

@@ -24,7 +24,6 @@
 
 package org.liuguangsheng.galois.service.runners;
 
-import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationRunner;
@@ -33,8 +32,6 @@ import org.springframework.boot.SpringApplicationRunListener;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
-
-import static org.liuguangsheng.galois.constants.Constant.APPLICATION;
 
 /**
  * 兼容2.0.3与2.5.5版本的SpringBoot，在低版本中，这个接口没有任何默认实现，而在2.5.5版本中的SpringBoot，这个接口的所有方法都有默认实现
@@ -51,6 +48,9 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
      * the rank mean which runer will run first if got a higher rank value
      */
     protected int rank;
+    // 低版本SpringBoot有一个bug，在引入SpringCloud组件后，会重复执行SpringApplicationRunListener
+    // ，因此这里加入计数，保证SpringApplicationRunListener只执行一次
+    protected int invokeCount;
 
     @Override
     public void starting() {
@@ -58,14 +58,11 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
          * you can only use DeferredLog to print log in starting method.
          * @see org.springframework.boot.logging.DeferredLog
          */
-        System.out.printf("%s ###[%s]### %s%n", getClass().getSimpleName(), Objects.hashCode(this), "starting");
+        invokeCount++;
     }
 
     @Override
     public void environmentPrepared(ConfigurableEnvironment environment) {
-        // TODO
-        logger.info("{} ###[{}-{}]### {}", getClass().getSimpleName(), Objects.hashCode(this), environment,
-                "environmentPrepared");
     }
 
     /**
@@ -76,7 +73,6 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
      */
     @Override
     public void contextPrepared(ConfigurableApplicationContext context) {
-        logger.info("{} ###[{}]### {}", getClass().getSimpleName(), context.getId(), "contextPrepared");
     }
 
     /**
@@ -87,7 +83,6 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
      */
     @Override
     public void contextLoaded(ConfigurableApplicationContext context) {
-        logger.info("{} ###[{}]### {}", getClass().getSimpleName(), context.getId(), "contextLoaded");
     }
 
     /**
@@ -100,7 +95,6 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
      */
     @Override
     public void started(ConfigurableApplicationContext context) {
-        logger.info("{} ###[{}]### {}", getClass().getSimpleName(), context.getId(), "started");
     }
 
     /**
@@ -113,7 +107,6 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
      */
     @Override
     public void running(ConfigurableApplicationContext context) {
-        logger.info("{} ###[{}]### {}", getClass().getSimpleName(), context.getId(), "running");
     }
 
     /**
@@ -126,7 +119,6 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
      */
     @Override
     public void failed(ConfigurableApplicationContext context, Throwable exception) {
-        logger.info("{} ###[{}]### {}", getClass().getSimpleName(), context.getId(), "failed");
     }
 
     /**
@@ -166,12 +158,15 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
     }
 
     /**
-     * Is application context boolean.
+     * Is can invoke boolean.
      *
-     * @param context the context
      * @return the boolean
      */
-    protected boolean isApplicationContext(ConfigurableApplicationContext context) {
-        return Objects.equals(APPLICATION, context.getId());
+    protected boolean isCanInvoke() {
+        if (--invokeCount == 0) {
+            return true;
+        }
+
+        return false;
     }
 }
