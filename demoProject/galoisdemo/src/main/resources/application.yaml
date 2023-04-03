@@ -1,4 +1,8 @@
 spring:
+  cloud:
+    consul:
+      discovery:
+        enabled: false
   datasource:
     driver-class-name: dm.jdbc.driver.DmDriver
     url: jdbc:dm://10.92.225.249/DAMENG

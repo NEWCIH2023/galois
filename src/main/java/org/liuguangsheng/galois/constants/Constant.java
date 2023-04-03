@@ -172,6 +172,8 @@ public class Constant {
      * The constant CR.
      */
     public static final String CR = "\r";
-
-
+    /**
+     * The constant TAB.
+     */
+    public static final String TAB = "\t";
 }

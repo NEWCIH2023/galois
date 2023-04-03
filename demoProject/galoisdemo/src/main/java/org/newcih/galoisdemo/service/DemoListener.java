@@ -22,44 +22,21 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.service.runners;
+package org.newcih.galoisdemo.service;
 
-import org.liuguangsheng.galois.service.FileWatchService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Component;
 
 /**
- * file watch runner
- *
  * @author liuguangsheng
- * @see FileWatchService
- */
-public class FileWatchRunner extends AbstractRunner {
-
-    private static final Logger logger = LoggerFactory.getLogger(FileWatchRunner.class);
-    public static final int RANK = 1;
-    private static final FileWatchService fileWatchService = FileWatchService.getInstance();
-
-    /**
-     * Instantiates a new File watch runner.
-     */
-    public FileWatchRunner() {
-        setRank(RANK);
-    }
+ * @since 1.0.0
+ **/
+@Component
+public class DemoListener implements ApplicationListener<ApplicationStartedEvent> {
 
     @Override
-    public void started(ConfigurableApplicationContext context) {
-        logger.info("{} with context {} is {}", getClass().getSimpleName(), context.getId(), "started");
-
-        if (!isApplicationContext(context)) {
-            return;
-        }
-
-        logger.info("{} is Running.", getClass().getSimpleName());
-        fileWatchService.start();
+    public void onApplicationEvent(ApplicationStartedEvent applicationStartedEvent) {
+        System.out.println("##############onApplicationEvent");
     }
-
 }

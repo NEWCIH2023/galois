@@ -34,6 +34,7 @@ import static org.liuguangsheng.galois.constants.ConfConstant.BUILD_TYPE;
 import static org.liuguangsheng.galois.constants.ConfConstant.GALOIS_VERSION;
 import static org.liuguangsheng.galois.constants.Constant.HYPHEN;
 import static org.liuguangsheng.galois.constants.Constant.LF;
+import static org.liuguangsheng.galois.constants.Constant.TAB;
 
 /**
  * print banner when galois starting
@@ -44,12 +45,12 @@ import static org.liuguangsheng.galois.constants.Constant.LF;
 public class BannerService {
 
     private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
-    private static final String BANNER =
-            "  ____       _       _     \n" +
-                    " / ___| __ _| | ___ (_)___ \n" +
-                    "| |  _ / _` | |/ _ \\| / __|\n" +
-                    "| |_| | (_| | | (_) | \\__ \\\n" +
-                    " \\____|\\__,_|_|\\___/|_|___/\t\t" + galoisVersion();
+    private static final String BANNER = " ██████╗  █████╗ ██╗      ██████╗ ██╗███████╗\n" +
+            "██╔════╝ ██╔══██╗██║     ██╔═══██╗██║██╔════╝\n" +
+            "██║  ███╗███████║██║     ██║   ██║██║███████╗\n" +
+            "██║   ██║██╔══██║██║     ██║   ██║██║╚════██║\n" +
+            "╚██████╔╝██║  ██║███████╗╚██████╔╝██║███████║\n" +
+            " ╚═════╝ ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝╚══════╝";
 
     private BannerService() {
     }
@@ -62,7 +63,7 @@ public class BannerService {
             return;
         }
 
-        String bannerBuilder = BANNER + LF +
+        String bannerBuilder = BANNER + TAB + galoisVersion() + LF +
                 String.format(
                         " :: SpringBoot (%s) :: Spring (%s) :: MyBatis (%s)%n :: Jdk (%s)",
                         springBootVersion(), springVersion(), mybatisVersion(), jdkVersion()

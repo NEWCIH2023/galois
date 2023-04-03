@@ -53,7 +53,7 @@ public class AgentInitializeRunner extends AbstractRunner {
      * Instantiates a new Agent service init runner.
      */
     public AgentInitializeRunner() {
-        setRank(FileWatchRunner.RANK + 1);
+        setRank(0);
     }
 
     @Override
@@ -65,7 +65,6 @@ public class AgentInitializeRunner extends AbstractRunner {
         }
 
         logger.info("{} is Running.", getClass().getSimpleName());
-
         try {
             Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(SERVICE_PACKAGE, LazyBean.class);
             Set<AgentService> agentServices = ClassUtil.scanBaseClass(SERVICE_PACKAGE, AgentService.class)
@@ -97,6 +96,8 @@ public class AgentInitializeRunner extends AbstractRunner {
                     }
                 }
             }
+
+            fileWatchService.start();
         } catch (Exception ignored) {
         }
     }

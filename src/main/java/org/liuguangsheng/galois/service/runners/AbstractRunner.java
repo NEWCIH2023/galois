@@ -54,16 +54,17 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
 
     @Override
     public void starting() {
-        // TODO
-        logger.info("{} ###[{}]### {}", getClass().getSimpleName(), this, "starting");
-        System.out.printf("%s ###[%s]### %s%n", getClass().getSimpleName(), this, "starting");
+        /**
+         * you can only use DeferredLog to print log in starting method.
+         * @see org.springframework.boot.logging.DeferredLog
+         */
+        System.out.printf("%s ###[%s]### %s%n", getClass().getSimpleName(), Objects.hashCode(this), "starting");
     }
 
     @Override
     public void environmentPrepared(ConfigurableEnvironment environment) {
         // TODO
-        logger.info("{} ###[{}-{}]### {}", getClass().getSimpleName(), this, environment, "environmentPrepared");
-        System.out.printf("%s ###[%s-%s]### %s%n", getClass().getSimpleName(), this, environment,
+        logger.info("{} ###[{}-{}]### {}", getClass().getSimpleName(), Objects.hashCode(this), environment,
                 "environmentPrepared");
     }
 
