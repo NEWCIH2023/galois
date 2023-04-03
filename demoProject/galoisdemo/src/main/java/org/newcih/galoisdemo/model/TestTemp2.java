@@ -25,6 +25,9 @@ package org.newcih.galoisdemo.model;
 
 public class TestTemp2 {
     private String id;
+    private String id2;
+
+    private TestTemp2 testTemp2 = new TestTemp2();
 
     private String name;
 
