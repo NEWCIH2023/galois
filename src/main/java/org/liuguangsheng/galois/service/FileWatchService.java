@@ -57,7 +57,6 @@ public class FileWatchService {
     private static final List<FileChangedListener> listeners = new ArrayList<>(16);
     private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
     private static final FileWatchService instance = new FileWatchService();
-
     private WatchService watchService;
     private String rootPath = globalConfig.getString(USER_DIR);
 
@@ -151,7 +150,7 @@ public class FileWatchService {
                     }
 
                     watchKey.reset();
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     logger.error("File monitor handle event failed.", e);
                 }
             }

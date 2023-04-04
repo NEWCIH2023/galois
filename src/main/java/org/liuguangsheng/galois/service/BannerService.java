@@ -63,7 +63,7 @@ public class BannerService {
             return;
         }
 
-        String bannerBuilder = BANNER + TAB + galoisVersion() + LF +
+        String bannerBuilder = LF + BANNER + TAB + galoisVersion() + LF +
                 String.format(
                         " :: SpringBoot (%s) :: Spring (%s) :: MyBatis (%s)%n :: Jdk (%s)",
                         springBootVersion(), springVersion(), mybatisVersion(), jdkVersion()

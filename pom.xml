@@ -28,7 +28,7 @@
 
     <groupId>org.liuguangsheng</groupId>
     <artifactId>galois</artifactId>
-    <version>0.4.4</version>
+    <version>0.4.5-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>galois</name>
@@ -173,7 +173,7 @@
                             <Premain-Class>org.liuguangsheng.galois.service.PremainService</Premain-Class>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
-                            <Creator>NEWCIH</Creator>
+                            <Creator>LiuGuangSheng</Creator>
                         </manifestEntries>
                     </archive>
                 </configuration>

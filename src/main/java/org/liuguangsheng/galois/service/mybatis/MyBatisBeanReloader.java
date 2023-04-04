@@ -110,7 +110,7 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
             clearSqlElement(context.evalNodes("/mapper/sql"), namespace);
             // reparse mybatis mapper xml file
             reloadXML(xmlFile);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("Reload mybatis mapper by xml file fail.", e);
         }
 

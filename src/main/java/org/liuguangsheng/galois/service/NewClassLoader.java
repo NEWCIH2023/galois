@@ -1,6 +1,7 @@
 /*
  * MIT License
- * Copyright (c) [2023] [liuguangsheng]
+ *
+ * Copyright (c) [2023] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,29 +22,22 @@
  * SOFTWARE.
  */
 
-package org.newcih.galoisdemo.model;
+package org.liuguangsheng.galois.service;
 
-public class TestTemp2 {
-    private String id;
-    private String id2;
+/**
+ * The type New class loader.
+ */
+public class NewClassLoader extends ClassLoader {
 
-    private TestTemp2 testTemp2 = new TestTemp2();
+    private static final NewClassLoader instance = new NewClassLoader();
 
-    private String name;
-
-    public String getId() {
-        return id;
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
+    public static ClassLoader getInstance() {
+        return instance;
     }
 
-    public void setId(String id) {
-        this.id = id == null ? null : id.trim();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name == null ? null : name.trim();
-    }
 }

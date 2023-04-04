@@ -66,11 +66,8 @@ public class AgentInitializeRunner extends AbstractRunner {
 
         try {
             Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(SERVICE_PACKAGE, LazyBean.class);
-            Set<AgentService> agentServices = ClassUtil.scanBaseClass(SERVICE_PACKAGE, AgentService.class)
-                    .stream()
-                    .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
-                    .map(clazz -> (AgentService) ClassUtil.getInstance(clazz))
-                    .collect(Collectors.toSet());
+            Set<AgentService> agentServices =
+                    ClassUtil.scanBaseClass(SERVICE_PACKAGE, AgentService.class).stream().filter(clazz -> !Modifier.isAbstract(clazz.getModifiers())).map(clazz -> (AgentService) ClassUtil.getInstance(clazz)).collect(Collectors.toSet());
 
             for (AgentService agentService : agentServices) {
                 if (!agentService.isUseful()) {
@@ -81,7 +78,9 @@ public class AgentInitializeRunner extends AbstractRunner {
                 for (Class<?> lazyBeanFactory : lazyBeanFactorys) {
                     int modifiers = lazyBeanFactory.getModifiers();
                     LazyBean lazyBean = lazyBeanFactory.getAnnotation(LazyBean.class);
-                    if (Modifier.isInterface(modifiers) || Modifier.isAbstract(modifiers) || !lazyBean.manager().equals(agentService.getClass())) {
+                    boolean isManager = lazyBean.manager().equals(agentService.getClass());
+
+                    if (Modifier.isInterface(modifiers) || Modifier.isAbstract(modifiers) || !isManager) {
                         continue;
                     }
 
