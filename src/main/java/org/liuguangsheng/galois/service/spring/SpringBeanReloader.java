@@ -82,6 +82,12 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationCo
         logger.info("SpringBeanReloader reload class {} success.", clazz.getSimpleName());
     }
 
+    /**
+     * is useful
+     *
+     * @param clazz clazz
+     * @return {@link boolean}
+     */
     @Override
     public boolean isUseful(Class<?> clazz) {
         int m = clazz.getModifiers();

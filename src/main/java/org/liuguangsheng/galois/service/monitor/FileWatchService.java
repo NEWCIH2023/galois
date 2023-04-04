@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.service;
+package org.liuguangsheng.galois.service.monitor;
 
 import java.io.File;
 import java.io.IOException;
@@ -95,6 +95,7 @@ public class FileWatchService {
      * @param dir root dir
      */
     private void registerWatchService(File dir) throws IOException {
+        // SensitivityWatchEventModifier.MEDIUM may not work on window OS
         dir.toPath().register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY}, MEDIUM);
         File[] subDirs = dir.listFiles(File::isDirectory);
         if (subDirs == null) {
@@ -104,7 +105,6 @@ public class FileWatchService {
         String dirName;
         for (File subDir : subDirs) {
             dirName = subDir.getName();
-            // do not monitor hide path
             if (!dirName.startsWith(DOT)) {
                 registerWatchService(subDir);
             }
@@ -123,12 +123,15 @@ public class FileWatchService {
 
             while (true) {
                 try {
-                    WatchKey watchKey = watchService.poll();
+                    // take()是一个阻塞方法，会等待监视器发出的信号才返回。
+                    // 还可以使用watcher.poll()方法，非阻塞方法，会立即返回当时监视器中是否有信号
+                    WatchKey watchKey = watchService.take();
                     if (watchKey == null) {
                         continue;
                     }
 
-                    for (WatchEvent<?> event : watchKey.pollEvents()) {
+                    List<WatchEvent<?>> events = watchKey.pollEvents();
+                    for (WatchEvent<?> event : events) {
                         WatchEvent.Kind<?> kind = event.kind();
                         File file = new File(watchKey.watchable() + File.separator + event.context());
 
@@ -136,8 +139,8 @@ public class FileWatchService {
                             continue;
                         }
 
-                        if (logger.isTraceEnabled()) {
-                            logger.trace("monitor file {} {}.", kind, file);
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("monitor file {} {}.", kind, file);
                         }
 
                         listeners.stream().filter(listener -> listener.isUseful(file)).forEach(listener -> {

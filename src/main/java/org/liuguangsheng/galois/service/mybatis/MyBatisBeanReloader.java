@@ -112,6 +112,7 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
             reloadXML(xmlFile);
         } catch (Throwable e) {
             logger.error("Reload mybatis mapper by xml file fail.", e);
+            return;
         }
 
         logger.info("Reload mybatis mapper by xml file {} success.", xmlFile.getName());

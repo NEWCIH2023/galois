@@ -152,14 +152,53 @@
     </set>
     <if test="_parameter != ''">
       <include refid="Update_By_Example_Where_Clause" />
+      <include refid="Update_By_Example_Where_Clause" />
+      <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
     update TEST_TEMP2
     set ID = #{record.id,jdbcType=VARCHAR},
+    NAME = #{record.name,jdbcType=VARCHAR}
       NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
+    NAME = #{record.name,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
 </mapper>
+        NAME = #{record.name,jdbcType=VARCHAR}
+        NAME = #{record.name,jdbcType=VARCHAR}
+        NAME = #{record.name,jdbcType=VARCHAR}
+        NAME = #{record.name,jdbcType=VARCHAR}
+        NAME = #{record.name,jdbcType=VARCHAR}

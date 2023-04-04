@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.service;
+package org.liuguangsheng.galois.service.monitor;
 
 import java.io.File;
 

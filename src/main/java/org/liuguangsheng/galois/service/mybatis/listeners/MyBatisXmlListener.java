@@ -28,8 +28,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import org.liuguangsheng.galois.service.FileChangedListener;
 import org.liuguangsheng.galois.service.annotation.LazyBean;
+import org.liuguangsheng.galois.service.monitor.FileChangedListener;
 import org.liuguangsheng.galois.service.mybatis.MyBatisAgentService;
 import org.liuguangsheng.galois.service.mybatis.MyBatisBeanReloader;
 import org.liuguangsheng.galois.utils.FileUtil;
@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXParseException;
 
 import static org.liuguangsheng.galois.constants.FileType.XML_FILE;
 
@@ -72,11 +73,13 @@ public class MyBatisXmlListener implements FileChangedListener {
             dbf.setValidating(false);
             DocumentBuilder db = dbf.newDocumentBuilder();
             // do no validate dtd
-            db.setEntityResolver(
-                    ((publicId, systemId) -> new InputSource(new ByteArrayInputStream(new byte[0]))));
+            db.setEntityResolver(((publicId, systemId) -> new InputSource(new ByteArrayInputStream(new byte[0]))));
             Document document = db.parse(file);
             DocumentType documentType = document.getDoctype();
             return documentType != null && documentType.toString().contains(DOC_TYPE);
+        } catch (SAXParseException spe) {
+            logger.warn("Invalid xml file had ignored.");
+            return false;
         } catch (Throwable e) {
             logger.error("Parse xml file fail. Check it's file type.", e);
             return false;

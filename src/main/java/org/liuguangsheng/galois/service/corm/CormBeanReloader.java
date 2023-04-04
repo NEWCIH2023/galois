@@ -110,6 +110,7 @@ public class CormBeanReloader implements BeanReloader<File>,
             reloadXML(mapperFile);
         } catch (Throwable e) {
             logger.error("Reload mybatis mapper by xml file fail.", e);
+            return;
         }
 
         logger.info("Reload mybatis mapper by xml file {} success.", mapperFile.getName());

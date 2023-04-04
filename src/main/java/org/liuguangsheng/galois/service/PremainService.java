@@ -35,10 +35,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.liuguangsheng.galois.service.annotation.AsmVisitor;
+import org.liuguangsheng.galois.service.runners.AbstractRunner;
 import org.liuguangsheng.galois.service.runners.SpringRunnerManager;
 import org.liuguangsheng.galois.utils.ClassUtil;
 import org.liuguangsheng.galois.utils.StringUtil;
-import org.liuguangsheng.galois.service.runners.AbstractRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +64,7 @@ public class PremainService {
         scanAsmVisitor();
         scanRunner();
 
-        logger.info("Scan {} agentServices as list [{}].", agentServiceMap.keySet().size(),
+        logger.debug("Scan {} agentServices as list [{}].", agentServiceMap.keySet().size(),
                 agentServiceMap.values().stream().map(AgentService::toString).collect(Collectors.joining(COMMA)));
     }
 
@@ -123,6 +123,9 @@ public class PremainService {
         }
     }
 
+    /**
+     * scan agent service
+     */
     private static void scanAgentService() {
         // scan agent service over abstract class named AgentService
         Set<Class<?>> agentClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE, AgentService.class);
@@ -139,6 +142,9 @@ public class PremainService {
         }
     }
 
+    /**
+     * scan asm visitor
+     */
     private static void scanAsmVisitor() {
         Set<Class<?>> visitorClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE, MethodAdapter.class);
         for (Class<?> visitorClass : visitorClasses) {
@@ -153,6 +159,9 @@ public class PremainService {
         }
     }
 
+    /**
+     * scan runner
+     */
     private static void scanRunner() {
         Set<Class<?>> runnerClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE, AbstractRunner.class);
         for (Class<?> runnerClass : runnerClasses) {
@@ -160,8 +169,7 @@ public class PremainService {
                 continue;
             }
 
-            Optional.ofNullable(ClassUtil.getInstance(runnerClass))
-                    .ifPresent(object -> runManager.addRunner((AbstractRunner) object));
+            Optional.ofNullable(ClassUtil.getInstance(runnerClass)).ifPresent(object -> runManager.addRunner((AbstractRunner) object));
         }
 
     }
