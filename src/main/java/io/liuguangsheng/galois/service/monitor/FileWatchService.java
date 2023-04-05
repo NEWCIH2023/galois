@@ -24,6 +24,8 @@
 
 package io.liuguangsheng.galois.service.monitor;
 
+import io.liuguangsheng.galois.conf.GlobalConfiguration;
+import io.liuguangsheng.galois.utils.GaloisLog;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -33,17 +35,15 @@ import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import io.liuguangsheng.galois.conf.GlobalConfiguration;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static com.sun.nio.file.SensitivityWatchEventModifier.MEDIUM;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
-import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 import static io.liuguangsheng.galois.constants.Constant.COMMA;
 import static io.liuguangsheng.galois.constants.Constant.DOT;
 import static io.liuguangsheng.galois.constants.Constant.USER_DIR;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 /**
  * file monitor service based on {@link java.nio.file.WatchService}
@@ -53,7 +53,7 @@ import static io.liuguangsheng.galois.constants.Constant.USER_DIR;
  */
 public class FileWatchService {
 
-    private static final Logger logger = LoggerFactory.getLogger(FileWatchService.class);
+    private static final Logger logger = new GaloisLog(FileWatchService.class);
     private static final List<FileChangedListener> listeners = new ArrayList<>(16);
     private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
     private static final FileWatchService instance = new FileWatchService();

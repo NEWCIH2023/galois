@@ -24,19 +24,18 @@
 
 package io.liuguangsheng.galois.service;
 
+import io.liuguangsheng.galois.conf.GlobalConfiguration;
 import io.liuguangsheng.galois.utils.GaloisLog;
 import java.io.FileOutputStream;
 import jdk.internal.org.objectweb.asm.ClassReader;
 import jdk.internal.org.objectweb.asm.ClassVisitor;
 import jdk.internal.org.objectweb.asm.ClassWriter;
-import io.liuguangsheng.galois.conf.GlobalConfiguration;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
 import static io.liuguangsheng.galois.constants.ConfConstant.PRINT_ASM_CODE_ENABLE;
 import static io.liuguangsheng.galois.constants.Constant.DOT;
 import static io.liuguangsheng.galois.constants.FileType.CLASS_FILE;
+import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
 
 /**
  * method adapter
@@ -46,7 +45,6 @@ import static io.liuguangsheng.galois.constants.FileType.CLASS_FILE;
  */
 public abstract class MethodAdapter extends ClassVisitor {
 
-//    private static final Logger logger = LoggerFactory.getLogger(MethodAdapter.class);
     private static final Logger logger = new GaloisLog(MethodAdapter.class);
     private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
     /**

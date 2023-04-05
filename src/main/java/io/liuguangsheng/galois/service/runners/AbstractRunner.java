@@ -24,8 +24,8 @@
 
 package io.liuguangsheng.galois.service.runners;
 
+import io.liuguangsheng.galois.utils.GaloisLog;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplicationRunListener;
@@ -42,7 +42,7 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
     /**
      * The constant logger.
      */
-    public static final Logger logger = LoggerFactory.getLogger(AbstractRunner.class);
+    public static final Logger logger = new GaloisLog(AbstractRunner.class);
 
     /**
      * the rank mean which runer will run first if got a higher rank value

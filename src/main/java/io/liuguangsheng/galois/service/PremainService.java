@@ -30,6 +30,7 @@ import io.liuguangsheng.galois.service.annotation.AsmVisitor;
 import io.liuguangsheng.galois.service.runners.AbstractRunner;
 import io.liuguangsheng.galois.service.runners.SpringRunnerManager;
 import io.liuguangsheng.galois.utils.ClassUtil;
+import io.liuguangsheng.galois.utils.GaloisLog;
 import io.liuguangsheng.galois.utils.StringUtil;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
@@ -42,7 +43,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * premain agent服务入口
@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PremainService {
 
-    private static final Logger logger = LoggerFactory.getLogger(PremainService.class);
+    private static final Logger logger = new GaloisLog(PremainService.class);
     private static final Map<String, AgentService> agentServiceMap = new HashMap<>(8);
     private static final SpringRunnerManager runManager = SpringRunnerManager.getInstance();
 
@@ -84,39 +84,6 @@ public class PremainService {
             BannerService.printBanner();
         } catch (Throwable e) {
             logger.error("Start Premain Service fail.", e);
-        }
-    }
-
-    /**
-     * custom class file transformer
-     *
-     * @author liuguangsheng
-     */
-    static class CustomTransformer implements ClassFileTransformer {
-
-        @Override
-        public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
-                                ProtectionDomain protectionDomain, byte[] classfileBuffer) {
-            if (StringUtil.isBlank(className)) {
-                return null;
-            }
-
-            String newClassName = className.replace(Constant.SLASH, Constant.DOT);
-            Collection<AgentService> agentServices = agentServiceMap.values();
-
-            for (AgentService agentService : agentServices) {
-                boolean isNecessaryClass = agentService.checkNecessaryClass(newClassName);
-                // checkedClass表示当前加载的类newClassName是否有对应的MethodAdapter，当为false时，
-                // 表示没有对应的MethodAdapter，这时候就直接跳过
-                if (!isNecessaryClass) {
-                    continue;
-                }
-
-                MethodAdapter adapter = agentService.getMethodAdapterMap().get(newClassName);
-                return adapter.transform();
-            }
-
-            return null;
         }
     }
 
@@ -169,5 +136,38 @@ public class PremainService {
             Optional.ofNullable(ClassUtil.getInstance(runnerClass)).ifPresent(object -> runManager.addRunner((AbstractRunner) object));
         }
 
+    }
+
+    /**
+     * custom class file transformer
+     *
+     * @author liuguangsheng
+     */
+    static class CustomTransformer implements ClassFileTransformer {
+
+        @Override
+        public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
+                                ProtectionDomain protectionDomain, byte[] classfileBuffer) {
+            if (StringUtil.isBlank(className)) {
+                return null;
+            }
+
+            String newClassName = className.replace(Constant.SLASH, Constant.DOT);
+            Collection<AgentService> agentServices = agentServiceMap.values();
+
+            for (AgentService agentService : agentServices) {
+                boolean isNecessaryClass = agentService.checkNecessaryClass(newClassName);
+                // checkedClass表示当前加载的类newClassName是否有对应的MethodAdapter，当为false时，
+                // 表示没有对应的MethodAdapter，这时候就直接跳过
+                if (!isNecessaryClass) {
+                    continue;
+                }
+
+                MethodAdapter adapter = agentService.getMethodAdapterMap().get(newClassName);
+                return adapter.transform();
+            }
+
+            return null;
+        }
     }
 }

@@ -24,9 +24,9 @@
 
 package io.liuguangsheng.galois.service.spring;
 
+import io.liuguangsheng.galois.conf.GlobalConfiguration;
 import io.liuguangsheng.galois.constants.ConfConstant;
 import io.liuguangsheng.galois.service.AgentService;
-import io.liuguangsheng.galois.conf.GlobalConfiguration;
 
 /**
  * spring agent service

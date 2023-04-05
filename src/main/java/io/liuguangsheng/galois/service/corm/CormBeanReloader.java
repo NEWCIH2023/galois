@@ -32,6 +32,9 @@ import com.comtop.corm.resource.core.io.FileSystemResource;
 import com.comtop.corm.session.Configuration;
 import io.liuguangsheng.galois.constants.Constant;
 import io.liuguangsheng.galois.service.BeanReloader;
+import io.liuguangsheng.galois.service.annotation.LazyBean;
+import io.liuguangsheng.galois.service.corm.visitors.ComtopConfigurationVisitor;
+import io.liuguangsheng.galois.utils.GaloisLog;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -42,10 +45,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import io.liuguangsheng.galois.service.annotation.LazyBean;
-import io.liuguangsheng.galois.service.corm.visitors.ComtopConfigurationVisitor;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Corm Bean Reloader Service
@@ -61,7 +61,7 @@ public class CormBeanReloader implements BeanReloader<File>,
      * The constant mybatisBeanReloder.
      */
     public static final CormBeanReloader mybatisBeanReloder = new CormBeanReloader();
-    private static final Logger logger = LoggerFactory.getLogger(CormBeanReloader.class);
+    private static final Logger logger = new GaloisLog(CormBeanReloader.class);
     /**
      * The Configuration.
      */

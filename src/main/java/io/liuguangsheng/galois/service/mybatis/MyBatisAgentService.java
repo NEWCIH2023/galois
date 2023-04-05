@@ -24,9 +24,9 @@
 
 package io.liuguangsheng.galois.service.mybatis;
 
+import io.liuguangsheng.galois.conf.GlobalConfiguration;
 import io.liuguangsheng.galois.constants.ConfConstant;
 import io.liuguangsheng.galois.service.AgentService;
-import io.liuguangsheng.galois.conf.GlobalConfiguration;
 
 /**
  * mybatis agent service

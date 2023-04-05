@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * file util
@@ -46,7 +45,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FileUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
+    private static final Logger logger = new GaloisLog(FileUtil.class);
 
     private FileUtil() {
     }

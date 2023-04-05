@@ -25,7 +25,6 @@
 package io.liuguangsheng.galois.conf;
 
 import io.liuguangsheng.galois.constants.Constant;
-import io.liuguangsheng.galois.utils.FileUtil;
 import io.liuguangsheng.galois.utils.StringUtil;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,7 +45,7 @@ public class GlobalConfiguration {
     private final Properties configuration = new Properties();
 
     private GlobalConfiguration() {
-        try (InputStream is = FileUtil.readClassPathFile("galois.properties")) {
+        try (InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("galois.properties")) {
             configuration.load(is);
         } catch (IOException e) {
             throw new RuntimeException(e);

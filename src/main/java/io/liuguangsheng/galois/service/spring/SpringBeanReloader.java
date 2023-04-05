@@ -25,12 +25,12 @@
 package io.liuguangsheng.galois.service.spring;
 
 import io.liuguangsheng.galois.service.BeanReloader;
-import java.lang.reflect.Modifier;
 import io.liuguangsheng.galois.service.annotation.LazyBean;
 import io.liuguangsheng.galois.service.spring.visitors.ApplicationContextVisitor;
 import io.liuguangsheng.galois.service.spring.visitors.BeanDefinitionScannerVisitor;
+import io.liuguangsheng.galois.utils.GaloisLog;
+import java.lang.reflect.Modifier;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
@@ -44,10 +44,10 @@ import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationContextVisitor.NecessaryMethods,
         BeanDefinitionScannerVisitor.NecessaryMethods {
 
-    private static final Logger logger = LoggerFactory.getLogger(SpringBeanReloader.class);
+    private static final Logger logger = new GaloisLog(SpringBeanReloader.class);
+    private static final SpringBeanReloader instance = new SpringBeanReloader();
     protected ClassPathBeanDefinitionScanner scanner;
     protected AnnotationConfigServletWebServerApplicationContext context;
-    private static final SpringBeanReloader instance = new SpringBeanReloader();
 
     public static SpringBeanReloader getInstance() {
         return instance;

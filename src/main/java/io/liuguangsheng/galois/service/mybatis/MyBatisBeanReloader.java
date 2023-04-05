@@ -28,6 +28,7 @@ import io.liuguangsheng.galois.constants.Constant;
 import io.liuguangsheng.galois.service.BeanReloader;
 import io.liuguangsheng.galois.service.annotation.LazyBean;
 import io.liuguangsheng.galois.service.mybatis.visitors.MyBatisConfigurationVisitor;
+import io.liuguangsheng.galois.utils.GaloisLog;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -51,7 +52,6 @@ import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.parsing.XPathParser;
 import org.apache.ibatis.session.Configuration;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * MyBatis的Mapper重新加载服务类，适用于3.2.0或以上版本
@@ -63,7 +63,7 @@ import org.slf4j.LoggerFactory;
 public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigurationVisitor.NecessaryMethods {
 
     private static final MyBatisBeanReloader mybatisBeanReloder = new MyBatisBeanReloader();
-    private static final Logger logger = LoggerFactory.getLogger(MyBatisBeanReloader.class);
+    private static final Logger logger = new GaloisLog(MyBatisBeanReloader.class);
     private static final List<String> CHILD_NAMES = Arrays.asList("association", "collection", "case");
     /**
      * The Configuration.

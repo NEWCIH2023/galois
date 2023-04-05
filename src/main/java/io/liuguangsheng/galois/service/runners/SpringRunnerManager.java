@@ -24,13 +24,13 @@
 
 package io.liuguangsheng.galois.service.runners;
 
+import io.liuguangsheng.galois.service.spring.visitors.SpringApplicationRunListenersVisitor;
+import io.liuguangsheng.galois.utils.GaloisLog;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import io.liuguangsheng.galois.service.spring.visitors.SpringApplicationRunListenersVisitor;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplicationRunListener;
 
 /**
@@ -41,7 +41,7 @@ import org.springframework.boot.SpringApplicationRunListener;
 public class SpringRunnerManager implements SpringApplicationRunListenersVisitor.NecessaryMethods {
 
     private static final SpringRunnerManager instance = new SpringRunnerManager();
-    private static final Logger logger = LoggerFactory.getLogger(SpringRunnerManager.class);
+    private static final Logger logger = new GaloisLog(SpringRunnerManager.class);
     private final List<AbstractRunner> runners = new ArrayList<>();
 
     /**

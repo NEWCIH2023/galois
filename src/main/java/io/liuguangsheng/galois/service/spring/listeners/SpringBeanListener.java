@@ -29,12 +29,12 @@ import io.liuguangsheng.galois.service.annotation.LazyBean;
 import io.liuguangsheng.galois.service.monitor.FileChangedListener;
 import io.liuguangsheng.galois.service.spring.SpringAgentService;
 import io.liuguangsheng.galois.service.spring.SpringBeanReloader;
-import java.io.File;
-import java.lang.instrument.ClassDefinition;
 import io.liuguangsheng.galois.utils.ClassUtil;
 import io.liuguangsheng.galois.utils.FileUtil;
+import io.liuguangsheng.galois.utils.GaloisLog;
+import java.io.File;
+import java.lang.instrument.ClassDefinition;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 @LazyBean(value = "SpringBeanListener", manager = SpringAgentService.class)
 public class SpringBeanListener implements FileChangedListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(SpringBeanListener.class);
+    private static final Logger logger = new GaloisLog(SpringBeanListener.class);
 
     private final SpringBeanReloader springBeanReloader = SpringBeanReloader.getInstance();
 

@@ -29,13 +29,13 @@ import io.liuguangsheng.galois.service.annotation.LazyBean;
 import io.liuguangsheng.galois.service.monitor.FileChangedListener;
 import io.liuguangsheng.galois.service.mybatis.MyBatisAgentService;
 import io.liuguangsheng.galois.service.mybatis.MyBatisBeanReloader;
+import io.liuguangsheng.galois.utils.FileUtil;
+import io.liuguangsheng.galois.utils.GaloisLog;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import io.liuguangsheng.galois.utils.FileUtil;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.xml.sax.InputSource;
@@ -55,7 +55,7 @@ public class MyBatisXmlListener implements FileChangedListener {
      * The constant DOC_TYPE.
      */
     public static final String DOC_TYPE = "mapper";
-    private static final Logger logger = LoggerFactory.getLogger(MyBatisXmlListener.class);
+    private static final Logger logger = new GaloisLog(MyBatisXmlListener.class);
     private static final MyBatisBeanReloader reloader = MyBatisBeanReloader.getInstance();
 
     @Override
