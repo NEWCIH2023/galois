@@ -37,6 +37,10 @@ public class ConfConstant {
      */
     public static final String BUILD_TYPE = "build.type";
     /**
+     * The constant PRINT_THROWABLE.
+     */
+    public static final String PRINT_THROWABLE = "print.throwable";
+    /**
      * The constant LOGGING_ENABLE.
      */
     public static final String LOGGING_ENABLE = "logging.enable";
