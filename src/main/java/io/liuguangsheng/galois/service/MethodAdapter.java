@@ -24,6 +24,7 @@
 
 package io.liuguangsheng.galois.service;
 
+import io.liuguangsheng.galois.utils.GaloisLog;
 import java.io.FileOutputStream;
 import jdk.internal.org.objectweb.asm.ClassReader;
 import jdk.internal.org.objectweb.asm.ClassVisitor;
@@ -45,7 +46,8 @@ import static io.liuguangsheng.galois.constants.FileType.CLASS_FILE;
  */
 public abstract class MethodAdapter extends ClassVisitor {
 
-    private static final Logger logger = LoggerFactory.getLogger(MethodAdapter.class);
+//    private static final Logger logger = LoggerFactory.getLogger(MethodAdapter.class);
+    private static final Logger logger = new GaloisLog(MethodAdapter.class);
     private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
     /**
      * The Class name.

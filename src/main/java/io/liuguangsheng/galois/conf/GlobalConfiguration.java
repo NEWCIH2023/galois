@@ -26,10 +26,10 @@ package io.liuguangsheng.galois.conf;
 
 import io.liuguangsheng.galois.constants.Constant;
 import io.liuguangsheng.galois.utils.FileUtil;
+import io.liuguangsheng.galois.utils.StringUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import io.liuguangsheng.galois.utils.StringUtil;
 
 /**
  * global configuration service

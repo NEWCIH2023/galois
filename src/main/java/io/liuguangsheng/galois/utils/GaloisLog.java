@@ -29,12 +29,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
+import static io.liuguangsheng.galois.constants.ConfConstant.PRINT_THROWABLE;
+
 /**
  * The type Galois log.
  */
 public class GaloisLog implements Logger {
-    private Logger logger;
-    private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
+    private final Logger logger;
+    private final boolean printThrowable = GlobalConfiguration.getInstance().getBoolean(PRINT_THROWABLE);
 
     /**
      * Instantiates a new Galois log.
@@ -86,8 +88,9 @@ public class GaloisLog implements Logger {
 
     @Override
     public void trace(String msg, Throwable t) {
-        if (globalConfig.getString(BUILD))
-        logger.trace(msg, t);
+        if (printThrowable) {
+            logger.trace(msg, t);
+        } else logger.trace(msg);
     }
 
     @Override
@@ -121,7 +124,9 @@ public class GaloisLog implements Logger {
 
     @Override
     public void trace(Marker marker, String msg, Throwable t) {
-        logger.trace(marker, msg, t);
+        if (printThrowable) {
+            logger.trace(marker, msg, t);
+        } else logger.trace(marker, msg);
 
     }
 
@@ -155,8 +160,9 @@ public class GaloisLog implements Logger {
 
     @Override
     public void debug(String msg, Throwable t) {
-        logger.debug(msg, t);
-
+        if (printThrowable) {
+            logger.debug(msg, t);
+        } else logger.debug(msg);
     }
 
     @Override
@@ -190,8 +196,9 @@ public class GaloisLog implements Logger {
 
     @Override
     public void debug(Marker marker, String msg, Throwable t) {
-        logger.debug(marker, msg, t);
-
+        if (printThrowable) {
+            logger.debug(marker, msg, t);
+        } else logger.debug(marker, msg);
     }
 
     @Override
@@ -225,8 +232,9 @@ public class GaloisLog implements Logger {
 
     @Override
     public void info(String msg, Throwable t) {
-        logger.info(msg, t);
-
+        if (printThrowable) {
+            logger.info(msg, t);
+        } else logger.info(msg);
     }
 
     @Override
@@ -237,31 +245,28 @@ public class GaloisLog implements Logger {
     @Override
     public void info(Marker marker, String msg) {
         logger.info(marker, msg);
-
     }
 
     @Override
     public void info(Marker marker, String format, Object arg) {
         logger.info(marker, format, arg);
-
     }
 
     @Override
     public void info(Marker marker, String format, Object arg1, Object arg2) {
         logger.info(marker, format, arg1, arg2);
-
     }
 
     @Override
     public void info(Marker marker, String format, Object... arguments) {
         logger.info(marker, format, arguments);
-
     }
 
     @Override
     public void info(Marker marker, String msg, Throwable t) {
-        logger.info(marker, msg, t);
-
+        if (printThrowable) {
+            logger.info(marker, msg, t);
+        } else logger.info(marker, msg);
     }
 
     @Override
@@ -272,31 +277,28 @@ public class GaloisLog implements Logger {
     @Override
     public void warn(String msg) {
         logger.warn(msg);
-
     }
 
     @Override
     public void warn(String format, Object arg) {
         logger.warn(format, arg);
-
     }
 
     @Override
     public void warn(String format, Object... arguments) {
         logger.warn(format, arguments);
-
     }
 
     @Override
     public void warn(String format, Object arg1, Object arg2) {
         logger.warn(format, arg1, arg2);
-
     }
 
     @Override
     public void warn(String msg, Throwable t) {
-        logger.warn(msg, t);
-
+        if (printThrowable) {
+            logger.warn(msg, t);
+        } else logger.warn(msg);
     }
 
     @Override
@@ -307,31 +309,28 @@ public class GaloisLog implements Logger {
     @Override
     public void warn(Marker marker, String msg) {
         logger.warn(marker, msg);
-
     }
 
     @Override
     public void warn(Marker marker, String format, Object arg) {
         logger.warn(marker, format, arg);
-
     }
 
     @Override
     public void warn(Marker marker, String format, Object arg1, Object arg2) {
         logger.warn(marker, format, arg1, arg2);
-
     }
 
     @Override
     public void warn(Marker marker, String format, Object... arguments) {
         logger.warn(marker, format, arguments);
-
     }
 
     @Override
     public void warn(Marker marker, String msg, Throwable t) {
-        logger.warn(marker, msg, t);
-
+        if (printThrowable) {
+            logger.warn(marker, msg, t);
+        } else logger.warn(marker, msg);
     }
 
     @Override
@@ -342,31 +341,28 @@ public class GaloisLog implements Logger {
     @Override
     public void error(String msg) {
         logger.error(msg);
-
     }
 
     @Override
     public void error(String format, Object arg) {
         logger.error(format, arg);
-
     }
 
     @Override
     public void error(String format, Object arg1, Object arg2) {
         logger.error(format, arg1, arg2);
-
     }
 
     @Override
     public void error(String format, Object... arguments) {
         logger.error(format, arguments);
-
     }
 
     @Override
     public void error(String msg, Throwable t) {
-        logger.error(msg, t);
-
+        if (printThrowable) {
+            logger.error(msg, t);
+        } else logger.error(msg);
     }
 
     @Override
@@ -377,30 +373,27 @@ public class GaloisLog implements Logger {
     @Override
     public void error(Marker marker, String msg) {
         logger.error(marker, msg);
-
     }
 
     @Override
     public void error(Marker marker, String format, Object arg) {
         logger.error(marker, format, arg);
-
     }
 
     @Override
     public void error(Marker marker, String format, Object arg1, Object arg2) {
         logger.error(marker, format, arg1, arg2);
-
     }
 
     @Override
     public void error(Marker marker, String format, Object... arguments) {
         logger.error(marker, format, arguments);
-
     }
 
     @Override
     public void error(Marker marker, String msg, Throwable t) {
-        logger.error(marker, msg, t);
-
+        if (printThrowable) {
+            logger.error(marker, msg, t);
+        } else logger.error(marker, msg);
     }
 }
