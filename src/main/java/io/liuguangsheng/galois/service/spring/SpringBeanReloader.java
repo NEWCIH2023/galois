@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
+import org.springframework.stereotype.Controller;
 
 /**
  * Spring的Bean重载服务
@@ -46,9 +47,20 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationCo
 
     private static final Logger logger = new GaloisLog(SpringBeanReloader.class);
     private static final SpringBeanReloader instance = new SpringBeanReloader();
+    /**
+     * The Scanner.
+     */
     protected ClassPathBeanDefinitionScanner scanner;
+    /**
+     * The Context.
+     */
     protected AnnotationConfigServletWebServerApplicationContext context;
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static SpringBeanReloader getInstance() {
         return instance;
     }
@@ -73,6 +85,10 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationCo
             Object bean = clazz.newInstance();
             factory.destroySingleton(beanName);
             factory.registerSingleton(beanName, bean);
+
+            if (isController(clazz)) {
+                reMapping(bean);
+            }
         } catch (InstantiationException ie) {
             logger.error("Can't create a new object by newInstance method, ensure that's not an abstract class.");
         } catch (Throwable e) {
@@ -80,6 +96,25 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationCo
         }
 
         logger.info("SpringBeanReloader reload class {} success.", clazz.getSimpleName());
+    }
+
+
+    /**
+     * controller bean need to re mapping
+     *
+     * @param bean controller bean
+     */
+    private void reMapping(Object bean) {
+
+    }
+
+    /**
+     * is controller
+     *
+     * @param clazz changed class
+     */
+    private boolean isController(Class<?> clazz) {
+        return clazz.isAnnotationPresent(Controller.class);
     }
 
     /**
