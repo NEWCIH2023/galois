@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXParseException;
 
 /**
  * corm xml listener
@@ -75,6 +76,8 @@ public class CormXmlListener implements FileChangedListener {
             Document document = db.parse(file);
             DocumentType documentType = document.getDoctype();
             return documentType != null && documentType.toString().contains(DOC_TYPE);
+        } catch (SAXParseException ignored) {
+            return false;
         } catch (Throwable e) {
             logger.error("Parse xml file fail. Check it's file type.", e);
             return false;

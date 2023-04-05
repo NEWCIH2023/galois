@@ -76,8 +76,7 @@ public class MyBatisXmlListener implements FileChangedListener {
             Document document = db.parse(file);
             DocumentType documentType = document.getDoctype();
             return documentType != null && documentType.toString().contains(DOC_TYPE);
-        } catch (SAXParseException spe) {
-            logger.warn("Invalid xml file had ignored.");
+        } catch (SAXParseException ignored) {
             return false;
         } catch (Throwable e) {
             logger.error("Parse xml file fail. Check it's file type.", e);

@@ -164,5 +164,6 @@
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
+    </if>
     </update>
 </mapper>
