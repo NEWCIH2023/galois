@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [liuguangsheng]
+ * Copyright (c) [2023] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,15 +22,17 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.service.corm.visitors;
+package io.liuguangsheng.galois.service.corm.visitors;
 
 import com.comtop.corm.session.Configuration;
+import io.liuguangsheng.galois.constants.ClassNameConstant;
+import io.liuguangsheng.galois.constants.Constant;
+import io.liuguangsheng.galois.service.MethodAdapter;
+import io.liuguangsheng.galois.service.annotation.AsmVisitor;
+import io.liuguangsheng.galois.service.corm.CormAgentService;
+import io.liuguangsheng.galois.service.corm.CormBeanReloader;
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
-import org.liuguangsheng.galois.service.MethodAdapter;
-import org.liuguangsheng.galois.service.annotation.AsmVisitor;
-import org.liuguangsheng.galois.service.corm.CormAgentService;
-import org.liuguangsheng.galois.service.corm.CormBeanReloader;
 
 import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
@@ -39,9 +41,6 @@ import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
 import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
-import static org.liuguangsheng.galois.constants.ClassNameConstant.CT_CONFIGURATION;
-import static org.liuguangsheng.galois.constants.Constant.DOT;
-import static org.liuguangsheng.galois.constants.Constant.SLASH;
 
 /**
  * comtop configuration visitor
@@ -56,7 +55,7 @@ public class ComtopConfigurationVisitor extends MethodAdapter {
      * Instantiates a new Comtop configuration visitor.
      */
     public ComtopConfigurationVisitor() {
-        super(CT_CONFIGURATION);
+        super(ClassNameConstant.CT_CONFIGURATION);
     }
 
     @Override
@@ -94,8 +93,8 @@ public class ComtopConfigurationVisitor extends MethodAdapter {
         @Override
         public void visitInsn(int opcode) {
             if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-                String pClassName = CormBeanReloader.class.getName().replace(DOT, SLASH);
-                String vClassName = className.replace(DOT, SLASH);
+                String pClassName = CormBeanReloader.class.getName().replace(Constant.DOT, Constant.SLASH);
+                String vClassName = className.replace(Constant.DOT, Constant.SLASH);
 
                 mv.visitCode();
                 mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";", false);

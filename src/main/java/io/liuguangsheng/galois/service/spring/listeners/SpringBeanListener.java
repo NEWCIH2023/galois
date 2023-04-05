@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [liuguangsheng]
+ * Copyright (c) [2023] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,20 +22,19 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.service.spring.listeners;
+package io.liuguangsheng.galois.service.spring.listeners;
 
+import io.liuguangsheng.galois.constants.FileType;
+import io.liuguangsheng.galois.service.annotation.LazyBean;
+import io.liuguangsheng.galois.service.monitor.FileChangedListener;
+import io.liuguangsheng.galois.service.spring.SpringAgentService;
+import io.liuguangsheng.galois.service.spring.SpringBeanReloader;
 import java.io.File;
 import java.lang.instrument.ClassDefinition;
-import org.liuguangsheng.galois.service.annotation.LazyBean;
-import org.liuguangsheng.galois.service.monitor.FileChangedListener;
-import org.liuguangsheng.galois.service.spring.SpringAgentService;
-import org.liuguangsheng.galois.service.spring.SpringBeanReloader;
-import org.liuguangsheng.galois.utils.ClassUtil;
-import org.liuguangsheng.galois.utils.FileUtil;
+import io.liuguangsheng.galois.utils.ClassUtil;
+import io.liuguangsheng.galois.utils.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.liuguangsheng.galois.constants.FileType.CLASS_FILE;
 
 
 /**
@@ -52,7 +51,7 @@ public class SpringBeanListener implements FileChangedListener {
 
     @Override
     public boolean isUseful(File file) {
-        return FileUtil.validFileType(file, CLASS_FILE);
+        return FileUtil.validFileType(file, FileType.CLASS_FILE);
     }
 
     /**

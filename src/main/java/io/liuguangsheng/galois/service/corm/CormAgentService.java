@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [liuguangsheng]
+ * Copyright (c) [2023] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.service.corm;
+package io.liuguangsheng.galois.service.corm;
 
-import org.liuguangsheng.galois.service.AgentService;
+import io.liuguangsheng.galois.service.AgentService;
 
 /**
  * corm agent service

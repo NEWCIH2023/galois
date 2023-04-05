@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [liuguangsheng]
+ * Copyright (c) [2023] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.service.monitor;
+package io.liuguangsheng.galois.service.monitor;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +33,7 @@ import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.liuguangsheng.galois.conf.GlobalConfiguration;
+import io.liuguangsheng.galois.conf.GlobalConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,9 +41,9 @@ import static com.sun.nio.file.SensitivityWatchEventModifier.MEDIUM;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
-import static org.liuguangsheng.galois.constants.Constant.COMMA;
-import static org.liuguangsheng.galois.constants.Constant.DOT;
-import static org.liuguangsheng.galois.constants.Constant.USER_DIR;
+import static io.liuguangsheng.galois.constants.Constant.COMMA;
+import static io.liuguangsheng.galois.constants.Constant.DOT;
+import static io.liuguangsheng.galois.constants.Constant.USER_DIR;
 
 /**
  * file monitor service based on {@link java.nio.file.WatchService}

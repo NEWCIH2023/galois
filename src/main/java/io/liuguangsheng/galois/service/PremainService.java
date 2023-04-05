@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [liuguangsheng]
+ * Copyright (c) [2023] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,15 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.service;
+package io.liuguangsheng.galois.service;
 
+import io.liuguangsheng.galois.constants.ClassNameConstant;
+import io.liuguangsheng.galois.constants.Constant;
+import io.liuguangsheng.galois.service.annotation.AsmVisitor;
+import io.liuguangsheng.galois.service.runners.AbstractRunner;
+import io.liuguangsheng.galois.service.runners.SpringRunnerManager;
+import io.liuguangsheng.galois.utils.ClassUtil;
+import io.liuguangsheng.galois.utils.StringUtil;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Modifier;
@@ -34,18 +41,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.liuguangsheng.galois.service.annotation.AsmVisitor;
-import org.liuguangsheng.galois.service.runners.AbstractRunner;
-import org.liuguangsheng.galois.service.runners.SpringRunnerManager;
-import org.liuguangsheng.galois.utils.ClassUtil;
-import org.liuguangsheng.galois.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.liuguangsheng.galois.constants.ClassNameConstant.SERVICE_PACKAGE;
-import static org.liuguangsheng.galois.constants.Constant.COMMA;
-import static org.liuguangsheng.galois.constants.Constant.DOT;
-import static org.liuguangsheng.galois.constants.Constant.SLASH;
 
 /**
  * premain agent服务入口
@@ -65,7 +62,7 @@ public class PremainService {
         scanRunner();
 
         logger.debug("Scan {} agentServices as list [{}].", agentServiceMap.keySet().size(),
-                agentServiceMap.values().stream().map(AgentService::toString).collect(Collectors.joining(COMMA)));
+                agentServiceMap.values().stream().map(AgentService::toString).collect(Collectors.joining(Constant.COMMA)));
     }
 
     /**
@@ -104,7 +101,7 @@ public class PremainService {
                 return null;
             }
 
-            String newClassName = className.replace(SLASH, DOT);
+            String newClassName = className.replace(Constant.SLASH, Constant.DOT);
             Collection<AgentService> agentServices = agentServiceMap.values();
 
             for (AgentService agentService : agentServices) {
@@ -128,7 +125,7 @@ public class PremainService {
      */
     private static void scanAgentService() {
         // scan agent service over abstract class named AgentService
-        Set<Class<?>> agentClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE, AgentService.class);
+        Set<Class<?>> agentClasses = ClassUtil.scanBaseClass(ClassNameConstant.SERVICE_PACKAGE, AgentService.class);
 
         for (Class<?> agentClass : agentClasses) {
             if (Modifier.isAbstract(agentClass.getModifiers())) {
@@ -146,7 +143,7 @@ public class PremainService {
      * scan asm visitor
      */
     private static void scanAsmVisitor() {
-        Set<Class<?>> visitorClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE, MethodAdapter.class);
+        Set<Class<?>> visitorClasses = ClassUtil.scanBaseClass(ClassNameConstant.SERVICE_PACKAGE, MethodAdapter.class);
         for (Class<?> visitorClass : visitorClasses) {
             if (Modifier.isAbstract(visitorClass.getModifiers())) {
                 continue;
@@ -163,7 +160,7 @@ public class PremainService {
      * scan runner
      */
     private static void scanRunner() {
-        Set<Class<?>> runnerClasses = ClassUtil.scanBaseClass(SERVICE_PACKAGE, AbstractRunner.class);
+        Set<Class<?>> runnerClasses = ClassUtil.scanBaseClass(ClassNameConstant.SERVICE_PACKAGE, AbstractRunner.class);
         for (Class<?> runnerClass : runnerClasses) {
             if (Modifier.isAbstract(runnerClass.getModifiers())) {
                 continue;

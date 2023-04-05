@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [liuguangsheng]
+ * Copyright (c) [2023] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.service.runners;
+package io.liuguangsheng.galois.service.runners;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

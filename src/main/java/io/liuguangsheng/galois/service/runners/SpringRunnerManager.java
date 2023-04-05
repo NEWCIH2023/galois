@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [liuguangsheng]
+ * Copyright (c) [2023] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,13 +22,13 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.service.runners;
+package io.liuguangsheng.galois.service.runners;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.liuguangsheng.galois.service.spring.visitors.SpringApplicationRunListenersVisitor;
+import io.liuguangsheng.galois.service.spring.visitors.SpringApplicationRunListenersVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplicationRunListener;

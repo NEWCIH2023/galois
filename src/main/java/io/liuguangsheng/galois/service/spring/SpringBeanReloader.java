@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [liuguangsheng]
+ * Copyright (c) [2023] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,13 +22,13 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.service.spring;
+package io.liuguangsheng.galois.service.spring;
 
+import io.liuguangsheng.galois.service.BeanReloader;
 import java.lang.reflect.Modifier;
-import org.liuguangsheng.galois.service.BeanReloader;
-import org.liuguangsheng.galois.service.annotation.LazyBean;
-import org.liuguangsheng.galois.service.spring.visitors.ApplicationContextVisitor;
-import org.liuguangsheng.galois.service.spring.visitors.BeanDefinitionScannerVisitor;
+import io.liuguangsheng.galois.service.annotation.LazyBean;
+import io.liuguangsheng.galois.service.spring.visitors.ApplicationContextVisitor;
+import io.liuguangsheng.galois.service.spring.visitors.BeanDefinitionScannerVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;

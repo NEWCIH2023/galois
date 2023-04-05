@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [liuguangsheng]
+ * Copyright (c) [2023] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,12 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.service.mybatis;
+package io.liuguangsheng.galois.service.mybatis;
 
+import io.liuguangsheng.galois.constants.Constant;
+import io.liuguangsheng.galois.service.BeanReloader;
+import io.liuguangsheng.galois.service.annotation.LazyBean;
+import io.liuguangsheng.galois.service.mybatis.visitors.MyBatisConfigurationVisitor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -46,14 +50,8 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.parsing.XPathParser;
 import org.apache.ibatis.session.Configuration;
-import org.liuguangsheng.galois.service.BeanReloader;
-import org.liuguangsheng.galois.service.annotation.LazyBean;
-import org.liuguangsheng.galois.service.mybatis.visitors.MyBatisConfigurationVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.liuguangsheng.galois.constants.Constant.ID;
-import static org.liuguangsheng.galois.constants.Constant.NAMESPACE;
 
 /**
  * MyBatis的Mapper重新加载服务类，适用于3.2.0或以上版本
@@ -66,8 +64,7 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 
     private static final MyBatisBeanReloader mybatisBeanReloder = new MyBatisBeanReloader();
     private static final Logger logger = LoggerFactory.getLogger(MyBatisBeanReloader.class);
-    private static final List<String> CHILD_NAMES = Arrays.asList("association", "collection",
-            "case");
+    private static final List<String> CHILD_NAMES = Arrays.asList("association", "collection", "case");
     /**
      * The Configuration.
      */
@@ -99,7 +96,7 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
             Properties properties = configuration.getVariables();
             XPathParser parser = new XPathParser(fis, true, properties, new XMLMapperEntityResolver());
             XNode context = parser.evalNode("/mapper");
-            String namespace = context.getStringAttribute(NAMESPACE);
+            String namespace = context.getStringAttribute(Constant.NAMESPACE);
             // clear cache
             clearMapperRegistry(namespace);
             clearLoadedResources(xmlFile.getName());
@@ -192,7 +189,7 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
      */
     private void clearParameterMap(List<XNode> list, String namespace) {
         for (XNode xNode : list) {
-            String id = xNode.getStringAttribute(ID);
+            String id = xNode.getStringAttribute(Constant.ID);
             configuration.getResultMapNames().remove(namespace + "." + id);
         }
     }
@@ -205,7 +202,7 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
      */
     private void clearResultMap(List<XNode> list, String namespace) {
         for (XNode xNode : list) {
-            String id = xNode.getStringAttribute(ID, xNode.getValueBasedIdentifier());
+            String id = xNode.getStringAttribute(Constant.ID, xNode.getValueBasedIdentifier());
             configuration.getResultMapNames().remove(id);
             configuration.getResultMapNames().remove(namespace + "." + id);
             clearResultMap(xNode, namespace);
@@ -222,10 +219,10 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
         for (XNode child : xNode.getChildren()) {
             if (CHILD_NAMES.contains(child.getName())) {
                 if (child.getStringAttribute("select") == null) {
-                    configuration.getResultMapNames().remove(child.getStringAttribute(ID,
+                    configuration.getResultMapNames().remove(child.getStringAttribute(Constant.ID,
                             child.getValueBasedIdentifier()));
                     configuration.getResultMapNames()
-                            .remove(namespace + "." + child.getStringAttribute(ID,
+                            .remove(namespace + "." + child.getStringAttribute(Constant.ID,
                                     child.getValueBasedIdentifier()));
 
                     if (child.getChildren() != null && !child.getChildren().isEmpty()) {
@@ -244,7 +241,7 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
      */
     private void clearKeyGenerators(List<XNode> list, String namespace) {
         for (XNode xNode : list) {
-            String id = xNode.getStringAttribute(ID);
+            String id = xNode.getStringAttribute(Constant.ID);
             configuration.getKeyGeneratorNames().remove(id + SelectKeyGenerator.SELECT_KEY_SUFFIX);
             configuration.getKeyGeneratorNames()
                     .remove(namespace + "." + id + SelectKeyGenerator.SELECT_KEY_SUFFIX);
@@ -272,7 +269,7 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
      */
     private void clearSqlElement(List<XNode> list, String namespace) {
         for (XNode xNode : list) {
-            String id = xNode.getStringAttribute(ID);
+            String id = xNode.getStringAttribute(Constant.ID);
             configuration.getSqlFragments().remove(id);
             configuration.getSqlFragments().remove(namespace + "." + id);
         }

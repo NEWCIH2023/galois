@@ -22,45 +22,12 @@
  * SOFTWARE.
  */
 
-package io.liuguangsheng.galois.service.monitor;
+package io.liuguangsheng.galois.service.log;
 
-import java.io.File;
+import org.slf4j.Logger;
 
 /**
- * file monitor service interface
- *
- * @author liuguangsheng
- * @since 1.0.0
+ * The interface Galois log.
  */
-public interface FileChangedListener {
-
-    /**
-     * is listener useful for this file object
-     *
-     * @param file the changed file
-     * @return is the listener monitor this file change
-     */
-    boolean isUseful(File file);
-
-    /**
-     * handler for file created
-     *
-     * @param file the changed file
-     */
-    void createdHandle(File file);
-
-    /**
-     * handler for file modifed
-     *
-     * @param file the changed file
-     */
-    void modifiedHandle(File file);
-
-    /**
-     * handler for file deleted
-     *
-     * @param file the changed file
-     */
-    void deletedHandle(File file);
-
+public interface GaloisLog extends Logger {
 }

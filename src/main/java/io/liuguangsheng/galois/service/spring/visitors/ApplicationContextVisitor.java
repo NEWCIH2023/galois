@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [liuguangsheng]
+ * Copyright (c) [2023] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,14 +22,16 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.service.spring.visitors;
+package io.liuguangsheng.galois.service.spring.visitors;
 
+import io.liuguangsheng.galois.constants.ClassNameConstant;
+import io.liuguangsheng.galois.constants.Constant;
+import io.liuguangsheng.galois.service.MethodAdapter;
+import io.liuguangsheng.galois.service.annotation.AsmVisitor;
+import io.liuguangsheng.galois.service.spring.SpringAgentService;
+import io.liuguangsheng.galois.service.spring.SpringBeanReloader;
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
-import org.liuguangsheng.galois.service.MethodAdapter;
-import org.liuguangsheng.galois.service.annotation.AsmVisitor;
-import org.liuguangsheng.galois.service.spring.SpringAgentService;
-import org.liuguangsheng.galois.service.spring.SpringBeanReloader;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 
 import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
@@ -40,9 +42,6 @@ import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
 import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
-import static org.liuguangsheng.galois.constants.ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT;
-import static org.liuguangsheng.galois.constants.Constant.DOT;
-import static org.liuguangsheng.galois.constants.Constant.SLASH;
 
 
 /**
@@ -58,7 +57,7 @@ public class ApplicationContextVisitor extends MethodAdapter {
      * Instantiates a new Application context visitor.
      */
     public ApplicationContextVisitor() {
-        super(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT);
+        super(ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT);
     }
 
     @Override
@@ -96,8 +95,8 @@ public class ApplicationContextVisitor extends MethodAdapter {
         @Override
         public void visitInsn(int opcode) {
             if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-                String pClassName = SpringBeanReloader.class.getName().replace(DOT, SLASH);
-                String vClassName = className.replace(DOT, SLASH);
+                String pClassName = SpringBeanReloader.class.getName().replace(Constant.DOT, Constant.SLASH);
+                String vClassName = className.replace(Constant.DOT, Constant.SLASH);
 
                 mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";", false);
                 mv.visitVarInsn(ALOAD, 0);

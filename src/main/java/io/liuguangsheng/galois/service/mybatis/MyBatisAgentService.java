@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [liuguangsheng]
+ * Copyright (c) [2023] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,11 +22,11 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.service.mybatis;
+package io.liuguangsheng.galois.service.mybatis;
 
-import org.liuguangsheng.galois.conf.GlobalConfiguration;
-import org.liuguangsheng.galois.constants.ConfConstant;
-import org.liuguangsheng.galois.service.AgentService;
+import io.liuguangsheng.galois.constants.ConfConstant;
+import io.liuguangsheng.galois.service.AgentService;
+import io.liuguangsheng.galois.conf.GlobalConfiguration;
 
 /**
  * mybatis agent service

@@ -171,7 +171,7 @@
                         <manifestEntries>
                             <Build-Time>${maven.build.timestamp}</Build-Time>
                             <Galois-Version>${version}</Galois-Version>
-                            <Premain-Class>org.liuguangsheng.galois.service.PremainService</Premain-Class>
+                            <Premain-Class>io.liuguangsheng.galois.service.PremainService</Premain-Class>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
                             <Creator>LiuGuangSheng</Creator>

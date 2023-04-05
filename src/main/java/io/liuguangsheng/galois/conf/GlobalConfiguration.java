@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [liuguangsheng]
+ * Copyright (c) [2023] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,14 +22,14 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.conf;
+package io.liuguangsheng.galois.conf;
 
+import io.liuguangsheng.galois.constants.Constant;
+import io.liuguangsheng.galois.utils.FileUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import org.liuguangsheng.galois.constants.Constant;
-import org.liuguangsheng.galois.utils.FileUtil;
-import org.liuguangsheng.galois.utils.StringUtil;
+import io.liuguangsheng.galois.utils.StringUtil;
 
 /**
  * global configuration service

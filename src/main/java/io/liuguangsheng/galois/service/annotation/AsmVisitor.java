@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [liuguangsheng]
+ * Copyright (c) [2023] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,15 +22,15 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.service.annotation;
+package io.liuguangsheng.galois.service.annotation;
 
+import io.liuguangsheng.galois.service.AgentService;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import org.liuguangsheng.galois.service.AgentService;
 
 /**
  * The interface Asm visitor.

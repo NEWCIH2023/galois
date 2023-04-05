@@ -2,7 +2,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [liuguangsheng]
+ * Copyright (c) [2023] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,10 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.utils;
+package io.liuguangsheng.galois.utils;
 
+import io.liuguangsheng.galois.constants.Constant;
+import io.liuguangsheng.galois.constants.FileType;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -41,7 +43,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import jdk.internal.org.objectweb.asm.ClassReader;
-import org.liuguangsheng.galois.service.NewClassLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -55,10 +56,6 @@ import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.core.type.filter.TypeFilter;
 import org.springframework.util.SystemPropertyUtils;
 
-import static org.liuguangsheng.galois.constants.Constant.DOT;
-import static org.liuguangsheng.galois.constants.Constant.GET_INSTANCE;
-import static org.liuguangsheng.galois.constants.Constant.SLASH;
-import static org.liuguangsheng.galois.constants.FileType.CLASS_FILE;
 import static org.springframework.core.io.support.ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX;
 import static org.springframework.util.ClassUtils.convertClassNameToResourcePath;
 
@@ -106,7 +103,7 @@ public class ClassUtil {
     public static Object getInstance(Class<?> clazz) {
         try {
             // is static method getInstance exists?
-            Method getInstanceMethod = clazz.getMethod(GET_INSTANCE);
+            Method getInstanceMethod = clazz.getMethod(Constant.GET_INSTANCE);
             return getInstanceMethod.invoke(null);
             // or invoke newInstance method
         } catch (NoSuchMethodException e) {
@@ -235,7 +232,7 @@ public class ClassUtil {
      */
     public static String getClassNameFromClass(File classFile) throws IOException {
         ClassReader classReader = new ClassReader(Files.newInputStream(classFile.toPath()));
-        return classReader.getClassName().replace(SLASH, DOT);
+        return classReader.getClassName().replace(Constant.SLASH, Constant.DOT);
     }
 
     /**
@@ -261,7 +258,7 @@ public class ClassUtil {
 
                 classNameMatcher = classNamePattern.matcher(tmp);
                 if (classNameMatcher.find()) {
-                    result += DOT + classNameMatcher.group(1);
+                    result += Constant.DOT + classNameMatcher.group(1);
                     break;
                 }
             }
@@ -294,7 +291,7 @@ public class ClassUtil {
             return null;
         }
 
-        return new File(compileDir + String.join(File.separator, className.split("\\.")) + CLASS_FILE.getFileType());
+        return new File(compileDir + String.join(File.separator, className.split("\\.")) + FileType.CLASS_FILE.getFileType());
     }
 
     /**

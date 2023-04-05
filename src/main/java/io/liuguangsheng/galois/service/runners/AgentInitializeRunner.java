@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [liuguangsheng]
+ * Copyright (c) [2023] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,22 +22,21 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.service.runners;
+package io.liuguangsheng.galois.service.runners;
 
+import io.liuguangsheng.galois.constants.ClassNameConstant;
+import io.liuguangsheng.galois.service.AgentService;
+import io.liuguangsheng.galois.service.BeanReloader;
+import io.liuguangsheng.galois.service.annotation.LazyBean;
+import io.liuguangsheng.galois.service.monitor.FileChangedListener;
+import io.liuguangsheng.galois.service.monitor.FileWatchService;
 import java.lang.reflect.Modifier;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.liuguangsheng.galois.service.AgentService;
-import org.liuguangsheng.galois.service.BeanReloader;
-import org.liuguangsheng.galois.service.monitor.FileChangedListener;
-import org.liuguangsheng.galois.service.monitor.FileWatchService;
-import org.liuguangsheng.galois.service.annotation.LazyBean;
-import org.liuguangsheng.galois.utils.ClassUtil;
+import io.liuguangsheng.galois.utils.ClassUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
-
-import static org.liuguangsheng.galois.constants.ClassNameConstant.SERVICE_PACKAGE;
 
 /**
  * agent service init runner
@@ -65,9 +64,9 @@ public class AgentInitializeRunner extends AbstractRunner {
         logger.info("{} with context {} is {}", getClass().getSimpleName(), context.getId(), "started");
 
         try {
-            Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(SERVICE_PACKAGE, LazyBean.class);
+            Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(ClassNameConstant.SERVICE_PACKAGE, LazyBean.class);
             Set<AgentService> agentServices =
-                    ClassUtil.scanBaseClass(SERVICE_PACKAGE, AgentService.class).stream().filter(clazz -> !Modifier.isAbstract(clazz.getModifiers())).map(clazz -> (AgentService) ClassUtil.getInstance(clazz)).collect(Collectors.toSet());
+                    ClassUtil.scanBaseClass(ClassNameConstant.SERVICE_PACKAGE, AgentService.class).stream().filter(clazz -> !Modifier.isAbstract(clazz.getModifiers())).map(clazz -> (AgentService) ClassUtil.getInstance(clazz)).collect(Collectors.toSet());
 
             for (AgentService agentService : agentServices) {
                 if (!agentService.isUseful()) {

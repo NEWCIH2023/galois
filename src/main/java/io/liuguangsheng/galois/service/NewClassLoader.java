@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.service;
+package io.liuguangsheng.galois.service;
 
 /**
  * The type New class loader.

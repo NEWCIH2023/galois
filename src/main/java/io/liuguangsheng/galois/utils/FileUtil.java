@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [liuguangsheng]
+ * Copyright (c) [2023] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,10 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.utils;
+package io.liuguangsheng.galois.utils;
 
+import io.liuguangsheng.galois.constants.Constant;
+import io.liuguangsheng.galois.constants.FileType;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -33,11 +35,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
-import org.liuguangsheng.galois.constants.FileType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.liuguangsheng.galois.constants.Constant.LF;
 
 /**
  * file util
@@ -147,7 +146,7 @@ public class FileUtil {
 
         StringBuilder sb = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            br.lines().map(line -> line + LF).forEach(sb::append);
+            br.lines().map(line -> line + Constant.LF).forEach(sb::append);
         } catch (Exception e) {
             logger.error("Read text file fail.", e);
             return "";

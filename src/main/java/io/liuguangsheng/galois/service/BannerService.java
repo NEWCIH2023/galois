@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [liuguangsheng]
+ * Copyright (c) [2023] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,19 +22,14 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.service;
+package io.liuguangsheng.galois.service;
 
+import io.liuguangsheng.galois.conf.GlobalConfiguration;
+import io.liuguangsheng.galois.constants.ConfConstant;
+import io.liuguangsheng.galois.constants.Constant;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
-import org.liuguangsheng.galois.conf.GlobalConfiguration;
-
-import static org.liuguangsheng.galois.constants.ConfConstant.BANNER_ENABLE;
-import static org.liuguangsheng.galois.constants.ConfConstant.BUILD_TYPE;
-import static org.liuguangsheng.galois.constants.ConfConstant.GALOIS_VERSION;
-import static org.liuguangsheng.galois.constants.Constant.HYPHEN;
-import static org.liuguangsheng.galois.constants.Constant.LF;
-import static org.liuguangsheng.galois.constants.Constant.TAB;
 
 /**
  * print banner when galois starting
@@ -59,16 +54,16 @@ public class BannerService {
      * print banner
      */
     public static void printBanner() {
-        if (!globalConfig.getBoolean(BANNER_ENABLE, true)) {
+        if (!globalConfig.getBoolean(ConfConstant.BANNER_ENABLE, true)) {
             return;
         }
 
-        String bannerBuilder = LF + BANNER + TAB + galoisVersion() + LF +
+        String bannerBuilder = Constant.LF + BANNER + Constant.TAB + galoisVersion() + Constant.LF +
                 String.format(
                         " :: SpringBoot (%s) :: Spring (%s) :: MyBatis (%s)%n :: Jdk (%s)",
                         springBootVersion(), springVersion(), mybatisVersion(), jdkVersion()
                 ) +
-                LF;
+                Constant.LF;
         System.out.println(bannerBuilder);
     }
 
@@ -142,7 +137,7 @@ public class BannerService {
      * @see String
      */
     private static String galoisVersion() {
-        return String.format("%s (%s)", globalConfig.getString(GALOIS_VERSION, HYPHEN),
-                globalConfig.getString(BUILD_TYPE));
+        return String.format("%s (%s)", globalConfig.getString(ConfConstant.GALOIS_VERSION, Constant.HYPHEN),
+                globalConfig.getString(ConfConstant.BUILD_TYPE));
     }
 }

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [liuguangsheng]
+ * Copyright (c) [2023] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,12 +22,11 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.service.spring;
+package io.liuguangsheng.galois.service.spring;
 
-import org.liuguangsheng.galois.conf.GlobalConfiguration;
-import org.liuguangsheng.galois.service.AgentService;
-
-import static org.liuguangsheng.galois.constants.ConfConstant.RELOADER_SPRING_BOOT_ENABLE;
+import io.liuguangsheng.galois.constants.ConfConstant;
+import io.liuguangsheng.galois.service.AgentService;
+import io.liuguangsheng.galois.conf.GlobalConfiguration;
 
 /**
  * spring agent service
@@ -55,7 +54,7 @@ public class SpringAgentService extends AgentService {
      */
     @Override
     public boolean isUseful() {
-        return super.isUseful() && globalConfig.getBoolean(RELOADER_SPRING_BOOT_ENABLE);
+        return super.isUseful() && globalConfig.getBoolean(ConfConstant.RELOADER_SPRING_BOOT_ENABLE);
     }
 
 }

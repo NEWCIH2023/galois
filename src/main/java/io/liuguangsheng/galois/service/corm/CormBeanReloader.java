@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [liuguangsheng]
+ * Copyright (c) [2023] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.liuguangsheng.galois.service.corm;
+package io.liuguangsheng.galois.service.corm;
 
 import com.comtop.corm.builder.xml.XMLMapperBuilder;
 import com.comtop.corm.builder.xml.XMLMapperEntityResolver;
@@ -30,6 +30,8 @@ import com.comtop.corm.parsing.XNode;
 import com.comtop.corm.parsing.XPathParser;
 import com.comtop.corm.resource.core.io.FileSystemResource;
 import com.comtop.corm.session.Configuration;
+import io.liuguangsheng.galois.constants.Constant;
+import io.liuguangsheng.galois.service.BeanReloader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -40,14 +42,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import org.liuguangsheng.galois.service.BeanReloader;
-import org.liuguangsheng.galois.service.annotation.LazyBean;
-import org.liuguangsheng.galois.service.corm.visitors.ComtopConfigurationVisitor;
+import io.liuguangsheng.galois.service.annotation.LazyBean;
+import io.liuguangsheng.galois.service.corm.visitors.ComtopConfigurationVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.liuguangsheng.galois.constants.Constant.ID;
-import static org.liuguangsheng.galois.constants.Constant.NAMESPACE;
 
 /**
  * Corm Bean Reloader Service
@@ -98,7 +96,7 @@ public class CormBeanReloader implements BeanReloader<File>,
             Properties variables = configuration.getVariables();
             XPathParser parser = new XPathParser(fis, true, variables, new XMLMapperEntityResolver());
             XNode context = parser.evalNode("/mapper");
-            String namespace = context.getStringAttribute(NAMESPACE);
+            String namespace = context.getStringAttribute(Constant.NAMESPACE);
 
             // clear mapper cache
             clearLoadedResources(mapperFile.getName());
@@ -164,7 +162,7 @@ public class CormBeanReloader implements BeanReloader<File>,
      */
     private void clearParameterMap(List<XNode> list, String namespace) {
         for (XNode xNode : list) {
-            String id = xNode.getStringAttribute(ID);
+            String id = xNode.getStringAttribute(Constant.ID);
             configuration.getResultMapNames().remove(namespace + "." + id);
         }
     }
@@ -177,7 +175,7 @@ public class CormBeanReloader implements BeanReloader<File>,
      */
     private void clearResultMap(List<XNode> list, String namespace) {
         for (XNode xNode : list) {
-            String id = xNode.getStringAttribute(ID, xNode.getValueBasedIdentifier());
+            String id = xNode.getStringAttribute(Constant.ID, xNode.getValueBasedIdentifier());
             configuration.getResultMapNames().remove(id);
             configuration.getResultMapNames().remove(namespace + "." + id);
             clearResultMap(xNode, namespace);
@@ -195,10 +193,10 @@ public class CormBeanReloader implements BeanReloader<File>,
             if (Objects.equals("association", child.getName()) || Objects.equals("collection",
                     child.getName()) || Objects.equals("case", child.getName())) {
                 if (child.getStringAttribute("select") == null) {
-                    configuration.getResultMapNames().remove(child.getStringAttribute(ID,
+                    configuration.getResultMapNames().remove(child.getStringAttribute(Constant.ID,
                             child.getValueBasedIdentifier()));
                     configuration.getResultMapNames()
-                            .remove(namespace + "." + child.getStringAttribute(ID,
+                            .remove(namespace + "." + child.getStringAttribute(Constant.ID,
                                     child.getValueBasedIdentifier()));
 
                     if (child.getChildren() != null && !child.getChildren().isEmpty()) {
@@ -218,7 +216,7 @@ public class CormBeanReloader implements BeanReloader<File>,
      */
     private void clearSqlElement(List<XNode> list, String namespace) {
         for (XNode xNode : list) {
-            String id = xNode.getStringAttribute(ID);
+            String id = xNode.getStringAttribute(Constant.ID);
             configuration.getSqlFragments().remove(id);
             configuration.getSqlFragments().remove(namespace + "." + id);
         }
