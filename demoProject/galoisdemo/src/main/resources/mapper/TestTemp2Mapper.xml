@@ -141,6 +141,8 @@
         select count(*) from TEST_TEMP2
         <if test="_parameter != null">
             <include refid="Example_Where_Clause"/>
+            <include refid="Example_Where_Clause"/>
+            <include refid="Example_Where_Clause"/>
         </if>
     </select>
     <update id="updateByExampleSelective" parameterType="map">
@@ -164,6 +166,5 @@
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
-    </if>
     </update>
 </mapper>

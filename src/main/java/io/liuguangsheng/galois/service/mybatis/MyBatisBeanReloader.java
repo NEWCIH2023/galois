@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.Set;
 import org.apache.ibatis.binding.MapperRegistry;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
@@ -99,7 +98,6 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
             String namespace = context.getStringAttribute(Constant.NAMESPACE);
             // clear cache
             clearMapperRegistry(namespace);
-            clearLoadedResources(xmlFile.getName());
             clearCachedNames(namespace);
             clearParameterMap(context.evalNodes("/mapper/parameterMap"), namespace);
             clearResultMap(context.evalNodes("/mapper/resultMap"), namespace);
@@ -142,8 +140,7 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
             throws NoSuchFieldException, IllegalAccessException {
         Field field = MapperRegistry.class.getDeclaredField("knownMappers");
         field.setAccessible(true);
-        Map<Class<?>, Object> mapConfig = (Map<Class<?>, Object>) field.get(
-                configuration.getMapperRegistry());
+        Map<Class<?>, Object> mapConfig = (Map<Class<?>, Object>) field.get(configuration.getMapperRegistry());
         Class<?> refreshKey = null;
 
         for (Map.Entry<Class<?>, Object> item : mapConfig.entrySet()) {
@@ -159,24 +156,11 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
     }
 
     /**
-     * clear loaded resources
-     *
-     * @param fileName fileName
-     */
-    @SuppressWarnings("rawtypes")
-    private void clearLoadedResources(String fileName)
-            throws NoSuchFieldException, IllegalAccessException {
-        Field loadedResourcesField = configuration.getClass().getDeclaredField("loadedResources");
-        loadedResourcesField.setAccessible(true);
-        Set loadedResourcesSet = (Set) loadedResourcesField.get(configuration);
-        loadedResourcesSet.remove(fileName);
-    }
-
-    /**
      * clear cached names
      *
      * @param namespace namespace
      */
+    @Deprecated
     private void clearCachedNames(String namespace) {
         configuration.getCacheNames().remove(namespace);
     }

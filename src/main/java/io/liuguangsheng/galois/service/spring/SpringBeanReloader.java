@@ -29,12 +29,19 @@ import io.liuguangsheng.galois.service.annotation.LazyBean;
 import io.liuguangsheng.galois.service.spring.visitors.ApplicationContextVisitor;
 import io.liuguangsheng.galois.service.spring.visitors.BeanDefinitionScannerVisitor;
 import io.liuguangsheng.galois.utils.GaloisLog;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
  * Spring的Bean重载服务
@@ -86,8 +93,8 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationCo
             factory.destroySingleton(beanName);
             factory.registerSingleton(beanName, bean);
 
-            if (isController(clazz)) {
-                reMapping(bean);
+            if (isControllerBean(clazz)) {
+                updateRequestMapping(bean);
             }
         } catch (InstantiationException ie) {
             logger.error("Can't create a new object by newInstance method, ensure that's not an abstract class.");
@@ -104,8 +111,15 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationCo
      *
      * @param bean controller bean
      */
-    private void reMapping(Object bean) {
-
+    private void updateRequestMapping(Object bean) {
+        RequestMappingHandlerMapping mappingHandler = context.getBean(RequestMappingHandlerMapping.class);
+        Class<?> entry = bean.getClass();
+        Method method_name = ReflectionUtils.findMethod(entry, "t2", HttpServletRequest.class,
+                HttpServletResponse.class);
+        final String[] arr = patterns;
+        PatternsRequestCondition patterns = new PatternsRequestCondition(arr);
+        RequestMappingInfo mapping_info = new RequestMappingInfo("name", patterns, null, null, null, null, null, null);
+        mappingHandler.registerMapping(mapping_info, bean, method_name);
     }
 
     /**
@@ -113,7 +127,7 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationCo
      *
      * @param clazz changed class
      */
-    private boolean isController(Class<?> clazz) {
+    private boolean isControllerBean(Class<?> clazz) {
         return clazz.isAnnotationPresent(Controller.class);
     }
 

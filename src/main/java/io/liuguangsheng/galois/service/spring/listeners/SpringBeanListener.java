@@ -62,12 +62,12 @@ public class SpringBeanListener implements FileChangedListener {
     private void fileChangedHandle(File classFile) {
 
         try {
+            // 结合class变动与java变动，当两者同时出现时，更新该class
             String className = ClassUtil.getClassNameFromClass(classFile);
             byte[] classBytes = FileUtil.readFile(classFile);
             Class<?> clazz = Class.forName(className);
             ClassDefinition definition = new ClassDefinition(clazz, classBytes);
             ClassUtil.getInstrumentation().redefineClasses(definition);
-
             logger.info("Redefine class file {} success.", classFile.getName());
         } catch (Throwable e) {
             logger.error("Reload Spring Bean fail.", e);
