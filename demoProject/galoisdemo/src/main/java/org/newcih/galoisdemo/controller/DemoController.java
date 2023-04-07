@@ -34,7 +34,7 @@ public class DemoController {
 
     @GetMapping("string")
     public String demo() {
-        return "demo-string";
+        return "huide";
     }
 
 }

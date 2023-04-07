@@ -29,8 +29,7 @@ import io.liuguangsheng.galois.service.annotation.LazyBean;
 import io.liuguangsheng.galois.service.spring.visitors.ApplicationContextVisitor;
 import io.liuguangsheng.galois.service.spring.visitors.BeanDefinitionScannerVisitor;
 import io.liuguangsheng.galois.utils.GaloisLog;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import org.slf4j.Logger;
@@ -38,9 +37,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
-import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
@@ -93,7 +90,7 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationCo
             factory.destroySingleton(beanName);
             factory.registerSingleton(beanName, bean);
 
-            if (isControllerBean(clazz)) {
+            if (isHandler(clazz)) {
                 updateRequestMapping(bean);
             }
         } catch (InstantiationException ie) {
@@ -107,28 +104,37 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationCo
 
 
     /**
-     * controller bean need to re mapping
+     * update request mapping
      *
-     * @param bean controller bean
+     * @param bean
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
      */
-    private void updateRequestMapping(Object bean) {
+    private void updateRequestMapping(Object bean) throws NoSuchMethodException, InvocationTargetException,
+            IllegalAccessException {
         RequestMappingHandlerMapping mappingHandler = context.getBean(RequestMappingHandlerMapping.class);
-        Class<?> entry = bean.getClass();
-        Method method_name = ReflectionUtils.findMethod(entry, "t2", HttpServletRequest.class,
-                HttpServletResponse.class);
-        final String[] arr = patterns;
-        PatternsRequestCondition patterns = new PatternsRequestCondition(arr);
-        RequestMappingInfo mapping_info = new RequestMappingInfo("name", patterns, null, null, null, null, null, null);
-        mappingHandler.registerMapping(mapping_info, bean, method_name);
+        String[] beanNames = context.getBeanNamesForType(bean.getClass());
+
+        if (beanNames.length == 0) {
+            return;
+        }
+
+        String beanName = beanNames[0];
+        Method processCandidateBean = RequestMappingHandlerMapping.class.getMethod("processCandidateBean",
+                String.class);
+        processCandidateBean.setAccessible(true);
+        processCandidateBean.invoke(mappingHandler, beanName);
     }
+
 
     /**
      * is controller
      *
      * @param clazz changed class
      */
-    private boolean isControllerBean(Class<?> clazz) {
-        return clazz.isAnnotationPresent(Controller.class);
+    private boolean isHandler(Class<?> clazz) {
+        return clazz != null && (clazz.isAnnotationPresent(Controller.class) || clazz.isAnnotationPresent(RequestMapping.class));
     }
 
     /**
