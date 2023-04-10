@@ -71,7 +71,6 @@ public class AgentInitializeRunner extends AbstractRunner {
 
             for (AgentService agentService : agentServices) {
                 if (!agentService.isUseful()) {
-                    logger.info("{} wasn't enable, do not init it.", agentService);
                     continue;
                 }
 

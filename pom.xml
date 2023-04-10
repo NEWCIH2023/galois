@@ -122,7 +122,6 @@
                 <reloader.mybatis.enable>true</reloader.mybatis.enable>
                 <reloader.spring.boot.enable>true</reloader.spring.boot.enable>
                 <build.type>DEVELOP</build.type>
-                <print.throwable>true</print.throwable>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -136,7 +135,6 @@
                 <reloader.mybatis.enable>true</reloader.mybatis.enable>
                 <reloader.spring.boot.enable>false</reloader.spring.boot.enable>
                 <build.type>RELEASE</build.type>
-                <print.throwable>false</print.throwable>
             </properties>
         </profile>
     </profiles>

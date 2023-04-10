@@ -176,4 +176,8 @@ public class Constant {
      * The constant TAB.
      */
     public static final String TAB = "\t";
+    /**
+     * The constant RELEASE.
+     */
+    public static final String RELEASE = "RELEASE";
 }

@@ -69,6 +69,10 @@ public class SpringBeanListener implements FileChangedListener {
             ClassDefinition definition = new ClassDefinition(clazz, classBytes);
             ClassUtil.getInstrumentation().redefineClasses(definition);
             logger.info("Redefine class file {} success.", classFile.getName());
+
+            if (springBeanReloader.isUseful(clazz)) {
+                springBeanReloader.updateBean(clazz);
+            }
         } catch (Throwable e) {
             logger.error("Reload Spring Bean fail.", e);
         }

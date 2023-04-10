@@ -32,13 +32,16 @@ import io.liuguangsheng.galois.utils.GaloisLog;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Map;
 import org.slf4j.Logger;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
+import org.springframework.core.MethodIntrospector;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
  * Spring的Bean重载服务
@@ -113,7 +116,6 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationCo
      */
     private void updateRequestMapping(Object bean) throws NoSuchMethodException, InvocationTargetException,
             IllegalAccessException {
-        RequestMappingHandlerMapping mappingHandler = context.getBean(RequestMappingHandlerMapping.class);
         String[] beanNames = context.getBeanNamesForType(bean.getClass());
 
         if (beanNames.length == 0) {
@@ -121,12 +123,38 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationCo
         }
 
         String beanName = beanNames[0];
-        Method processCandidateBean = RequestMappingHandlerMapping.class.getMethod("processCandidateBean",
-                String.class);
-        processCandidateBean.setAccessible(true);
-        processCandidateBean.invoke(mappingHandler, beanName);
+        detectHandlerMethods(beanName);
     }
 
+    /**
+     * Detect handler methods.
+     *
+     * @param handler the handler
+     */
+    public void detectHandlerMethods(Object handler) {
+        Class<?> handlerType = (handler instanceof String ?
+                obtainApplicationContext().getType((String) handler) : handler.getClass());
+
+        if (handlerType != null) {
+            Class<?> userType = ClassUtils.getUserClass(handlerType);
+            Map<Method, T> methods = MethodIntrospector.selectMethods(userType,
+                    (MethodIntrospector.MetadataLookup<T>) method -> {
+                        try {
+                            return getMappingForMethod(method, userType);
+                        } catch (Throwable ex) {
+                            throw new IllegalStateException("Invalid mapping on handler class [" +
+                                    userType.getName() + "]: " + method, ex);
+                        }
+                    });
+            if (logger.isDebugEnabled()) {
+                logger.debug(methods.size() + " request handler methods found on " + userType + ": " + methods);
+            }
+            methods.forEach((method, mapping) -> {
+                Method invocableMethod = AopUtils.selectInvocableMethod(method, userType);
+                registerHandlerMethod(handler, invocableMethod, mapping);
+            });
+        }
+    }
 
     /**
      * is controller

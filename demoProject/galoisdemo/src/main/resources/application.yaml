@@ -12,3 +12,8 @@ mybatis:
   mapper-locations: classpath:mapper/*.xml
 server:
   port: 9839
+logging:
+  pattern:
+    console: "%date{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  level:
+    io.liuguangsheng.galois: debug

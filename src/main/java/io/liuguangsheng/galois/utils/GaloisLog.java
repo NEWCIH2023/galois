@@ -25,18 +25,21 @@
 package io.liuguangsheng.galois.utils;
 
 import io.liuguangsheng.galois.conf.GlobalConfiguration;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
-import static io.liuguangsheng.galois.constants.ConfConstant.PRINT_THROWABLE;
+import static io.liuguangsheng.galois.constants.ConfConstant.BUILD_TYPE;
+import static io.liuguangsheng.galois.constants.Constant.RELEASE;
 
 /**
  * The type Galois log.
  */
 public class GaloisLog implements Logger {
     private final Logger logger;
-    private final boolean printThrowable = GlobalConfiguration.getInstance().getBoolean(PRINT_THROWABLE);
+    private final boolean isReleaseVersion = Objects.equals(GlobalConfiguration.getInstance().getString(BUILD_TYPE),
+            RELEASE);
 
     /**
      * Instantiates a new Galois log.
@@ -88,7 +91,7 @@ public class GaloisLog implements Logger {
 
     @Override
     public void trace(String msg, Throwable t) {
-        if (printThrowable) {
+        if (isReleaseVersion) {
             logger.trace(msg, t);
         } else logger.trace(msg);
     }
@@ -124,7 +127,7 @@ public class GaloisLog implements Logger {
 
     @Override
     public void trace(Marker marker, String msg, Throwable t) {
-        if (printThrowable) {
+        if (isReleaseVersion) {
             logger.trace(marker, msg, t);
         } else logger.trace(marker, msg);
 
@@ -160,7 +163,7 @@ public class GaloisLog implements Logger {
 
     @Override
     public void debug(String msg, Throwable t) {
-        if (printThrowable) {
+        if (isReleaseVersion) {
             logger.debug(msg, t);
         } else logger.debug(msg);
     }
@@ -196,7 +199,7 @@ public class GaloisLog implements Logger {
 
     @Override
     public void debug(Marker marker, String msg, Throwable t) {
-        if (printThrowable) {
+        if (isReleaseVersion) {
             logger.debug(marker, msg, t);
         } else logger.debug(marker, msg);
     }
@@ -232,7 +235,7 @@ public class GaloisLog implements Logger {
 
     @Override
     public void info(String msg, Throwable t) {
-        if (printThrowable) {
+        if (isReleaseVersion) {
             logger.info(msg, t);
         } else logger.info(msg);
     }
@@ -264,7 +267,7 @@ public class GaloisLog implements Logger {
 
     @Override
     public void info(Marker marker, String msg, Throwable t) {
-        if (printThrowable) {
+        if (isReleaseVersion) {
             logger.info(marker, msg, t);
         } else logger.info(marker, msg);
     }
@@ -296,7 +299,7 @@ public class GaloisLog implements Logger {
 
     @Override
     public void warn(String msg, Throwable t) {
-        if (printThrowable) {
+        if (isReleaseVersion) {
             logger.warn(msg, t);
         } else logger.warn(msg);
     }
@@ -328,7 +331,7 @@ public class GaloisLog implements Logger {
 
     @Override
     public void warn(Marker marker, String msg, Throwable t) {
-        if (printThrowable) {
+        if (isReleaseVersion) {
             logger.warn(marker, msg, t);
         } else logger.warn(marker, msg);
     }
@@ -340,29 +343,37 @@ public class GaloisLog implements Logger {
 
     @Override
     public void error(String msg) {
-        logger.error(msg);
+        if (!isReleaseVersion) {
+            logger.error(msg);
+        }
     }
 
     @Override
     public void error(String format, Object arg) {
-        logger.error(format, arg);
+        if (!isReleaseVersion) {
+            logger.error(format, arg);
+        }
     }
 
     @Override
     public void error(String format, Object arg1, Object arg2) {
-        logger.error(format, arg1, arg2);
+        if (!isReleaseVersion) {
+            logger.error(format, arg1, arg2);
+        }
     }
 
     @Override
     public void error(String format, Object... arguments) {
-        logger.error(format, arguments);
+        if (!isReleaseVersion) {
+            logger.error(format, arguments);
+        }
     }
 
     @Override
     public void error(String msg, Throwable t) {
-        if (printThrowable) {
+        if (!isReleaseVersion) {
             logger.error(msg, t);
-        } else logger.error(msg);
+        }
     }
 
     @Override
@@ -372,28 +383,36 @@ public class GaloisLog implements Logger {
 
     @Override
     public void error(Marker marker, String msg) {
-        logger.error(marker, msg);
+        if (!isReleaseVersion) {
+            logger.error(marker, msg);
+        }
     }
 
     @Override
     public void error(Marker marker, String format, Object arg) {
-        logger.error(marker, format, arg);
+        if (!isReleaseVersion) {
+            logger.error(marker, format, arg);
+        }
     }
 
     @Override
     public void error(Marker marker, String format, Object arg1, Object arg2) {
-        logger.error(marker, format, arg1, arg2);
+        if (!isReleaseVersion) {
+            logger.error(marker, format, arg1, arg2);
+        }
     }
 
     @Override
     public void error(Marker marker, String format, Object... arguments) {
-        logger.error(marker, format, arguments);
+        if (!isReleaseVersion) {
+            logger.error(marker, format, arguments);
+        }
     }
 
     @Override
     public void error(Marker marker, String msg, Throwable t) {
-        if (printThrowable) {
+        if (!isReleaseVersion) {
             logger.error(marker, msg, t);
-        } else logger.error(marker, msg);
+        }
     }
 }

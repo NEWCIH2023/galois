@@ -37,4 +37,9 @@ public class DemoController {
         return "huide";
     }
 
+    @GetMapping("huhu")
+    public String demo2() {
+        return "hui89";
+    }
+
 }

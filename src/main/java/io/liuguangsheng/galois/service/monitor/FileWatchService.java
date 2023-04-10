@@ -29,9 +29,15 @@ import io.liuguangsheng.galois.utils.GaloisLog;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,6 +46,7 @@ import org.slf4j.Logger;
 import static com.sun.nio.file.SensitivityWatchEventModifier.MEDIUM;
 import static io.liuguangsheng.galois.constants.Constant.COMMA;
 import static io.liuguangsheng.galois.constants.Constant.DOT;
+import static io.liuguangsheng.galois.constants.Constant.TILDE;
 import static io.liuguangsheng.galois.constants.Constant.USER_DIR;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
@@ -82,32 +89,25 @@ public class FileWatchService {
 
         try {
             watchService = FileSystems.getDefault().newWatchService();
-            registerWatchService(new File(rootPath));
+            Files.walkFileTree(Paths.get(rootPath), new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                    if (dir.getFileName().toString().startsWith(DOT)) {
+                        return FileVisitResult.SKIP_SUBTREE;
+                    }
+
+                    dir.register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY}, MEDIUM);
+
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Register File WatchService on {}", dir);
+                    }
+
+                    return FileVisitResult.CONTINUE;
+                }
+            });
         } catch (IOException e) {
             logger.error("Start file watch service fail.", e);
             System.exit(0);
-        }
-    }
-
-    /**
-     * register each child directory to monitor file changed
-     *
-     * @param dir root dir
-     */
-    private void registerWatchService(File dir) throws IOException {
-        // SensitivityWatchEventModifier.MEDIUM may not work on window OS
-        dir.toPath().register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY}, MEDIUM);
-        File[] subDirs = dir.listFiles(File::isDirectory);
-        if (subDirs == null) {
-            return;
-        }
-
-        String dirName;
-        for (File subDir : subDirs) {
-            dirName = subDir.getName();
-            if (!dirName.startsWith(DOT)) {
-                registerWatchService(subDir);
-            }
         }
     }
 
@@ -133,14 +133,18 @@ public class FileWatchService {
                     List<WatchEvent<?>> events = watchKey.pollEvents();
                     for (WatchEvent<?> event : events) {
                         WatchEvent.Kind<?> kind = event.kind();
-                        File file = new File(watchKey.watchable() + File.separator + event.context());
+                        String fileName = event.context().toString();
+                        if (fileName.endsWith(TILDE)) {
+                            fileName = fileName.substring(0, fileName.length() - 1);
+                        }
+                        File file = new File(watchKey.watchable() + File.separator + fileName);
 
                         if (event.count() > 1 || kind == OVERFLOW || file.isDirectory()) {
                             continue;
                         }
 
                         if (logger.isDebugEnabled()) {
-                            logger.debug("monitor file {} {}.", kind, file);
+                            logger.debug("monitor file {} {}", kind, file);
                         }
 
                         listeners.stream().filter(listener -> listener.isUseful(file)).forEach(listener -> {
