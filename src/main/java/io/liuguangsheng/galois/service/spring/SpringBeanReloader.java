@@ -29,19 +29,29 @@ import io.liuguangsheng.galois.service.annotation.LazyBean;
 import io.liuguangsheng.galois.service.spring.visitors.ApplicationContextVisitor;
 import io.liuguangsheng.galois.service.spring.visitors.BeanDefinitionScannerVisitor;
 import io.liuguangsheng.galois.utils.GaloisLog;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import org.slf4j.Logger;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
-import org.springframework.core.MethodIntrospector;
+import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.ClassUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.condition.RequestCondition;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
  * Spring的Bean重载服务
@@ -62,6 +72,11 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationCo
      * The Context.
      */
     protected AnnotationConfigServletWebServerApplicationContext context;
+    /**
+     * The constant requestMethodAnnotations.
+     */
+    public static final List<Class<? extends Annotation>> requestMethodAnnotations = Arrays.asList(GetMapping.class,
+            PostMapping.class, DeleteMapping.class, PatchMapping.class, PutMapping.class, RequestMapping.class);
 
     /**
      * Gets instance.
@@ -110,50 +125,71 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationCo
      * update request mapping
      *
      * @param bean
-     * @throws NoSuchMethodException
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
      */
     private void updateRequestMapping(Object bean) throws NoSuchMethodException, InvocationTargetException,
             IllegalAccessException {
-        String[] beanNames = context.getBeanNamesForType(bean.getClass());
+        RequestMappingHandlerMapping mappingHandler = getContext().getBean(RequestMappingHandlerMapping.class);
 
-        if (beanNames.length == 0) {
-            return;
+        Method registerMapping;
+        try {
+            registerMapping = RequestMappingHandlerMapping.class.getMethod("registerMapping",
+                    Object.class, Object.class, Method.class);
+        } catch (NoSuchMethodException nsme) {
+            registerMapping = RequestMappingHandlerMapping.class.getMethod("registerMapping",
+                    RequestMappingInfo.class, Object.class, Method.class);
         }
 
-        String beanName = beanNames[0];
-        detectHandlerMethods(beanName);
+        Method unregisterMapping = RequestMappingHandlerMapping.class.getMethod("unregisterMapping", Object.class);
+
+        for (Method method : bean.getClass().getMethods()) {
+            RequestMapping requestMapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class);
+            if (requestMapping == null) {
+                continue;
+            }
+
+            RequestMappingInfo mappingInfo = createRequestMappingInfo(requestMapping, null);
+            unregisterMapping.invoke(mappingHandler, mappingInfo);
+            registerMapping.invoke(mappingHandler, mappingInfo, bean, method);
+        }
     }
 
     /**
-     * Detect handler methods.
+     * Get request mapping annotation request mapping.
      *
-     * @param handler the handler
+     * @param method the method
+     * @return the request mapping
      */
-    public void detectHandlerMethods(Object handler) {
-        Class<?> handlerType = (handler instanceof String ?
-                obtainApplicationContext().getType((String) handler) : handler.getClass());
-
-        if (handlerType != null) {
-            Class<?> userType = ClassUtils.getUserClass(handlerType);
-            Map<Method, T> methods = MethodIntrospector.selectMethods(userType,
-                    (MethodIntrospector.MetadataLookup<T>) method -> {
-                        try {
-                            return getMappingForMethod(method, userType);
-                        } catch (Throwable ex) {
-                            throw new IllegalStateException("Invalid mapping on handler class [" +
-                                    userType.getName() + "]: " + method, ex);
-                        }
-                    });
-            if (logger.isDebugEnabled()) {
-                logger.debug(methods.size() + " request handler methods found on " + userType + ": " + methods);
-            }
-            methods.forEach((method, mapping) -> {
-                Method invocableMethod = AopUtils.selectInvocableMethod(method, userType);
-                registerHandlerMethod(handler, invocableMethod, mapping);
-            });
+    public RequestMapping getRequestMappingAnnotation(Method method) {
+        Class<? extends Annotation> annotationClass =
+                requestMethodAnnotations.stream().filter(method::isAnnotationPresent).findFirst().orElse(null);
+        if (annotationClass == null) {
+            return null;
         }
+
+        if (Objects.equals(annotationClass, RequestMapping.class)) {
+            return (RequestMapping) method.getAnnotation(annotationClass);
+        }
+
+        return annotationClass.getAnnotation(RequestMapping.class);
+    }
+
+    /**
+     * Create request mapping info request mapping info.
+     *
+     * @param requestMapping  the request mapping
+     * @param customCondition the custom condition
+     * @return the request mapping info
+     */
+    public RequestMappingInfo createRequestMappingInfo(RequestMapping requestMapping,
+                                                       @Nullable RequestCondition<?> customCondition) {
+
+        RequestMappingInfo.Builder builder =
+                RequestMappingInfo.paths(requestMapping.path()).methods(requestMapping.method()).params(requestMapping.params()).headers(requestMapping.headers()).consumes(requestMapping.consumes()).produces(requestMapping.produces()).mappingName(requestMapping.name());
+
+        if (customCondition != null) {
+            builder.customCondition(customCondition);
+        }
+        return builder.build();
     }
 
     /**

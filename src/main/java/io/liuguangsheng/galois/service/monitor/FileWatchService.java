@@ -29,26 +29,24 @@ import io.liuguangsheng.galois.utils.GaloisLog;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 
+import static com.sun.nio.file.ExtendedWatchEventModifier.FILE_TREE;
 import static com.sun.nio.file.SensitivityWatchEventModifier.MEDIUM;
 import static io.liuguangsheng.galois.constants.Constant.COMMA;
-import static io.liuguangsheng.galois.constants.Constant.DOT;
 import static io.liuguangsheng.galois.constants.Constant.TILDE;
 import static io.liuguangsheng.galois.constants.Constant.USER_DIR;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
@@ -66,6 +64,11 @@ public class FileWatchService {
     private static final FileWatchService instance = new FileWatchService();
     private WatchService watchService;
     private String rootPath = globalConfig.getString(USER_DIR);
+    /**
+     * The constant ignorePaths.
+     */
+    public static final List<String> ignorePaths = Arrays.asList("target" + File.separator + "generated-sources",
+            "target" + File.separator + "maven-status", "target" + File.separator + "test-classes");
 
     private FileWatchService() {
     }
@@ -89,26 +92,44 @@ public class FileWatchService {
 
         try {
             watchService = FileSystems.getDefault().newWatchService();
-            Files.walkFileTree(Paths.get(rootPath), new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                    if (dir.getFileName().toString().startsWith(DOT)) {
-                        return FileVisitResult.SKIP_SUBTREE;
-                    }
 
-                    dir.register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY}, MEDIUM);
+//            Files.walkFileTree(Paths.get(rootPath), new SimpleFileVisitor<Path>() {
+//                @Override
+//                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+//                    if (dir.getFileName().toString().startsWith(DOT) || ignorePaths.stream().anyMatch(path -> dir
+//                    .toAbsolutePath().toString().contains(path))) {
+//                        return FileVisitResult.SKIP_SUBTREE;
+//                    }
+//
+//                    registerPath(dir);
+//
+//                    if (logger.isDebugEnabled()) {
+//                        logger.debug("Register File WatchService on {}", dir);
+//                    }
+//
+//                    return FileVisitResult.CONTINUE;
+//                }
+//            });
 
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Register File WatchService on {}", dir);
-                    }
-
-                    return FileVisitResult.CONTINUE;
-                }
-            });
+            registerPath(Paths.get(rootPath));
         } catch (IOException e) {
             logger.error("Start file watch service fail.", e);
             System.exit(0);
         }
+    }
+
+    /**
+     * Register path.
+     *
+     * @param path the path
+     * @throws IOException the io exception
+     */
+    public void registerPath(Path path) throws IOException {
+        if (path == null) {
+            return;
+        }
+
+        path.register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE}, MEDIUM, FILE_TREE);
     }
 
     /**
@@ -117,54 +138,58 @@ public class FileWatchService {
     public void start() {
         init();
 
-        Thread watchThread = new Thread(() -> {
-            logger.info("FileWatchService Started in path {} with these listeners {}", rootPath,
-                    listeners.stream().map(FileChangedListener::toString).collect(Collectors.joining(COMMA)));
+//        Thread watchThread = new Thread(() -> {
+        logger.info("FileWatchService Started in path {} with these listeners {}", rootPath,
+                listeners.stream().map(FileChangedListener::toString).collect(Collectors.joining(COMMA)));
 
-            while (true) {
-                try {
-                    // take()是一个阻塞方法，会等待监视器发出的信号才返回。
-                    // 还可以使用watcher.poll()方法，非阻塞方法，会立即返回当时监视器中是否有信号
-                    WatchKey watchKey = watchService.take();
-                    if (watchKey == null) {
+        while (true) {
+            try {
+                // take()是一个阻塞方法，会等待监视器发出的信号才返回。
+                // 还可以使用watcher.poll()方法，非阻塞方法，会立即返回当时监视器中是否有信号
+                WatchKey watchKey = watchService.take();
+                if (watchKey == null) {
+                    continue;
+                }
+
+                List<WatchEvent<?>> events = watchKey.pollEvents();
+                for (WatchEvent<?> event : events) {
+                    WatchEvent.Kind<?> kind = event.kind();
+                    String fileName = event.context().toString();
+                    if (fileName.endsWith(TILDE)) {
+                        fileName = fileName.substring(0, fileName.length() - 1);
+                    }
+                    File file = new File(watchKey.watchable() + File.separator + fileName);
+
+                    if (logger.isDebugEnabled()) {
+                        if (event.count() > 1) {
+                            logger.warn("[{}] monitor file {} {}", event.count(), kind, file);
+                        } else {
+                            logger.debug("[{}] monitor file {} {}", event.count(), kind, file);
+                        }
+                    }
+
+                    if (event.count() > 1 || kind == OVERFLOW || file.isDirectory()) {
                         continue;
                     }
 
-                    List<WatchEvent<?>> events = watchKey.pollEvents();
-                    for (WatchEvent<?> event : events) {
-                        WatchEvent.Kind<?> kind = event.kind();
-                        String fileName = event.context().toString();
-                        if (fileName.endsWith(TILDE)) {
-                            fileName = fileName.substring(0, fileName.length() - 1);
+                    listeners.stream().filter(listener -> listener.isUseful(file)).forEach(listener -> {
+                        if (kind == ENTRY_CREATE) {
+                            listener.createdHandle(file);
+                        } else if (kind == ENTRY_MODIFY) {
+                            listener.modifiedHandle(file);
                         }
-                        File file = new File(watchKey.watchable() + File.separator + fileName);
-
-                        if (event.count() > 1 || kind == OVERFLOW || file.isDirectory()) {
-                            continue;
-                        }
-
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("monitor file {} {}", kind, file);
-                        }
-
-                        listeners.stream().filter(listener -> listener.isUseful(file)).forEach(listener -> {
-                            if (kind == ENTRY_CREATE) {
-                                listener.createdHandle(file);
-                            } else if (kind == ENTRY_MODIFY) {
-                                listener.modifiedHandle(file);
-                            }
-                        });
-                    }
-
-                    watchKey.reset();
-                } catch (Throwable e) {
-                    logger.error("File monitor handle event failed.", e);
+                    });
                 }
-            }
-        });
 
-        watchThread.setDaemon(true);
-        watchThread.start();
+                watchKey.reset();
+            } catch (Throwable e) {
+                logger.error("File monitor handle event failed.", e);
+            }
+        }
+//        });
+//
+//        watchThread.setDaemon(true);
+//        watchThread.start();
     }
 
     /**
