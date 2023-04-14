@@ -31,7 +31,15 @@ package io.liuguangsheng.galois.constants;
  * @since 1.0.0
  */
 public final class ClassNameConstant {
+    /**
+     * The constant ABSTRACT_HANDLER_METHOD_MAPPING.
+     */
+    public static final String ABSTRACT_HANDLER_METHOD_MAPPING =
+            "org.springframework.web.servlet.handler.AbstractHandlerMethodMapping";
 
+    /**
+     * The constant SERVICE_PACKAGE.
+     */
     public static final String SERVICE_PACKAGE = "io.liuguangsheng.galois.service";
     /**
      * The constant CT_CONFIGURATION.

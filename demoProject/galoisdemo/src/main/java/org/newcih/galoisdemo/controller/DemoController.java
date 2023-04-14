@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/demo")
 public class DemoController {
 
-    @GetMapping("stringiff")
+    @GetMapping("stringifxfxf")
     public String demo() {
         return "huaha";
     }

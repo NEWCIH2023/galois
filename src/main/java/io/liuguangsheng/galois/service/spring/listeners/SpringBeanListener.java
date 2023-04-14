@@ -62,6 +62,7 @@ public class SpringBeanListener implements FileChangedListener {
     private void fileChangedHandle(File classFile) {
 
         try {
+            // TODO 现在classFile监听java文件，需要动态转换成class字节数组
             // 结合class变动与java变动，当两者同时出现时，更新该class
             String className = ClassUtil.getClassNameFromClass(classFile);
             byte[] classBytes = FileUtil.readFile(classFile);

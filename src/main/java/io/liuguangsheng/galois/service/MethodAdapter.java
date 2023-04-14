@@ -26,7 +26,10 @@ package io.liuguangsheng.galois.service;
 
 import io.liuguangsheng.galois.conf.GlobalConfiguration;
 import io.liuguangsheng.galois.utils.GaloisLog;
+import java.io.File;
 import java.io.FileOutputStream;
+import java.util.Arrays;
+import java.util.Optional;
 import jdk.internal.org.objectweb.asm.ClassReader;
 import jdk.internal.org.objectweb.asm.ClassVisitor;
 import jdk.internal.org.objectweb.asm.ClassWriter;
@@ -34,6 +37,7 @@ import org.slf4j.Logger;
 
 import static io.liuguangsheng.galois.constants.ConfConstant.PRINT_ASM_CODE_ENABLE;
 import static io.liuguangsheng.galois.constants.Constant.DOT;
+import static io.liuguangsheng.galois.constants.Constant.USER_DIR;
 import static io.liuguangsheng.galois.constants.FileType.CLASS_FILE;
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
 
@@ -47,6 +51,7 @@ public abstract class MethodAdapter extends ClassVisitor {
 
     private static final Logger logger = new GaloisLog(MethodAdapter.class);
     private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
+    private static int deleteActionCount = 0;
     /**
      * The Class name.
      */
@@ -76,9 +81,15 @@ public abstract class MethodAdapter extends ClassVisitor {
     }
 
     /**
+     * Add method.
+     */
+    protected void beforeTransform() {
+    }
+
+    /**
      * convert byte[] of original class file
      *
-     * @return the byte [ ]
+     * @return the byte []
      */
     public byte[] transform() {
 
@@ -94,11 +105,29 @@ public abstract class MethodAdapter extends ClassVisitor {
         }
 
         cr.accept(this, 0);
+        beforeTransform();
         byte[] result = cw.toByteArray();
+        debugClassFile(result);
 
+        return result;
+    }
+
+    private void debugClassFile(byte[] result) {
+        // 清空之前生成的.class文件
+        if (++deleteActionCount == 1) {
+            Optional.ofNullable(
+                    new File(globalConfig.getString(USER_DIR))
+                            .listFiles(file -> file.getName().endsWith(CLASS_FILE.getFileType()))
+            ).ifPresent(files ->
+                    Arrays.stream(files).forEach(File::delete)
+            );
+        }
+
+        // 生成.class
         if (globalConfig.getBoolean(PRINT_ASM_CODE_ENABLE, false)) {
-            String tempClassFile =
-                    className.substring(className.lastIndexOf(DOT) + 1) + CLASS_FILE.getFileType();
+            String newClassName = className.substring(className.lastIndexOf(DOT) + 1);
+            String tempClassFile = newClassName + CLASS_FILE.getFileType();
+
             try (FileOutputStream fos = new FileOutputStream(tempClassFile)) {
                 fos.write(result);
             } catch (Throwable e) {
@@ -107,7 +136,6 @@ public abstract class MethodAdapter extends ClassVisitor {
             logger.info("Had dump class file to {}.", tempClassFile);
         }
 
-        return result;
     }
 
     /**

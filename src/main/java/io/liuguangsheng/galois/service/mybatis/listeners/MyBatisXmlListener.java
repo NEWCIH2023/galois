@@ -104,7 +104,6 @@ public class MyBatisXmlListener implements FileChangedListener {
 
     @Override
     public void deletedHandle(File file) {
-        // TODO
     }
 
     @Override

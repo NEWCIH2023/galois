@@ -104,6 +104,5 @@ public class CormXmlListener implements FileChangedListener {
 
     @Override
     public void deletedHandle(File file) {
-        // TODO
     }
 }

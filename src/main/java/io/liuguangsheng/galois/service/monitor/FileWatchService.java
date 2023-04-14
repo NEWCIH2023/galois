@@ -29,7 +29,6 @@ import io.liuguangsheng.galois.utils.GaloisLog;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
@@ -92,44 +91,12 @@ public class FileWatchService {
 
         try {
             watchService = FileSystems.getDefault().newWatchService();
-
-//            Files.walkFileTree(Paths.get(rootPath), new SimpleFileVisitor<Path>() {
-//                @Override
-//                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-//                    if (dir.getFileName().toString().startsWith(DOT) || ignorePaths.stream().anyMatch(path -> dir
-//                    .toAbsolutePath().toString().contains(path))) {
-//                        return FileVisitResult.SKIP_SUBTREE;
-//                    }
-//
-//                    registerPath(dir);
-//
-//                    if (logger.isDebugEnabled()) {
-//                        logger.debug("Register File WatchService on {}", dir);
-//                    }
-//
-//                    return FileVisitResult.CONTINUE;
-//                }
-//            });
-
-            registerPath(Paths.get(rootPath));
+            Paths.get(rootPath).register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE},
+                    MEDIUM, FILE_TREE);
         } catch (IOException e) {
             logger.error("Start file watch service fail.", e);
             System.exit(0);
         }
-    }
-
-    /**
-     * Register path.
-     *
-     * @param path the path
-     * @throws IOException the io exception
-     */
-    public void registerPath(Path path) throws IOException {
-        if (path == null) {
-            return;
-        }
-
-        path.register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE}, MEDIUM, FILE_TREE);
     }
 
     /**
@@ -138,7 +105,6 @@ public class FileWatchService {
     public void start() {
         init();
 
-//        Thread watchThread = new Thread(() -> {
         logger.info("FileWatchService Started in path {} with these listeners {}", rootPath,
                 listeners.stream().map(FileChangedListener::toString).collect(Collectors.joining(COMMA)));
 
@@ -154,6 +120,11 @@ public class FileWatchService {
                 List<WatchEvent<?>> events = watchKey.pollEvents();
                 for (WatchEvent<?> event : events) {
                     WatchEvent.Kind<?> kind = event.kind();
+
+                    if (event.context() == null || watchKey.watchable() == null) {
+                        continue;
+                    }
+
                     String fileName = event.context().toString();
                     if (fileName.endsWith(TILDE)) {
                         fileName = fileName.substring(0, fileName.length() - 1);
@@ -186,10 +157,6 @@ public class FileWatchService {
                 logger.error("File monitor handle event failed.", e);
             }
         }
-//        });
-//
-//        watchThread.setDaemon(true);
-//        watchThread.start();
     }
 
     /**
