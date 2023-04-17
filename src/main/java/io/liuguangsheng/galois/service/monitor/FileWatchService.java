@@ -108,55 +108,60 @@ public class FileWatchService {
         logger.info("FileWatchService Started in path {} with these listeners {}", rootPath,
                 listeners.stream().map(FileChangedListener::toString).collect(Collectors.joining(COMMA)));
 
-        while (true) {
-            try {
-                // take()是一个阻塞方法，会等待监视器发出的信号才返回。
-                // 还可以使用watcher.poll()方法，非阻塞方法，会立即返回当时监视器中是否有信号
-                WatchKey watchKey = watchService.take();
-                if (watchKey == null) {
-                    continue;
-                }
-
-                List<WatchEvent<?>> events = watchKey.pollEvents();
-                for (WatchEvent<?> event : events) {
-                    WatchEvent.Kind<?> kind = event.kind();
-
-                    if (event.context() == null || watchKey.watchable() == null) {
+        Thread fileMonitorThread = new Thread(() -> {
+            while (true) {
+                try {
+                    // take()是一个阻塞方法，会等待监视器发出的信号才返回。
+                    // 还可以使用watcher.poll()方法，非阻塞方法，会立即返回当时监视器中是否有信号
+                    WatchKey watchKey = watchService.take();
+                    if (watchKey == null) {
                         continue;
                     }
 
-                    String fileName = event.context().toString();
-                    if (fileName.endsWith(TILDE)) {
-                        fileName = fileName.substring(0, fileName.length() - 1);
-                    }
-                    File file = new File(watchKey.watchable() + File.separator + fileName);
+                    List<WatchEvent<?>> events = watchKey.pollEvents();
+                    for (WatchEvent<?> event : events) {
+                        WatchEvent.Kind<?> kind = event.kind();
 
-                    if (logger.isDebugEnabled()) {
-                        if (event.count() > 1) {
-                            logger.warn("[{}] monitor file {} {}", event.count(), kind, file);
-                        } else {
-                            logger.debug("[{}] monitor file {} {}", event.count(), kind, file);
+                        if (event.context() == null || watchKey.watchable() == null) {
+                            continue;
                         }
-                    }
 
-                    if (event.count() > 1 || kind == OVERFLOW || file.isDirectory()) {
-                        continue;
-                    }
-
-                    listeners.stream().filter(listener -> listener.isUseful(file)).forEach(listener -> {
-                        if (kind == ENTRY_CREATE) {
-                            listener.createdHandle(file);
-                        } else if (kind == ENTRY_MODIFY) {
-                            listener.modifiedHandle(file);
+                        String fileName = event.context().toString();
+                        if (fileName.endsWith(TILDE)) {
+                            fileName = fileName.substring(0, fileName.length() - 1);
                         }
-                    });
+                        File file = new File(watchKey.watchable() + File.separator + fileName);
+
+                        if (logger.isDebugEnabled()) {
+                            if (event.count() > 1) {
+                                logger.warn("[{}] monitor file {} {}", event.count(), kind, file);
+                            } else {
+                                logger.debug("[{}] monitor file {} {}", event.count(), kind, file);
+                            }
+                        }
+
+                        if (event.count() > 1 || kind == OVERFLOW || file.isDirectory()) {
+                            continue;
+                        }
+
+                        listeners.stream().filter(listener -> listener.isUseful(file)).forEach(listener -> {
+                            if (kind == ENTRY_CREATE) {
+                                listener.createdHandle(file);
+                            } else if (kind == ENTRY_MODIFY) {
+                                listener.modifiedHandle(file);
+                            }
+                        });
+                    }
+
+                    watchKey.reset();
+                } catch (Throwable e) {
+                    logger.error("File monitor handle event failed.", e);
                 }
-
-                watchKey.reset();
-            } catch (Throwable e) {
-                logger.error("File monitor handle event failed.", e);
             }
-        }
+        });
+
+        fileMonitorThread.setDaemon(true);
+        fileMonitorThread.start();
     }
 
     /**
