@@ -24,10 +24,10 @@
 
 package io.liuguangsheng.galois.service.spring.listeners;
 
-import static io.liuguangsheng.galois.service.spring.listeners.JavaFileListener.javaFileChangedList;
 import io.liuguangsheng.galois.constants.FileType;
 import io.liuguangsheng.galois.service.annotation.LazyBean;
 import io.liuguangsheng.galois.service.monitor.FileChangedListener;
+import io.liuguangsheng.galois.service.spring.JavaSourceManager;
 import io.liuguangsheng.galois.service.spring.SpringAgentService;
 import io.liuguangsheng.galois.service.spring.SpringBeanReloader;
 import io.liuguangsheng.galois.utils.ClassUtil;
@@ -49,6 +49,7 @@ public class SpringBeanListener implements FileChangedListener {
   private static final Logger logger = new GaloisLog(SpringBeanListener.class);
 
   private final SpringBeanReloader springBeanReloader = SpringBeanReloader.getInstance();
+  private static final JavaSourceManager sourceManager = JavaSourceManager.getInstance();
 
   @Override
   public boolean isUseful(File file) {
@@ -65,14 +66,9 @@ public class SpringBeanListener implements FileChangedListener {
     try {
       // 结合class变动与java变动，当两者同时出现时，更新该class
       String className = ClassUtil.getClassNameFromClass(classFile);
-      if (!javaFileChangedList.contains(className)) {
-        if (logger.isDebugEnabled()) {
-          logger.debug(
-              "had not detect source file {} changed, do not reload class by file change event.",
-              className);
-        }
-      } else {
-        javaFileChangedList.remove(className);
+
+      if (!sourceManager.removeClassName(className)) {
+        return;
       }
 
       byte[] classBytes = FileUtil.readFile(classFile);

@@ -206,5 +206,7 @@ public class HandlerMethodMappingVisitor extends MethodAdapter {
       mv.visitMaxs(4, 4);
       mv.visitEnd();
     }
+
+    super.beforeTransform();
   }
 }

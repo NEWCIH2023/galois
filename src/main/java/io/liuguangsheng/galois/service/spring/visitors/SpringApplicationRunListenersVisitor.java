@@ -64,9 +64,9 @@ public class SpringApplicationRunListenersVisitor extends MethodAdapter {
   public MethodVisitor visitMethod(int i, String s, String s1, String s2, String[] strings) {
     MethodVisitor mv = super.visitMethod(i, s, s1, s2, strings);
 
-    if (Objects.equals(s, "<init>")) {
-      return new RunMethod(ASM5, mv);
-    }
+//    if (Objects.equals(s, "<init>")) {
+//      return new RunMethod(ASM5, mv);
+//    }
 
     return mv;
   }
@@ -91,18 +91,15 @@ public class SpringApplicationRunListenersVisitor extends MethodAdapter {
     @Override
     public void visitInsn(int opcode) {
       if (opcode >= IRETURN && opcode <= RETURN) {
-        String vClassName = SpringRunnerManager.class.getName()
-            .replace(Constant.DOT, Constant.SLASH);
+        String vClassName = SpringRunnerManager.class.getName().replace(Constant.DOT, Constant.SLASH);
         String pClassName = className.replace(Constant.DOT, Constant.SLASH);
 
         mv.visitCode();
         mv.visitVarInsn(ALOAD, 0);
         mv.visitFieldInsn(GETFIELD, pClassName, "listeners", "Ljava/util/List;");
-        mv.visitMethodInsn(INVOKESTATIC, vClassName, "getInstance", "()L" + vClassName + ";",
-            false);
+        mv.visitMethodInsn(INVOKESTATIC, vClassName, "getInstance", "()L" + vClassName + ";", false);
         mv.visitMethodInsn(INVOKEVIRTUAL, vClassName, "getRunners", "()Ljava/util/List;", false);
-        mv.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "addAll", "(Ljava/util/Collection;)Z",
-            true);
+        mv.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "addAll", "(Ljava/util/Collection;)Z", true);
         mv.visitInsn(POP);
         mv.visitInsn(RETURN);
         mv.visitEnd();
