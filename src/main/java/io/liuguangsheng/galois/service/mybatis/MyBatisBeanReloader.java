@@ -59,223 +59,226 @@ import org.slf4j.Logger;
  * @since 1.0.0
  */
 @LazyBean(value = "MyBatisBeanReloader", manager = MyBatisAgentService.class)
-public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigurationVisitor.NecessaryMethods {
+public class MyBatisBeanReloader implements BeanReloader<File>,
+    MyBatisConfigurationVisitor.NecessaryMethods {
 
-    private static final MyBatisBeanReloader mybatisBeanReloder = new MyBatisBeanReloader();
-    private static final Logger logger = new GaloisLog(MyBatisBeanReloader.class);
-    private static final List<String> CHILD_NAMES = Arrays.asList("association", "collection", "case");
-    /**
-     * The Configuration.
-     */
-    protected Configuration configuration;
+  private static final MyBatisBeanReloader mybatisBeanReloder = new MyBatisBeanReloader();
+  private static final Logger logger = new GaloisLog(MyBatisBeanReloader.class);
+  private static final List<String> CHILD_NAMES = Arrays.asList("association", "collection",
+      "case");
+  /**
+   * The Configuration.
+   */
+  protected Configuration configuration;
 
-    private MyBatisBeanReloader() {
+  private MyBatisBeanReloader() {
+  }
+
+  /**
+   * 获取单例实例
+   *
+   * @return the instance
+   */
+  public static MyBatisBeanReloader getInstance() {
+    return mybatisBeanReloder;
+  }
+
+  /**
+   * 更新bean实例
+   */
+  @Override
+  public void updateBean(File xmlFile) {
+    if (configuration == null) {
+      logger.error("MybatisBeanReloader not prepare ready. Configuration object is null.");
+      return;
     }
 
-    /**
-     * 获取单例实例
-     *
-     * @return the instance
-     */
-    public static MyBatisBeanReloader getInstance() {
-        return mybatisBeanReloder;
+    try (FileInputStream fis = new FileInputStream(xmlFile)) {
+      Properties properties = configuration.getVariables();
+      XPathParser parser = new XPathParser(fis, true, properties, new XMLMapperEntityResolver());
+      XNode context = parser.evalNode("/mapper");
+      String namespace = context.getStringAttribute(Constant.NAMESPACE);
+      // clear cache
+      clearMapperRegistry(namespace);
+      clearCachedNames(namespace);
+      clearParameterMap(context.evalNodes("/mapper/parameterMap"), namespace);
+      clearResultMap(context.evalNodes("/mapper/resultMap"), namespace);
+      clearKeyGenerators(context.evalNodes("insert|update|select|delete"), namespace);
+      clearSqlElement(context.evalNodes("/mapper/sql"), namespace);
+      // reparse mybatis mapper xml file
+      reloadXML(xmlFile);
+    } catch (Throwable e) {
+      logger.error("Reload mybatis mapper by xml file fail.", e);
+      return;
     }
 
-    /**
-     * 更新bean实例
-     */
-    @Override
-    public void updateBean(File xmlFile) {
-        if (configuration == null) {
-            logger.error("MybatisBeanReloader not prepare ready. Configuration object is null.");
-            return;
+    logger.info("Reload mybatis mapper by xml file {} success.", xmlFile.getName());
+  }
+
+  @Override
+  public boolean isUseful(File file) {
+    return true;
+  }
+
+  /**
+   * reload xml
+   *
+   * @param xmlFile xmlFile
+   */
+  private void reloadXML(File xmlFile) throws IOException {
+    InputStream is = Files.newInputStream(xmlFile.toPath());
+    XMLMapperBuilder builder = new XMLMapperBuilder(is, configuration, xmlFile.getName(),
+        configuration.getSqlFragments());
+    builder.parse();
+  }
+
+  /**
+   * clear mapper registry
+   *
+   * @param namespace namespace
+   */
+  @SuppressWarnings("unchecked")
+  private void clearMapperRegistry(String namespace)
+      throws NoSuchFieldException, IllegalAccessException {
+    Field field = MapperRegistry.class.getDeclaredField("knownMappers");
+    field.setAccessible(true);
+    Map<Class<?>, Object> mapConfig = (Map<Class<?>, Object>) field.get(
+        configuration.getMapperRegistry());
+    Class<?> refreshKey = null;
+
+    for (Map.Entry<Class<?>, Object> item : mapConfig.entrySet()) {
+      if (item.getKey().getName().contains(namespace)) {
+        refreshKey = item.getKey();
+        break;
+      }
+    }
+
+    if (refreshKey != null) {
+      mapConfig.remove(refreshKey);
+    }
+  }
+
+  /**
+   * clear cached names
+   *
+   * @param namespace namespace
+   */
+  @Deprecated
+  private void clearCachedNames(String namespace) {
+    configuration.getCacheNames().remove(namespace);
+  }
+
+  /**
+   * clear parameter map
+   *
+   * @param list      list
+   * @param namespace namespace
+   */
+  private void clearParameterMap(List<XNode> list, String namespace) {
+    for (XNode xNode : list) {
+      String id = xNode.getStringAttribute(Constant.ID);
+      configuration.getResultMapNames().remove(namespace + "." + id);
+    }
+  }
+
+  /**
+   * clear result map
+   *
+   * @param list      list
+   * @param namespace namespace
+   */
+  private void clearResultMap(List<XNode> list, String namespace) {
+    for (XNode xNode : list) {
+      String id = xNode.getStringAttribute(Constant.ID, xNode.getValueBasedIdentifier());
+      configuration.getResultMapNames().remove(id);
+      configuration.getResultMapNames().remove(namespace + "." + id);
+      clearResultMap(xNode, namespace);
+    }
+  }
+
+  /**
+   * clear result map
+   *
+   * @param xNode     xNode
+   * @param namespace namespace
+   */
+  private void clearResultMap(XNode xNode, String namespace) {
+    for (XNode child : xNode.getChildren()) {
+      if (CHILD_NAMES.contains(child.getName())) {
+        if (child.getStringAttribute("select") == null) {
+          configuration.getResultMapNames().remove(child.getStringAttribute(Constant.ID,
+              child.getValueBasedIdentifier()));
+          configuration.getResultMapNames()
+              .remove(namespace + "." + child.getStringAttribute(Constant.ID,
+                  child.getValueBasedIdentifier()));
+
+          if (child.getChildren() != null && !child.getChildren().isEmpty()) {
+            clearResultMap(child, namespace);
+          }
         }
+      }
+    }
+  }
 
-        try (FileInputStream fis = new FileInputStream(xmlFile)) {
-            Properties properties = configuration.getVariables();
-            XPathParser parser = new XPathParser(fis, true, properties, new XMLMapperEntityResolver());
-            XNode context = parser.evalNode("/mapper");
-            String namespace = context.getStringAttribute(Constant.NAMESPACE);
-            // clear cache
-            clearMapperRegistry(namespace);
-            clearCachedNames(namespace);
-            clearParameterMap(context.evalNodes("/mapper/parameterMap"), namespace);
-            clearResultMap(context.evalNodes("/mapper/resultMap"), namespace);
-            clearKeyGenerators(context.evalNodes("insert|update|select|delete"), namespace);
-            clearSqlElement(context.evalNodes("/mapper/sql"), namespace);
-            // reparse mybatis mapper xml file
-            reloadXML(xmlFile);
-        } catch (Throwable e) {
-            logger.error("Reload mybatis mapper by xml file fail.", e);
-            return;
+  /**
+   * clear key generators
+   *
+   * @param list      list
+   * @param namespace namespace
+   */
+  private void clearKeyGenerators(List<XNode> list, String namespace) {
+    for (XNode xNode : list) {
+      String id = xNode.getStringAttribute(Constant.ID);
+      configuration.getKeyGeneratorNames().remove(id + SelectKeyGenerator.SELECT_KEY_SUFFIX);
+      configuration.getKeyGeneratorNames()
+          .remove(namespace + "." + id + SelectKeyGenerator.SELECT_KEY_SUFFIX);
+
+      Collection<MappedStatement> mappedStatements = configuration.getMappedStatements();
+      List<MappedStatement> tempStatements = new ArrayList<>(64);
+
+      for (MappedStatement statement : mappedStatements) {
+        if (statement != null) {
+          if (Objects.equals(statement.getId(), namespace + "." + id)) {
+            tempStatements.add(statement);
+          }
         }
+      }
 
-        logger.info("Reload mybatis mapper by xml file {} success.", xmlFile.getName());
+      mappedStatements.removeAll(tempStatements);
     }
+  }
 
-    @Override
-    public boolean isUseful(File file) {
-        return true;
+  /**
+   * clear sql element
+   *
+   * @param list      list
+   * @param namespace namespace
+   */
+  private void clearSqlElement(List<XNode> list, String namespace) {
+    for (XNode xNode : list) {
+      String id = xNode.getStringAttribute(Constant.ID);
+      configuration.getSqlFragments().remove(id);
+      configuration.getSqlFragments().remove(namespace + "." + id);
     }
+  }
 
-    /**
-     * reload xml
-     *
-     * @param xmlFile xmlFile
-     */
-    private void reloadXML(File xmlFile) throws IOException {
-        InputStream is = Files.newInputStream(xmlFile.toPath());
-        XMLMapperBuilder builder = new XMLMapperBuilder(is, configuration, xmlFile.getName(),
-                configuration.getSqlFragments());
-        builder.parse();
-    }
+  /**
+   * get configuration
+   *
+   * @return {@link Configuration}
+   * @see Configuration
+   */
+  public Configuration getConfiguration() {
+    return configuration;
+  }
 
-    /**
-     * clear mapper registry
-     *
-     * @param namespace namespace
-     */
-    @SuppressWarnings("unchecked")
-    private void clearMapperRegistry(String namespace)
-            throws NoSuchFieldException, IllegalAccessException {
-        Field field = MapperRegistry.class.getDeclaredField("knownMappers");
-        field.setAccessible(true);
-        Map<Class<?>, Object> mapConfig = (Map<Class<?>, Object>) field.get(configuration.getMapperRegistry());
-        Class<?> refreshKey = null;
-
-        for (Map.Entry<Class<?>, Object> item : mapConfig.entrySet()) {
-            if (item.getKey().getName().contains(namespace)) {
-                refreshKey = item.getKey();
-                break;
-            }
-        }
-
-        if (refreshKey != null) {
-            mapConfig.remove(refreshKey);
-        }
-    }
-
-    /**
-     * clear cached names
-     *
-     * @param namespace namespace
-     */
-    @Deprecated
-    private void clearCachedNames(String namespace) {
-        configuration.getCacheNames().remove(namespace);
-    }
-
-    /**
-     * clear parameter map
-     *
-     * @param list      list
-     * @param namespace namespace
-     */
-    private void clearParameterMap(List<XNode> list, String namespace) {
-        for (XNode xNode : list) {
-            String id = xNode.getStringAttribute(Constant.ID);
-            configuration.getResultMapNames().remove(namespace + "." + id);
-        }
-    }
-
-    /**
-     * clear result map
-     *
-     * @param list      list
-     * @param namespace namespace
-     */
-    private void clearResultMap(List<XNode> list, String namespace) {
-        for (XNode xNode : list) {
-            String id = xNode.getStringAttribute(Constant.ID, xNode.getValueBasedIdentifier());
-            configuration.getResultMapNames().remove(id);
-            configuration.getResultMapNames().remove(namespace + "." + id);
-            clearResultMap(xNode, namespace);
-        }
-    }
-
-    /**
-     * clear result map
-     *
-     * @param xNode     xNode
-     * @param namespace namespace
-     */
-    private void clearResultMap(XNode xNode, String namespace) {
-        for (XNode child : xNode.getChildren()) {
-            if (CHILD_NAMES.contains(child.getName())) {
-                if (child.getStringAttribute("select") == null) {
-                    configuration.getResultMapNames().remove(child.getStringAttribute(Constant.ID,
-                            child.getValueBasedIdentifier()));
-                    configuration.getResultMapNames()
-                            .remove(namespace + "." + child.getStringAttribute(Constant.ID,
-                                    child.getValueBasedIdentifier()));
-
-                    if (child.getChildren() != null && !child.getChildren().isEmpty()) {
-                        clearResultMap(child, namespace);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * clear key generators
-     *
-     * @param list      list
-     * @param namespace namespace
-     */
-    private void clearKeyGenerators(List<XNode> list, String namespace) {
-        for (XNode xNode : list) {
-            String id = xNode.getStringAttribute(Constant.ID);
-            configuration.getKeyGeneratorNames().remove(id + SelectKeyGenerator.SELECT_KEY_SUFFIX);
-            configuration.getKeyGeneratorNames()
-                    .remove(namespace + "." + id + SelectKeyGenerator.SELECT_KEY_SUFFIX);
-
-            Collection<MappedStatement> mappedStatements = configuration.getMappedStatements();
-            List<MappedStatement> tempStatements = new ArrayList<>(64);
-
-            for (MappedStatement statement : mappedStatements) {
-                if (statement != null) {
-                    if (Objects.equals(statement.getId(), namespace + "." + id)) {
-                        tempStatements.add(statement);
-                    }
-                }
-            }
-
-            mappedStatements.removeAll(tempStatements);
-        }
-    }
-
-    /**
-     * clear sql element
-     *
-     * @param list      list
-     * @param namespace namespace
-     */
-    private void clearSqlElement(List<XNode> list, String namespace) {
-        for (XNode xNode : list) {
-            String id = xNode.getStringAttribute(Constant.ID);
-            configuration.getSqlFragments().remove(id);
-            configuration.getSqlFragments().remove(namespace + "." + id);
-        }
-    }
-
-    /**
-     * get configuration
-     *
-     * @return {@link Configuration}
-     * @see Configuration
-     */
-    public Configuration getConfiguration() {
-        return configuration;
-    }
-
-    /**
-     * Sets configuration.
-     *
-     * @param configuration the configuration
-     */
-    @Override
-    public void setConfiguration(Configuration configuration) {
-        this.configuration = configuration;
-    }
+  /**
+   * Sets configuration.
+   *
+   * @param configuration the configuration
+   */
+  @Override
+  public void setConfiguration(Configuration configuration) {
+    this.configuration = configuration;
+  }
 }

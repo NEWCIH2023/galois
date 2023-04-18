@@ -29,15 +29,15 @@ package io.liuguangsheng.galois.service;
  */
 public class NewClassLoader extends ClassLoader {
 
-    private static final NewClassLoader instance = new NewClassLoader();
+  private static final NewClassLoader instance = new NewClassLoader();
 
-    /**
-     * Gets instance.
-     *
-     * @return the instance
-     */
-    public static ClassLoader getInstance() {
-        return instance;
-    }
+  /**
+   * Gets instance.
+   *
+   * @return the instance
+   */
+  public static ClassLoader getInstance() {
+    return instance;
+  }
 
 }

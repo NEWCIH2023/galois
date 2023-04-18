@@ -37,6 +37,8 @@ public class DemoListener implements ApplicationListener<ApplicationStartedEvent
 
     @Override
     public void onApplicationEvent(ApplicationStartedEvent applicationStartedEvent) {
+
         System.out.println("##############onApplicationEvent");
+        System.out.println(1);
     }
 }

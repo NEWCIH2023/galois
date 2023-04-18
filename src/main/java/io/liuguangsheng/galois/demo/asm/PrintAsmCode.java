@@ -32,6 +32,7 @@ import jdk.internal.org.objectweb.asm.util.ASMifier;
 import jdk.internal.org.objectweb.asm.util.Printer;
 import jdk.internal.org.objectweb.asm.util.Textifier;
 import jdk.internal.org.objectweb.asm.util.TraceClassVisitor;
+import org.springframework.web.servlet.handler.AbstractHandlerMethodMapping;
 
 /**
  * The type Print asm code.
@@ -41,39 +42,39 @@ import jdk.internal.org.objectweb.asm.util.TraceClassVisitor;
  */
 public class PrintAsmCode {
 
-    public void updateHandlerMethods(Object handler) {
+  /**
+   * The entry point of application.
+   *
+   * @param args the input arguments
+   * @throws IOException the io exception
+   */
+  public static void main(String[] args) throws IOException {
+    printCode(AbstractHandlerMethodMapping.class.getName(), true);
+  }
+
+  /**
+   * Print code.
+   *
+   * @param className the class name
+   * @param asmCode   the asm code
+   * @throws IOException the io exception
+   */
+  public static void printCode(String className, boolean asmCode) throws IOException {
+    if (StringUtil.isBlank(className)) {
+      className = PrintAsmCode.class.getName();
     }
 
-    protected void detectHandlerMethods(Object handler) {
+    ClassReader cr = new ClassReader(className);
+    Printer printer = asmCode ? new ASMifier() : new Textifier();
+    PrintWriter printWriter = new PrintWriter(System.out, true);
+    TraceClassVisitor cv = new TraceClassVisitor(null, printer, printWriter);
+    cr.accept(cv, ClassReader.SKIP_FRAMES + ClassReader.SKIP_DEBUG);
+  }
 
-    }
+  public void updateHandlerMethods(Object handler) {
+  }
 
-    /**
-     * The entry point of application.
-     *
-     * @param args the input arguments
-     * @throws IOException the io exception
-     */
-    public static void main(String[] args) throws IOException {
-        printCode(AbstractHandlerMethodMapping.class.getName(), true);
-    }
+  protected void detectHandlerMethods(Object handler) {
 
-    /**
-     * Print code.
-     *
-     * @param className the class name
-     * @param asmCode   the asm code
-     * @throws IOException the io exception
-     */
-    public static void printCode(String className, boolean asmCode) throws IOException {
-        if (StringUtil.isBlank(className)) {
-            className = PrintAsmCode.class.getName();
-        }
-
-        int parsingOptions = ClassReader.SKIP_FRAMES & ClassReader.SKIP_DEBUG;
-        Printer printer = asmCode ? new ASMifier() : new Textifier();
-        PrintWriter printWriter = new PrintWriter(System.out, true);
-        TraceClassVisitor cv = new TraceClassVisitor(null, printer, printWriter);
-        new ClassReader(className).accept(cv, parsingOptions);
-    }
+  }
 }

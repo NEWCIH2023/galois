@@ -34,7 +34,8 @@ public class DemoController {
 
     @GetMapping("stringifxfxf")
     public String demo() {
-        return "huaha";
+        System.out.println(1);
+        return "huahahui";
     }
 
     @GetMapping("huhu")

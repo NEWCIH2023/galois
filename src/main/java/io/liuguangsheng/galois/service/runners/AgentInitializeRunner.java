@@ -33,6 +33,8 @@ import io.liuguangsheng.galois.service.monitor.FileWatchService;
 import io.liuguangsheng.galois.utils.ClassUtil;
 import io.liuguangsheng.galois.utils.GaloisLog;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -45,57 +47,64 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 public class AgentInitializeRunner extends AbstractRunner {
 
-    private static final FileWatchService fileWatchService = FileWatchService.getInstance();
-    private static final Logger logger = new GaloisLog(AgentInitializeRunner.class);
+  private static final FileWatchService fileWatchService = FileWatchService.getInstance();
+  private static final Logger logger = new GaloisLog(AgentInitializeRunner.class);
 
-    /**
-     * Instantiates a new Agent service init runner.
-     */
-    public AgentInitializeRunner() {
-        setRank(0);
+  /**
+   * Instantiates a new Agent service init runner.
+   */
+  public AgentInitializeRunner() {
+    setRank(0);
+  }
+
+  @Override
+  public void started(ConfigurableApplicationContext context) {
+    if (!isCanInvoke()) {
+      return;
     }
 
-    @Override
-    public void started(ConfigurableApplicationContext context) {
-        if (!isCanInvoke()) {
-            return;
+    logger.info("{} with context {} is {}", getClass().getSimpleName(), context.getId(), "started");
+
+    try {
+      Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(
+          ClassNameConstant.SERVICE_PACKAGE,
+          LazyBean.class);
+      Set<AgentService> agentServices = ClassUtil.scanBaseClass(ClassNameConstant.SERVICE_PACKAGE,
+              AgentService.class)
+          .stream()
+          .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
+          .map(clazz -> (AgentService) ClassUtil.getInstance(clazz))
+          .collect(Collectors.toSet());
+      List<FileChangedListener> fileChangedListeners = new ArrayList<>(64);
+
+      for (AgentService agentService : agentServices) {
+        if (!agentService.isUseful()) {
+          continue;
         }
 
-        logger.info("{} with context {} is {}", getClass().getSimpleName(), context.getId(), "started");
+        for (Class<?> factory : lazyBeanFactorys) {
+          int modifiers = factory.getModifiers();
+          LazyBean lazyBean = factory.getAnnotation(LazyBean.class);
+          boolean isManager = lazyBean.manager().equals(agentService.getClass());
 
-        try {
-            Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(ClassNameConstant.SERVICE_PACKAGE,
-                    LazyBean.class);
-            Set<AgentService> agentServices =
-                    ClassUtil.scanBaseClass(ClassNameConstant.SERVICE_PACKAGE, AgentService.class).stream().filter(clazz -> !Modifier.isAbstract(clazz.getModifiers())).map(clazz -> (AgentService) ClassUtil.getInstance(clazz)).collect(Collectors.toSet());
+          if (Modifier.isInterface(modifiers) || Modifier.isAbstract(modifiers) || !isManager) {
+            continue;
+          }
 
-            for (AgentService agentService : agentServices) {
-                if (!agentService.isUseful()) {
-                    continue;
-                }
-
-                for (Class<?> lazyBeanFactory : lazyBeanFactorys) {
-                    int modifiers = lazyBeanFactory.getModifiers();
-                    LazyBean lazyBean = lazyBeanFactory.getAnnotation(LazyBean.class);
-                    boolean isManager = lazyBean.manager().equals(agentService.getClass());
-
-                    if (Modifier.isInterface(modifiers) || Modifier.isAbstract(modifiers) || !isManager) {
-                        continue;
-                    }
-
-                    if (BeanReloader.class.isAssignableFrom(lazyBeanFactory)) {
-                        BeanReloader<?> beanReloader = (BeanReloader<?>) ClassUtil.getInstance(lazyBeanFactory);
-                        agentService.setBeanReloader(beanReloader);
-                    } else if (FileChangedListener.class.isAssignableFrom(lazyBeanFactory)) {
-                        FileChangedListener listener = (FileChangedListener) ClassUtil.getInstance(lazyBeanFactory);
-                        agentService.registerFileChangedListener(listener);
-                        fileWatchService.registerListener(listener);
-                    }
-                }
-            }
-
-            fileWatchService.start();
-        } catch (Exception ignored) {
+          if (BeanReloader.class.isAssignableFrom(factory)) {
+            BeanReloader<?> beanReloader = (BeanReloader<?>) ClassUtil.getInstance(factory);
+            agentService.setBeanReloader(beanReloader);
+          } else if (FileChangedListener.class.isAssignableFrom(factory)) {
+            FileChangedListener listener = (FileChangedListener) ClassUtil.getInstance(factory);
+            agentService.registerFileChangedListener(listener);
+            fileChangedListeners.add(lazyBean.rank(), listener);
+          }
         }
+      }
+
+      fileChangedListeners.forEach(fileWatchService::registerListener);
+      fileWatchService.start();
+    } catch (Exception ignored) {
     }
+  }
 }

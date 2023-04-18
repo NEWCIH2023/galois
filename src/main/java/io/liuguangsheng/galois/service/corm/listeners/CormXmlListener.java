@@ -50,59 +50,60 @@ import org.xml.sax.SAXParseException;
 @LazyBean(value = "CormXmlListener", manager = CormAgentService.class)
 public class CormXmlListener implements FileChangedListener {
 
-    private static final String DOC_TYPE = "mapper";
-    private static final Logger logger = new GaloisLog(CormXmlListener.class);
-    private static final CormBeanReloader reloader = CormBeanReloader.getInstance();
+  private static final String DOC_TYPE = "mapper";
+  private static final Logger logger = new GaloisLog(CormXmlListener.class);
+  private static final CormBeanReloader reloader = CormBeanReloader.getInstance();
 
-    @Override
-    public String toString() {
-        return "CormXmlListener";
+  @Override
+  public String toString() {
+    return "CormXmlListener";
+  }
+
+  @Override
+  public boolean isUseful(File file) {
+    boolean fileTypeCheck = FileUtil.validFileType(file, FileType.XML_FILE);
+
+    if (!fileTypeCheck) {
+      return false;
     }
 
-    @Override
-    public boolean isUseful(File file) {
-        boolean fileTypeCheck = FileUtil.validFileType(file, FileType.XML_FILE);
+    try {
+      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      dbf.setValidating(false);
+      DocumentBuilder db = dbf.newDocumentBuilder();
+      // do no validate dtd
+      db.setEntityResolver(
+          ((publicId, systemId) -> new InputSource(new ByteArrayInputStream(new byte[0]))));
+      Document document = db.parse(file);
+      DocumentType documentType = document.getDoctype();
+      return documentType != null && documentType.toString().contains(DOC_TYPE);
+    } catch (SAXParseException ignored) {
+      return false;
+    } catch (Throwable e) {
+      logger.error("Parse xml file fail. Check it's file type.", e);
+      return false;
+    }
+  }
 
-        if (!fileTypeCheck) {
-            return false;
-        }
-
-        try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setValidating(false);
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            // do no validate dtd
-            db.setEntityResolver(((publicId, systemId) -> new InputSource(new ByteArrayInputStream(new byte[0]))));
-            Document document = db.parse(file);
-            DocumentType documentType = document.getDoctype();
-            return documentType != null && documentType.toString().contains(DOC_TYPE);
-        } catch (SAXParseException ignored) {
-            return false;
-        } catch (Throwable e) {
-            logger.error("Parse xml file fail. Check it's file type.", e);
-            return false;
-        }
+  @Override
+  public void createdHandle(File file) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("CormXmlListener detect file created: {}.", file.getName());
     }
 
-    @Override
-    public void createdHandle(File file) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("CormXmlListener detect file created: {}.", file.getName());
-        }
+    reloader.updateBean(file);
+  }
 
-        reloader.updateBean(file);
+  @Override
+  public void modifiedHandle(File file) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("CormXmlListener detect file modified: {}.", file.getName());
     }
 
-    @Override
-    public void modifiedHandle(File file) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("CormXmlListener detect file modified: {}.", file.getName());
-        }
+    reloader.updateBean(file);
+  }
 
-        reloader.updateBean(file);
-    }
-
-    @Override
-    public void deletedHandle(File file) {
-    }
+  @Override
+  public void deletedHandle(File file) {
+  }
 }

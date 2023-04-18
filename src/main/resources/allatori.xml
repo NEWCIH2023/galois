@@ -1,20 +1,20 @@
 <config>
-    <input>
-        <!--混淆后直接覆盖原文件,out指向的路劲为混淆后的jar -->
-        <jar in="../galois.jar" out="../galois-obfuscated.jar"/>
-    </input>
+  <ignore-classes>
+    <class template="class *springframework*"/>
+    <class template="class *apache*"/>
+    <class template="class *comtop*"/>
+    <class template="class *slf4j*"/>
+  </ignore-classes>
 
-    <keep-names>
-        <class access="protected+">
-            <field access="protected+"/>
-            <method access="protected+"/>
-        </class>
-    </keep-names>
-    <ignore-classes>
-        <class template="class *springframework*"/>
-        <class template="class *apache*"/>
-        <class template="class *comtop*"/>
-        <class template="class *slf4j*"/>
-    </ignore-classes>
+  <input>
+    <!--混淆后直接覆盖原文件,out指向的路劲为混淆后的jar -->
+    <jar in="../galois.jar" out="../galois-obfuscated.jar"/>
+  </input>
+  <keep-names>
+    <class access="protected+">
+      <field access="protected+"/>
+      <method access="protected+"/>
+    </class>
+  </keep-names>
 
 </config>

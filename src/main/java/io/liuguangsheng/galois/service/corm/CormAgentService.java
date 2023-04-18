@@ -34,15 +34,15 @@ import io.liuguangsheng.galois.service.AgentService;
  */
 public class CormAgentService extends AgentService {
 
-    private final static CormAgentService cormAgentService = new CormAgentService();
+  private final static CormAgentService cormAgentService = new CormAgentService();
 
-    /**
-     * get instance
-     *
-     * @return {@link CormAgentService}
-     * @see CormAgentService
-     */
-    public static CormAgentService getInstance() {
-        return cormAgentService;
-    }
+  /**
+   * get instance
+   *
+   * @return {@link CormAgentService}
+   * @see CormAgentService
+   */
+  public static CormAgentService getInstance() {
+    return cormAgentService;
+  }
 }

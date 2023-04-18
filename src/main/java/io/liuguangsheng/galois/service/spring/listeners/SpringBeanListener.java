@@ -24,6 +24,7 @@
 
 package io.liuguangsheng.galois.service.spring.listeners;
 
+import static io.liuguangsheng.galois.service.spring.listeners.JavaFileListener.javaFileChangedList;
 import io.liuguangsheng.galois.constants.FileType;
 import io.liuguangsheng.galois.service.annotation.LazyBean;
 import io.liuguangsheng.galois.service.monitor.FileChangedListener;
@@ -45,75 +46,85 @@ import org.slf4j.Logger;
 @LazyBean(value = "SpringBeanListener", manager = SpringAgentService.class)
 public class SpringBeanListener implements FileChangedListener {
 
-    private static final Logger logger = new GaloisLog(SpringBeanListener.class);
+  private static final Logger logger = new GaloisLog(SpringBeanListener.class);
 
-    private final SpringBeanReloader springBeanReloader = SpringBeanReloader.getInstance();
+  private final SpringBeanReloader springBeanReloader = SpringBeanReloader.getInstance();
 
-    @Override
-    public boolean isUseful(File file) {
-        return FileUtil.validFileType(file, FileType.CLASS_FILE);
-    }
+  @Override
+  public boolean isUseful(File file) {
+    return FileUtil.validFileType(file, FileType.CLASS_FILE);
+  }
 
-    /**
-     * file changed handle
-     *
-     * @param classFile classFile
-     */
-    private void fileChangedHandle(File classFile) {
+  /**
+   * file changed handle
+   *
+   * @param classFile classFile
+   */
+  private void fileChangedHandle(File classFile) {
 
-        try {
-            // TODO 处理class文件热部署时，需要同步监听对应的java文件是否有变更，在java文件有变更的情况下，热部署class才有意义
-            // 结合class变动与java变动，当两者同时出现时，更新该class
-            String className = ClassUtil.getClassNameFromClass(classFile);
-            byte[] classBytes = FileUtil.readFile(classFile);
-            Class<?> clazz = Class.forName(className);
-            ClassDefinition definition = new ClassDefinition(clazz, classBytes);
-            ClassUtil.getInstrumentation().redefineClasses(definition);
-            logger.info("Redefine class file {} success.", classFile.getName());
-
-            if (springBeanReloader.isUseful(clazz)) {
-                springBeanReloader.updateBean(clazz);
-            }
-        } catch (Throwable e) {
-            logger.error("Reload Spring Bean fail.", e);
-        }
-    }
-
-    @Override
-    public void createdHandle(File file) {
+    try {
+      // 结合class变动与java变动，当两者同时出现时，更新该class
+      String className = ClassUtil.getClassNameFromClass(classFile);
+      if (!javaFileChangedList.contains(className)) {
         if (logger.isDebugEnabled()) {
-            logger.debug("SpringBeanListener detect class file created: {}", file.getName());
+          logger.debug(
+              "had not detect source file {} changed, do not reload class by file change event.",
+              className);
         }
+      } else {
+        javaFileChangedList.remove(className);
+      }
 
-        fileChangedHandle(file);
+      byte[] classBytes = FileUtil.readFile(classFile);
+      Class<?> clazz = Class.forName(className);
+      ClassDefinition definition = new ClassDefinition(clazz, classBytes);
+      ClassUtil.getInstrumentation().redefineClasses(definition);
+
+      if (springBeanReloader.isUseful(clazz)) {
+        springBeanReloader.updateBean(clazz);
+      }
+
+      logger.info("Redefine class file {} success.", classFile.getName());
+    } catch (Throwable e) {
+      logger.error("Reload Spring Bean fail.", e);
+    }
+  }
+
+  @Override
+  public void createdHandle(File file) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("SpringBeanListener detect class file created: {}", file.getName());
     }
 
-    /**
-     * handler for file modifed
-     *
-     * @param file file
-     */
-    @Override
-    public void modifiedHandle(File file) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("SpringBeanListener detect class file modified: {}", file.getName());
-        }
+    fileChangedHandle(file);
+  }
 
-        fileChangedHandle(file);
+  /**
+   * handler for file modifed
+   *
+   * @param file file
+   */
+  @Override
+  public void modifiedHandle(File file) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("SpringBeanListener detect class file modified: {}", file.getName());
     }
 
-    @Override
-    public String toString() {
-        return SpringBeanListener.class.getSimpleName();
-    }
+    fileChangedHandle(file);
+  }
 
-    /**
-     * handler for file deleted
-     *
-     * @param file file
-     */
-    @Override
-    public void deletedHandle(File file) {
+  @Override
+  public String toString() {
+    return SpringBeanListener.class.getSimpleName();
+  }
 
-    }
+  /**
+   * handler for file deleted
+   *
+   * @param file file
+   */
+  @Override
+  public void deletedHandle(File file) {
+
+  }
 }

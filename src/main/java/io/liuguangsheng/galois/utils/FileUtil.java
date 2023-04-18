@@ -45,126 +45,126 @@ import org.slf4j.Logger;
  */
 public class FileUtil {
 
-    private static final Logger logger = new GaloisLog(FileUtil.class);
+  private static final Logger logger = new GaloisLog(FileUtil.class);
 
-    private FileUtil() {
+  private FileUtil() {
+  }
+
+  /**
+   * check file type by file name
+   *
+   * @param file     input file
+   * @param fileType target file type
+   * @return the boolean
+   */
+  public static boolean validFileType(File file, FileType fileType) {
+    return Objects.equals(getFileType(file), fileType.getFileType());
+  }
+
+  /**
+   * get file type by filename and include dot char in result
+   *
+   * @param file input file
+   * @return the file type
+   */
+  public static String getFileType(File file) {
+    if (file == null) {
+      return "";
     }
 
-    /**
-     * check file type by file name
-     *
-     * @param file     input file
-     * @param fileType target file type
-     * @return the boolean
-     */
-    public static boolean validFileType(File file, FileType fileType) {
-        return Objects.equals(getFileType(file), fileType.getFileType());
+    String name = file.getName();
+    int index = name.lastIndexOf(".");
+
+    if (index != -1) {
+      String fileType = name.substring(index);
+      return fileType.toLowerCase();
     }
 
-    /**
-     * get file type by filename and include dot char in result
-     *
-     * @param file input file
-     * @return the file type
-     */
-    public static String getFileType(File file) {
-        if (file == null) {
-            return "";
-        }
+    return "";
+  }
 
-        String name = file.getName();
-        int index = name.lastIndexOf(".");
-
-        if (index != -1) {
-            String fileType = name.substring(index);
-            return fileType.toLowerCase();
-        }
-
-        return "";
+  /**
+   * write byte array to file
+   *
+   * @param bytes the byte array
+   * @param path  target file
+   * @return the file
+   */
+  public static File writeFile(byte[] bytes, String path) {
+    if (bytes == null || bytes.length == 0) {
+      return null;
     }
 
-    /**
-     * write byte array to file
-     *
-     * @param bytes the byte array
-     * @param path  target file
-     * @return the file
-     */
-    public static File writeFile(byte[] bytes, String path) {
-        if (bytes == null || bytes.length == 0) {
-            return null;
-        }
-
-        try (FileOutputStream fos = new FileOutputStream(path)) {
-            fos.write(bytes, 0, bytes.length);
-        } catch (IOException e) {
-            logger.error("Write byte array to {} fail.", path, e);
-        }
-
-        return new File(path);
+    try (FileOutputStream fos = new FileOutputStream(path)) {
+      fos.write(bytes, 0, bytes.length);
+    } catch (IOException e) {
+      logger.error("Write byte array to {} fail.", path, e);
     }
 
-    /**
-     * read file to byte array
-     *
-     * @param file input file
-     * @return the byte [ ]
-     */
-    public static byte[] readFile(File file) {
-        if (file == null) {
-            return new byte[0];
-        }
+    return new File(path);
+  }
 
-        try (FileInputStream fileInputStream = new FileInputStream(file);
-             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-
-            byte[] b = new byte[1024];
-            int n;
-            while ((n = fileInputStream.read(b)) != -1) {
-                byteArrayOutputStream.write(b, 0, n);
-            }
-
-            return byteArrayOutputStream.toByteArray();
-        } catch (Exception e) {
-            logger.error("Convert binary file to byte array fail.", e);
-        }
-
-        return new byte[0];
+  /**
+   * read file to byte array
+   *
+   * @param file input file
+   * @return the byte [ ]
+   */
+  public static byte[] readFile(File file) {
+    if (file == null) {
+      return new byte[0];
     }
 
-    /**
-     * get text content in file
-     *
-     * @param file input file
-     * @return the string
-     */
-    public static String readTextFile(File file) {
-        if (file == null) {
-            return "";
-        }
+    try (FileInputStream fileInputStream = new FileInputStream(file);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
 
-        StringBuilder sb = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            br.lines().map(line -> line + Constant.LF).forEach(sb::append);
-        } catch (Exception e) {
-            logger.error("Read text file fail.", e);
-            return "";
-        }
+      byte[] b = new byte[1024];
+      int n;
+      while ((n = fileInputStream.read(b)) != -1) {
+        byteArrayOutputStream.write(b, 0, n);
+      }
 
-        return sb.toString();
+      return byteArrayOutputStream.toByteArray();
+    } catch (Exception e) {
+      logger.error("Convert binary file to byte array fail.", e);
     }
 
-    /**
-     * read file in classpath
-     *
-     * @param relativePath relative path
-     * @return the input stream
-     */
-    public static InputStream readClassPathFile(String relativePath) {
-        if (StringUtil.isBlank(relativePath)) {
-            return null;
-        }
+    return new byte[0];
+  }
 
-        return FileUtil.class.getClassLoader().getResourceAsStream(relativePath);
+  /**
+   * get text content in file
+   *
+   * @param file input file
+   * @return the string
+   */
+  public static String readTextFile(File file) {
+    if (file == null) {
+      return "";
     }
+
+    StringBuilder sb = new StringBuilder();
+    try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+      br.lines().map(line -> line + Constant.LF).forEach(sb::append);
+    } catch (Exception e) {
+      logger.error("Read text file fail.", e);
+      return "";
+    }
+
+    return sb.toString();
+  }
+
+  /**
+   * read file in classpath
+   *
+   * @param relativePath relative path
+   * @return the input stream
+   */
+  public static InputStream readClassPathFile(String relativePath) {
+    if (StringUtil.isBlank(relativePath)) {
+      return null;
+    }
+
+    return FileUtil.class.getClassLoader().getResourceAsStream(relativePath);
+  }
 }

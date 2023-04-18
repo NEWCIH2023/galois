@@ -43,17 +43,24 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface LazyBean {
 
-    /**
-     * Value string.
-     *
-     * @return the string
-     */
-    String value();
+  /**
+   * Value string.
+   *
+   * @return the string
+   */
+  String value();
 
-    /**
-     * Belong to class.
-     *
-     * @return the class
-     */
-    Class<? extends AgentService> manager();
+  /**
+   * Belong to class.
+   *
+   * @return the class
+   */
+  Class<? extends AgentService> manager();
+
+  /**
+   * register rank, the heigher value will be handle first
+   *
+   * @return the rank
+   */
+  int rank() default 0;
 }

@@ -39,105 +39,106 @@ import java.util.Map;
  */
 public class BannerService {
 
-    private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
-    private static final String BANNER = " ██████╗  █████╗ ██╗      ██████╗ ██╗███████╗\n" +
-            "██╔════╝ ██╔══██╗██║     ██╔═══██╗██║██╔════╝\n" +
-            "██║  ███╗███████║██║     ██║   ██║██║███████╗\n" +
-            "██║   ██║██╔══██║██║     ██║   ██║██║╚════██║\n" +
-            "╚██████╔╝██║  ██║███████╗╚██████╔╝██║███████║\n" +
-            " ╚═════╝ ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝╚══════╝";
+  private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
+  private static final String BANNER = " ██████╗  █████╗ ██╗      ██████╗ ██╗███████╗\n" +
+      "██╔════╝ ██╔══██╗██║     ██╔═══██╗██║██╔════╝\n" +
+      "██║  ███╗███████║██║     ██║   ██║██║███████╗\n" +
+      "██║   ██║██╔══██║██║     ██║   ██║██║╚════██║\n" +
+      "╚██████╔╝██║  ██║███████╗╚██████╔╝██║███████║\n" +
+      " ╚═════╝ ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝╚══════╝";
 
-    private BannerService() {
+  private BannerService() {
+  }
+
+  /**
+   * print banner
+   */
+  public static void printBanner() {
+    if (!globalConfig.getBoolean(ConfConstant.BANNER_ENABLE, true)) {
+      return;
     }
 
-    /**
-     * print banner
-     */
-    public static void printBanner() {
-        if (!globalConfig.getBoolean(ConfConstant.BANNER_ENABLE, true)) {
-            return;
-        }
+    String bannerBuilder = Constant.LF + BANNER + Constant.TAB + galoisVersion() + Constant.LF +
+        String.format(
+            " :: SpringBoot (%s) :: Spring (%s) :: MyBatis (%s)%n :: Jdk (%s)",
+            springBootVersion(), springVersion(), mybatisVersion(), jdkVersion()
+        ) +
+        Constant.LF;
+    System.out.println(bannerBuilder);
+  }
 
-        String bannerBuilder = Constant.LF + BANNER + Constant.TAB + galoisVersion() + Constant.LF +
-                String.format(
-                        " :: SpringBoot (%s) :: Spring (%s) :: MyBatis (%s)%n :: Jdk (%s)",
-                        springBootVersion(), springVersion(), mybatisVersion(), jdkVersion()
-                ) +
-                Constant.LF;
-        System.out.println(bannerBuilder);
+  /**
+   * spring boot version
+   *
+   * @return {@link String}
+   * @see String
+   */
+  private static String springBootVersion() {
+    try {
+      Class<?> springBootVersion = Class.forName("org.springframework.boot.SpringBootVersion");
+      Method getVersion = springBootVersion.getDeclaredMethod("getVersion");
+      return (String) getVersion.invoke(null);
+    } catch (Exception e) {
+      return "-";
     }
+  }
 
-    /**
-     * spring boot version
-     *
-     * @return {@link String}
-     * @see String
-     */
-    private static String springBootVersion() {
-        try {
-            Class<?> springBootVersion = Class.forName("org.springframework.boot.SpringBootVersion");
-            Method getVersion = springBootVersion.getDeclaredMethod("getVersion");
-            return (String) getVersion.invoke(null);
-        } catch (Exception e) {
-            return "-";
-        }
+  /**
+   * spring version
+   *
+   * @return {@link String}
+   * @see String
+   */
+  private static String springVersion() {
+    try {
+      Class<?> springVersion = Class.forName("org.springframework.core.SpringVersion");
+      Method getVersion = springVersion.getDeclaredMethod("getVersion");
+      return (String) getVersion.invoke(null);
+    } catch (Exception e) {
+      return "-";
     }
+  }
 
-    /**
-     * spring version
-     *
-     * @return {@link String}
-     * @see String
-     */
-    private static String springVersion() {
-        try {
-            Class<?> springVersion = Class.forName("org.springframework.core.SpringVersion");
-            Method getVersion = springVersion.getDeclaredMethod("getVersion");
-            return (String) getVersion.invoke(null);
-        } catch (Exception e) {
-            return "-";
-        }
+  /**
+   * jdk version
+   *
+   * @return {@link String}
+   * @see String
+   */
+  private static String jdkVersion() {
+    try {
+      return System.getProperty("java.version") + " " + System.getProperty("java.vm.name");
+    } catch (Exception e) {
+      return "-";
     }
+  }
 
-    /**
-     * jdk version
-     *
-     * @return {@link String}
-     * @see String
-     */
-    private static String jdkVersion() {
-        try {
-            return System.getProperty("java.version") + " " + System.getProperty("java.vm.name");
-        } catch (Exception e) {
-            return "-";
-        }
+  /**
+   * mybatis version
+   *
+   * @return {@link String}
+   * @see String
+   */
+  private static String mybatisVersion() {
+    try {
+      Class<?> mapperRegistry = Class.forName("org.apache.ibatis.binding.MapperRegistry");
+      Field knownMappers = mapperRegistry.getDeclaredField("knownMappers");
+      boolean flag = knownMappers.getType().equals(Map.class);
+      return flag ? ">= 3.2.0" : "<= 3.1.0";
+    } catch (Exception e) {
+      return "-";
     }
+  }
 
-    /**
-     * mybatis version
-     *
-     * @return {@link String}
-     * @see String
-     */
-    private static String mybatisVersion() {
-        try {
-            Class<?> mapperRegistry = Class.forName("org.apache.ibatis.binding.MapperRegistry");
-            Field knownMappers = mapperRegistry.getDeclaredField("knownMappers");
-            boolean flag = knownMappers.getType().equals(Map.class);
-            return flag ? ">= 3.2.0" : "<= 3.1.0";
-        } catch (Exception e) {
-            return "-";
-        }
-    }
-
-    /**
-     * galois version
-     *
-     * @return {@link String}
-     * @see String
-     */
-    private static String galoisVersion() {
-        return String.format("%s (%s)", globalConfig.getString(ConfConstant.GALOIS_VERSION, Constant.HYPHEN),
-                globalConfig.getString(ConfConstant.BUILD_TYPE));
-    }
+  /**
+   * galois version
+   *
+   * @return {@link String}
+   * @see String
+   */
+  private static String galoisVersion() {
+    return String.format("%s (%s)",
+        globalConfig.getString(ConfConstant.GALOIS_VERSION, Constant.HYPHEN),
+        globalConfig.getString(ConfConstant.BUILD_TYPE));
+  }
 }
