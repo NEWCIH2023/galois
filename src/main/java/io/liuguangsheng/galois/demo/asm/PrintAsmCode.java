@@ -32,7 +32,6 @@ import jdk.internal.org.objectweb.asm.util.ASMifier;
 import jdk.internal.org.objectweb.asm.util.Printer;
 import jdk.internal.org.objectweb.asm.util.Textifier;
 import jdk.internal.org.objectweb.asm.util.TraceClassVisitor;
-import org.springframework.web.servlet.handler.AbstractHandlerMethodMapping;
 
 /**
  * The type Print asm code.

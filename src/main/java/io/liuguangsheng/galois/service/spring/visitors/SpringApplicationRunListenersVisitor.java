@@ -64,9 +64,9 @@ public class SpringApplicationRunListenersVisitor extends MethodAdapter {
   public MethodVisitor visitMethod(int i, String s, String s1, String s2, String[] strings) {
     MethodVisitor mv = super.visitMethod(i, s, s1, s2, strings);
 
-//    if (Objects.equals(s, "<init>")) {
-//      return new RunMethod(ASM5, mv);
-//    }
+    if (Objects.equals(s, "<init>")) {
+      return new RunMethod(ASM5, mv);
+    }
 
     return mv;
   }
@@ -103,9 +103,9 @@ public class SpringApplicationRunListenersVisitor extends MethodAdapter {
         mv.visitInsn(POP);
         mv.visitInsn(RETURN);
         mv.visitEnd();
+      } else {
+        super.visitInsn(opcode);
       }
-
-      super.visitInsn(opcode);
     }
   }
 }

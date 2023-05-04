@@ -115,7 +115,9 @@ public class PremainService {
         MethodAdapter.class);
 
     if (logger.isDebugEnabled()) {
-      String visitorClassNames = visitorClasses.stream().map(Class::getSimpleName)
+      String visitorClassNames = visitorClasses.stream()
+          .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
+          .map(Class::getSimpleName)
           .collect(Collectors.joining(","));
       logger.debug("Had scan there visitorClass: {}", visitorClassNames);
     }
@@ -127,6 +129,9 @@ public class PremainService {
 
       MethodAdapter methodAdapter = (MethodAdapter) ClassUtil.getInstance(visitorClass);
       AsmVisitor visitor = visitorClass.getAnnotation(AsmVisitor.class);
+      if (visitor == null) {
+        continue;
+      }
 
       Optional.ofNullable(ClassUtil.getInstance(visitor.manager()))
           .ifPresent(object -> ((AgentService) object).registerMethodAdapter(methodAdapter));
@@ -176,7 +181,7 @@ public class PremainService {
         }
 
         MethodAdapter adapter = agentService.getMethodAdapterMap().get(newClassName);
-        return adapter.transform();
+        return adapter.transform(classfileBuffer);
       }
 
       return null;

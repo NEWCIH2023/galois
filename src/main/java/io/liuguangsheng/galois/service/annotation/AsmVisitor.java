@@ -54,4 +54,5 @@ public @interface AsmVisitor {
    * @return the class
    */
   Class<? extends AgentService> manager();
+
 }

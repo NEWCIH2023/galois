@@ -84,21 +84,27 @@ public abstract class MethodAdapter extends ClassVisitor {
    * Before transform.
    */
   protected void beforeTransform() {
-    if (logger.isDebugEnabled()) {
-//      CheckClassAdapter checker = new CheckClassAdapter(cw, true);
-//      cr.accept(checker, ClassReader.EXPAND_FRAMES);
-    }
+  }
+
+  /**
+   * After transform.
+   *
+   * @param result the result
+   */
+  protected void afterTransform(byte[] result) {
+    debugClassFile(result);
   }
 
   /**
    * convert byte[] of original class file
    *
+   * @param classBytes the class bytes
    * @return the byte []
    */
-  public byte[] transform() {
+  public byte[] transform(byte[] classBytes) {
 
     try {
-      cr = new ClassReader(className);
+      cr = new ClassReader(classBytes);
       // COMPUTE_MAXS means automatically compute the maximum stack size and the maximum number of local variables
       // of methods.
       // COMPUTE_FRAMES means automatically compute the stack map frames of methods from scratch.
@@ -111,7 +117,7 @@ public abstract class MethodAdapter extends ClassVisitor {
     cr.accept(this, 0);
     beforeTransform();
     byte[] result = cw.toByteArray();
-    debugClassFile(result);
+    afterTransform(result);
 
     return result;
   }

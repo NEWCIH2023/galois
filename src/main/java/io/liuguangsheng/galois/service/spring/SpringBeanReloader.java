@@ -33,11 +33,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.config.EmbeddedValueResolver;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
@@ -111,16 +111,13 @@ public class SpringBeanReloader implements
    * update request mapping
    *
    * @param bean
-   * @throws NoSuchMethodException
-   * @throws InvocationTargetException
-   * @throws IllegalAccessException
    */
   private void updateRequestMapping(Object bean)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    RequestMappingHandlerMapping handlerMapping = getContext().getBean(
-        RequestMappingHandlerMapping.class);
-    Method updateHandlerMethods = handlerMapping.getClass()
-        .getMethod("updateHandlerMethods", Object.class);
+    RequestMappingHandlerMapping handlerMapping = getContext().getBean(RequestMappingHandlerMapping.class);
+    Method updateHandlerMethods = handlerMapping.getClass().getMethod("updateHandlerMethods", Object.class);
+    // 清空method缓存，避免获取到带有旧注解value的mapping方法
+    ReflectionUtils.clearCache();
     updateHandlerMethods.invoke(handlerMapping, bean);
   }
 

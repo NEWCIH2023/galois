@@ -102,10 +102,11 @@ public class MyBatisConfigurationVisitor extends MethodAdapter {
         mv.visitVarInsn(ALOAD, 0);
         mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setConfiguration", "(L" + vClassName + ";)V",
             false);
+        mv.visitInsn(RETURN);
         mv.visitEnd();
+      } else {
+        super.visitInsn(opcode);
       }
-
-      super.visitInsn(opcode);
     }
   }
 }

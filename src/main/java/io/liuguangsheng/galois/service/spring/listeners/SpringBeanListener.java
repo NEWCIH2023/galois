@@ -67,9 +67,9 @@ public class SpringBeanListener implements FileChangedListener {
       // 结合class变动与java变动，当两者同时出现时，更新该class
       String className = ClassUtil.getClassNameFromClass(classFile);
 
-      if (!sourceManager.removeClassName(className)) {
-        return;
-      }
+//      if (!sourceManager.removeClassName(className)) {
+//        return;
+//      }
 
       byte[] classBytes = FileUtil.readFile(classFile);
       Class<?> clazz = Class.forName(className);
