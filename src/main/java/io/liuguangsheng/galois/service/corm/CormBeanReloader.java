@@ -87,10 +87,6 @@ public class CormBeanReloader implements BeanReloader<File>,
    */
   @Override
   public void updateBean(File mapperFile) {
-    if (configuration == null) {
-      logger.error("CormBeanRealoder not prepare ready. Configuration object is null.");
-      return;
-    }
 
     try (FileInputStream fis = new FileInputStream(mapperFile)) {
       Properties variables = configuration.getVariables();
@@ -114,8 +110,33 @@ public class CormBeanReloader implements BeanReloader<File>,
     logger.info("Reload mybatis mapper by xml file {} success.", mapperFile.getName());
   }
 
+  /**
+   * 注册新的实例对象
+   *
+   * @param object 待新增的实例对象
+   */
+  @Override
+  public void addBean(File object) {
+
+  }
+
   @Override
   public boolean isUseful(File file) {
+    return true;
+  }
+
+  /**
+   * 判断当前beanReloader是否准备完成
+   *
+   * @return
+   */
+  @Override
+  public boolean isPrepared() {
+    if (configuration == null) {
+      logger.error("CormBeanRealoder not prepare ready. Configuration object is null.");
+      return false;
+    }
+
     return true;
   }
 

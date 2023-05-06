@@ -63,4 +63,5 @@ public @interface LazyBean {
    * @return the rank
    */
   int rank() default 0;
+
 }

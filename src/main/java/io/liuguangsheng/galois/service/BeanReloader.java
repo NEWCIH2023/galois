@@ -41,10 +41,24 @@ public interface BeanReloader<T> {
   void updateBean(T object);
 
   /**
+   * 注册新的实例对象
+   *
+   * @param object 待新增的实例对象
+   */
+  void addBean(T object);
+
+  /**
    * Is useful boolean.
    *
    * @param object 用来判断当前实例对象是否可以被框架重新加载
    * @return 验证结果 boolean
    */
   boolean isUseful(T object);
+
+  /**
+   * 判断当前beanReloader是否准备完成
+   *
+   * @return
+   */
+  boolean isPrepared();
 }

@@ -28,6 +28,8 @@ import jdk.internal.org.objectweb.asm.Type;
 @AsmVisitor(value = "HandlerMethodMappingVisitor", manager = SpringAgentService.class)
 public class HandlerMethodMappingVisitor extends MethodAdapter {
 
+  public static final String UPDATE_HANDLER_METHODS = "updateHandlerMethods";
+
   /**
    * Instantiates a new Method adapter.
    */
@@ -38,7 +40,7 @@ public class HandlerMethodMappingVisitor extends MethodAdapter {
   @Override
   public void visitEnd() {
     {
-      MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "updateHandlerMethods", "(Ljava/lang/Object;)V", null, null);
+      MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, UPDATE_HANDLER_METHODS, "(Ljava/lang/Object;)V", null, null);
       mv.visitCode();
       mv.visitVarInsn(ALOAD, 1);
       mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false);
@@ -62,7 +64,8 @@ public class HandlerMethodMappingVisitor extends MethodAdapter {
       mv.visitVarInsn(ALOAD, 0);
       mv.visitVarInsn(ALOAD, 2);
       mv.visitVarInsn(ALOAD, 1);
-      mv.visitInvokeDynamicInsn("accept", "(Lorg/springframework/web/servlet/handler/AbstractHandlerMethodMapping;Ljava/lang/Class;Ljava/lang/Object;)Ljava/util/function/BiConsumer;",
+      mv.visitInvokeDynamicInsn("accept",
+          "(Lorg/springframework/web/servlet/handler/AbstractHandlerMethodMapping;Ljava/lang/Class;Ljava/lang/Object;)Ljava/util/function/BiConsumer;",
           new Handle(Opcodes.H_INVOKESTATIC, "java/lang/invoke/LambdaMetafactory", "metafactory",
               "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;"
                   + "Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;"),

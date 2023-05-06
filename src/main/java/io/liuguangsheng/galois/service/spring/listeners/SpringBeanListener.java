@@ -27,7 +27,6 @@ package io.liuguangsheng.galois.service.spring.listeners;
 import io.liuguangsheng.galois.constants.FileType;
 import io.liuguangsheng.galois.service.annotation.LazyBean;
 import io.liuguangsheng.galois.service.monitor.FileChangedListener;
-import io.liuguangsheng.galois.service.spring.JavaSourceManager;
 import io.liuguangsheng.galois.service.spring.SpringAgentService;
 import io.liuguangsheng.galois.service.spring.SpringBeanReloader;
 import io.liuguangsheng.galois.utils.ClassUtil;
@@ -49,7 +48,7 @@ public class SpringBeanListener implements FileChangedListener {
   private static final Logger logger = new GaloisLog(SpringBeanListener.class);
 
   private final SpringBeanReloader springBeanReloader = SpringBeanReloader.getInstance();
-  private static final JavaSourceManager sourceManager = JavaSourceManager.getInstance();
+  private static final ClassModifyRecorder sourceManager = ClassModifyRecorder.getInstance();
 
   @Override
   public boolean isUseful(File file) {

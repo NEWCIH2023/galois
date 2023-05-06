@@ -132,7 +132,7 @@
                 <galois.version>${version}</galois.version>
                 <print-asm-code.enable>false</print-asm-code.enable>
                 <reloader.mybatis.enable>true</reloader.mybatis.enable>
-                <reloader.spring.boot.enable>false</reloader.spring.boot.enable>
+                <reloader.spring.boot.enable>true</reloader.spring.boot.enable>
                 <build.type>RELEASE</build.type>
             </properties>
         </profile>

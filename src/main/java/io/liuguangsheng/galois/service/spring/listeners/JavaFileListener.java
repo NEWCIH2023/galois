@@ -3,7 +3,6 @@ package io.liuguangsheng.galois.service.spring.listeners;
 import static io.liuguangsheng.galois.constants.FileType.JAVA_FILE;
 import io.liuguangsheng.galois.service.annotation.LazyBean;
 import io.liuguangsheng.galois.service.monitor.FileChangedListener;
-import io.liuguangsheng.galois.service.spring.JavaSourceManager;
 import io.liuguangsheng.galois.service.spring.SpringAgentService;
 import io.liuguangsheng.galois.utils.ClassUtil;
 import io.liuguangsheng.galois.utils.FileUtil;
@@ -17,7 +16,7 @@ import java.util.Objects;
 @LazyBean(value = "JavaFileListener", manager = SpringAgentService.class, rank = 1)
 public class JavaFileListener implements FileChangedListener {
 
-  private static final JavaSourceManager sourceManager = JavaSourceManager.getInstance();
+  private static final ClassModifyRecorder classModifyRecorder = ClassModifyRecorder.getInstance();
 
   /**
    * is listener useful for this file object
@@ -38,7 +37,7 @@ public class JavaFileListener implements FileChangedListener {
   @Override
   public void createdHandle(File file) {
     String className = ClassUtil.getClassNameFromSource(file);
-    sourceManager.addClassName(className);
+    classModifyRecorder.addClassName(className);
   }
 
   /**
@@ -49,7 +48,7 @@ public class JavaFileListener implements FileChangedListener {
   @Override
   public void modifiedHandle(File file) {
     String className = ClassUtil.getClassNameFromSource(file);
-    sourceManager.addClassName(className);
+    classModifyRecorder.addClassName(className);
   }
 
   /**

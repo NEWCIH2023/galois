@@ -24,6 +24,7 @@
 
 package io.liuguangsheng.galois.service;
 
+import static io.liuguangsheng.galois.constants.Constant.COMMA;
 import io.liuguangsheng.galois.constants.ClassNameConstant;
 import io.liuguangsheng.galois.constants.Constant;
 import io.liuguangsheng.galois.service.annotation.AsmVisitor;
@@ -38,6 +39,7 @@ import java.lang.reflect.Modifier;
 import java.security.ProtectionDomain;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -62,8 +64,7 @@ public class PremainService {
     scanRunner();
 
     logger.debug("Scan {} agentServices as list [{}].", agentServiceMap.keySet().size(),
-        agentServiceMap.values().stream().map(AgentService::toString)
-            .collect(Collectors.joining(Constant.COMMA)));
+        agentServiceMap.values().stream().map(AgentService::toString).collect(Collectors.joining(COMMA)));
   }
 
   /**
@@ -92,8 +93,7 @@ public class PremainService {
    */
   private static void scanAgentService() {
     // scan agent service over abstract class named AgentService
-    Set<Class<?>> agentClasses = ClassUtil.scanBaseClass(ClassNameConstant.SERVICE_PACKAGE,
-        AgentService.class);
+    Set<Class<?>> agentClasses = ClassUtil.scanBaseClass(ClassNameConstant.SERVICE_PACKAGE, AgentService.class);
 
     for (Class<?> agentClass : agentClasses) {
       if (Modifier.isAbstract(agentClass.getModifiers())) {
@@ -111,15 +111,15 @@ public class PremainService {
    * scan asm visitor
    */
   private static void scanAsmVisitor() {
-    Set<Class<?>> visitorClasses = ClassUtil.scanBaseClass(ClassNameConstant.SERVICE_PACKAGE,
-        MethodAdapter.class);
+    Set<Class<?>> visitorClasses = ClassUtil.scanBaseClass(ClassNameConstant.SERVICE_PACKAGE, MethodAdapter.class);
 
     if (logger.isDebugEnabled()) {
-      String visitorClassNames = visitorClasses.stream()
+      List<String> visitorClassNameList = visitorClasses.stream()
           .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
-          .map(Class::getSimpleName)
-          .collect(Collectors.joining(","));
-      logger.debug("Had scan there visitorClass: {}", visitorClassNames);
+          .map(Class::getSimpleName).collect(Collectors.toList());
+
+      String visitorClassNames = String.join(COMMA, visitorClassNameList);
+      logger.debug("Had scan {} visitorClass: {}", visitorClassNameList.size(), visitorClassNames);
     }
 
     for (Class<?> visitorClass : visitorClasses) {
@@ -133,8 +133,7 @@ public class PremainService {
         continue;
       }
 
-      Optional.ofNullable(ClassUtil.getInstance(visitor.manager()))
-          .ifPresent(object -> ((AgentService) object).registerMethodAdapter(methodAdapter));
+      Optional.ofNullable(ClassUtil.getInstance(visitor.manager())).ifPresent(object -> ((AgentService) object).registerMethodAdapter(methodAdapter));
     }
   }
 
@@ -142,15 +141,13 @@ public class PremainService {
    * scan runner
    */
   private static void scanRunner() {
-    Set<Class<?>> runnerClasses = ClassUtil.scanBaseClass(ClassNameConstant.SERVICE_PACKAGE,
-        AbstractRunner.class);
+    Set<Class<?>> runnerClasses = ClassUtil.scanBaseClass(ClassNameConstant.SERVICE_PACKAGE, AbstractRunner.class);
     for (Class<?> runnerClass : runnerClasses) {
       if (Modifier.isAbstract(runnerClass.getModifiers())) {
         continue;
       }
 
-      Optional.ofNullable(ClassUtil.getInstance(runnerClass))
-          .ifPresent(object -> runManager.addRunner((AbstractRunner) object));
+      Optional.ofNullable(ClassUtil.getInstance(runnerClass)).ifPresent(object -> runManager.addRunner((AbstractRunner) object));
     }
 
   }
@@ -163,8 +160,7 @@ public class PremainService {
   static class CustomTransformer implements ClassFileTransformer {
 
     @Override
-    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
-        ProtectionDomain protectionDomain, byte[] classfileBuffer) {
+    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) {
       if (StringUtil.isBlank(className)) {
         return null;
       }

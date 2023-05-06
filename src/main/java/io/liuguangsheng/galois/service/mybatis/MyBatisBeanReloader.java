@@ -88,10 +88,6 @@ public class MyBatisBeanReloader implements BeanReloader<File>,
    */
   @Override
   public void updateBean(File xmlFile) {
-    if (configuration == null) {
-      logger.error("MybatisBeanReloader not prepare ready. Configuration object is null.");
-      return;
-    }
 
     try (FileInputStream fis = new FileInputStream(xmlFile)) {
       Properties properties = configuration.getVariables();
@@ -115,8 +111,31 @@ public class MyBatisBeanReloader implements BeanReloader<File>,
     logger.info("Reload mybatis mapper by xml file {} success.", xmlFile.getName());
   }
 
+  /**
+   * 注册新的实例对象
+   *
+   * @param object 待新增的实例对象
+   */
+  @Override
+  public void addBean(File object) {
+
+  }
+
   @Override
   public boolean isUseful(File file) {
+    return true;
+  }
+
+  /**
+   * 判断当前beanReloader是否准备完成
+   */
+  @Override
+  public boolean isPrepared() {
+    if (configuration == null) {
+      logger.error("MybatisBeanReloader not prepare ready. Configuration object is null.");
+      return false;
+    }
+
     return true;
   }
 
@@ -127,8 +146,7 @@ public class MyBatisBeanReloader implements BeanReloader<File>,
    */
   private void reloadXML(File xmlFile) throws IOException {
     InputStream is = Files.newInputStream(xmlFile.toPath());
-    XMLMapperBuilder builder = new XMLMapperBuilder(is, configuration, xmlFile.getName(),
-        configuration.getSqlFragments());
+    XMLMapperBuilder builder = new XMLMapperBuilder(is, configuration, xmlFile.getName(), configuration.getSqlFragments());
     builder.parse();
   }
 

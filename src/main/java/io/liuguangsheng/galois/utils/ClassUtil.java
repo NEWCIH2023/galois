@@ -37,6 +37,7 @@ import java.lang.annotation.Annotation;
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -79,8 +80,7 @@ public class ClassUtil {
   public static Instrumentation instrumentation;
 
   static {
-    compileDir =
-        System.getProperty("java.io.tmpdir") + File.separator + "GaloisCompile" + File.separator;
+    compileDir = System.getProperty("java.io.tmpdir") + File.separator + "GaloisCompile" + File.separator;
     File directory = new File(compileDir);
     if (!directory.exists()) {
       try {
@@ -222,6 +222,11 @@ public class ClassUtil {
    */
   public static void setInstrumentation(Instrumentation instrumentation) {
     ClassUtil.instrumentation = instrumentation;
+  }
+
+  public static boolean isClass(Class<?> clazz) {
+    int m = clazz.getModifiers();
+    return !Modifier.isAbstract(m) && !Modifier.isInterface(m);
   }
 
   /**
