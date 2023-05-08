@@ -33,6 +33,7 @@ import io.liuguangsheng.galois.utils.FileUtil;
 import io.liuguangsheng.galois.utils.GaloisLog;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.slf4j.Logger;
@@ -77,7 +78,7 @@ public class MyBatisXmlListener implements FileChangedListener {
       Document document = db.parse(file);
       DocumentType documentType = document.getDoctype();
       return documentType != null && documentType.toString().contains(DOC_TYPE);
-    } catch (SAXParseException ignored) {
+    } catch (SAXParseException | FileNotFoundException ignored) {
       return false;
     } catch (Throwable e) {
       logger.error("Parse xml file fail. Check it's file type.", e);

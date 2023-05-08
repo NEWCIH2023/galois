@@ -48,7 +48,7 @@ public class SpringBeanListener implements FileChangedListener {
   private static final Logger logger = new GaloisLog(SpringBeanListener.class);
 
   private final SpringBeanReloader springBeanReloader = SpringBeanReloader.getInstance();
-  private static final ClassModifyRecorder sourceManager = ClassModifyRecorder.getInstance();
+  private static final ClassChangedCache classChangedCache = ClassChangedCache.getInstance();
 
   @Override
   public boolean isUseful(File file) {
@@ -65,10 +65,9 @@ public class SpringBeanListener implements FileChangedListener {
     try {
       // 结合class变动与java变动，当两者同时出现时，更新该class
       String className = ClassUtil.getClassNameFromClass(classFile);
-
-//      if (!sourceManager.removeClassName(className)) {
-//        return;
-//      }
+      if (!classChangedCache.handleIfExisted(className)) {
+        return;
+      }
 
       byte[] classBytes = FileUtil.readFile(classFile);
       Class<?> clazz = Class.forName(className);
@@ -120,6 +119,5 @@ public class SpringBeanListener implements FileChangedListener {
    */
   @Override
   public void deletedHandle(File file) {
-
   }
 }

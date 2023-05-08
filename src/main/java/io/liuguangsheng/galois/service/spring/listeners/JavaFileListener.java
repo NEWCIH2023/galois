@@ -16,7 +16,7 @@ import java.util.Objects;
 @LazyBean(value = "JavaFileListener", manager = SpringAgentService.class, rank = 1)
 public class JavaFileListener implements FileChangedListener {
 
-  private static final ClassModifyRecorder classModifyRecorder = ClassModifyRecorder.getInstance();
+  private static final ClassChangedCache classChangedCache = ClassChangedCache.getInstance();
 
   /**
    * is listener useful for this file object
@@ -37,7 +37,7 @@ public class JavaFileListener implements FileChangedListener {
   @Override
   public void createdHandle(File file) {
     String className = ClassUtil.getClassNameFromSource(file);
-    classModifyRecorder.addClassName(className);
+    classChangedCache.hadChanged(className);
   }
 
   /**
@@ -48,7 +48,7 @@ public class JavaFileListener implements FileChangedListener {
   @Override
   public void modifiedHandle(File file) {
     String className = ClassUtil.getClassNameFromSource(file);
-    classModifyRecorder.addClassName(className);
+    classChangedCache.hadChanged(className);
   }
 
   /**

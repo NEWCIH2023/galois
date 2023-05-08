@@ -14,7 +14,7 @@ public class TestController {
 
   @GetMapping("star")
   public String getStr() {
-    return "str";
+    return "fewf";
   }
 
 }

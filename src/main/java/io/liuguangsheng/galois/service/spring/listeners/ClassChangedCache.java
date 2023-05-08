@@ -1,29 +1,28 @@
 package io.liuguangsheng.galois.service.spring.listeners;
 
 import io.liuguangsheng.galois.utils.GaloisLog;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import org.slf4j.Logger;
 
 /**
- * The type Java source manager.
+ * record the changed java file name
  *
  * @author liuguangsheng
  * @since 1.0.0
  */
-public class ClassModifyRecorder {
+public class ClassChangedCache {
 
-  private final Set<String> changedClassNames = new HashSet<>(1 << 10);
-
-  private static final ClassModifyRecorder instance = new ClassModifyRecorder();
-  private static final Logger logger = new GaloisLog(ClassModifyRecorder.class);
+  private final Set<String> changedClassNames = new CopyOnWriteArraySet<>();
+  private static final ClassChangedCache instance = new ClassChangedCache();
+  private static final Logger logger = new GaloisLog(ClassChangedCache.class);
 
   /**
    * Gets instance.
    *
    * @return the instance
    */
-  public static ClassModifyRecorder getInstance() {
+  public static ClassChangedCache getInstance() {
     return instance;
   }
 
@@ -32,7 +31,7 @@ public class ClassModifyRecorder {
    *
    * @param className the class name
    */
-  public void addClassName(String className) {
+  public void hadChanged(String className) {
     if (logger.isDebugEnabled()) {
       logger.debug("记录到类{}源码发生变动.", className);
     }
@@ -45,7 +44,7 @@ public class ClassModifyRecorder {
    *
    * @param className the class name
    */
-  public boolean removeClassName(String className) {
+  public boolean handleIfExisted(String className) {
     if (logger.isDebugEnabled()) {
       logger.debug("类{}的源码变动已被处理.", className);
     }
@@ -56,7 +55,7 @@ public class ClassModifyRecorder {
   /**
    * Clear class name.
    */
-  public void clearClassName() {
+  public void clearCache() {
     if (logger.isDebugEnabled()) {
       logger.debug("已清空类源码变动缓存.");
     }
@@ -64,4 +63,12 @@ public class ClassModifyRecorder {
     changedClassNames.clear();
   }
 
+  public void printCache() {
+    if (logger.isDebugEnabled()) {
+      logger.debug("当前类源码变动缓存如下");
+    }
+
+    changedClassNames.forEach(name -> System.out.print(name + ",\t"));
+    System.out.println();
+  }
 }

@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 1.0.0
  **/
 @RestController
-@RequestMapping("f3strf3str")
+@RequestMapping("f3st")
 public class Test2433 {
 
   @GetMapping("fstr")
   public String str() {
-    return "f3sf3strf3strtr";
+    return "f3sfafef";
   }
 
 }
