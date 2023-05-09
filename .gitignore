@@ -4,6 +4,9 @@ logs/
 .DS_Store
 **/*.class
 **/*.log
+*.ps1
+*.sh
+demoProject/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
