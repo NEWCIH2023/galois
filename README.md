@@ -2,7 +2,7 @@
 
 ## 介绍
 
-开源的springboot热部署工具，基于Java Agent方式
+一个开源的springboot热部署工具，基于Java Agent方式。目前支持MyBatis、SpringBoot等框架的代码热部署。
 
 ## 软件架构
 
