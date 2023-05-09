@@ -3,6 +3,7 @@
 ## 介绍
 
 一个开源的springboot热部署工具，基于Java Agent方式。目前支持MyBatis、SpringBoot等框架的代码热部署。
+Java版本上，目前仅支持JDK 8版本。因为使用了JDK自带的ASM框架，因此暂无适配其它Java版本。
 
 ## 软件架构
 
