@@ -33,6 +33,7 @@ import io.liuguangsheng.galois.utils.GaloisLog;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Objects;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -92,16 +93,29 @@ public class SpringBeanReloader implements
         // if an old bean that had managered by spring container
         beanName = beanNames[0];
         factory.destroySingleton(beanName);
-        factory.registerSingleton(beanName, bean);
-        if (isHandler(clazz)) {
-          updateRequestMapping(bean);
-        }
       } else {
         // if a new bean that hadn't managered by spring container
-        factory.registerSingleton(UUID.randomUUID().toString(), bean);
-        if (isHandler(clazz)) {
-          updateRequestMapping(bean);
+        beanName = bean.getClass().getSimpleName();
+        if (beanName.length() > 1) {
+          beanName = Character.toLowerCase(beanName.charAt(0)) + beanName.substring(1);
+        } else {
+          beanName = beanName.toLowerCase();
         }
+
+        String[] allBeanNames = factory.getBeanDefinitionNames();
+        for (String bn : allBeanNames) {
+          if (Objects.equals(bn, beanName)) {
+            beanName = UUID.randomUUID().toString();
+            break;
+          }
+        }
+      }
+
+      factory.registerSingleton(beanName, bean);
+      context.refresh();
+
+      if (isHandler(clazz)) {
+        updateRequestMapping(bean);
       }
     } catch (InstantiationException ie) {
       logger.error(

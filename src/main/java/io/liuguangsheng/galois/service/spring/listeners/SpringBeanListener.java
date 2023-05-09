@@ -66,7 +66,12 @@ public class SpringBeanListener implements FileChangedListener {
       // 结合class变动与java变动，当两者同时出现时，更新该class
       String className = ClassUtil.getClassNameFromClass(classFile);
       if (!classChangedCache.handleIfExisted(className)) {
+        if (logger.isDebugEnabled()) {
+          logger.debug("当前类{}处理失败，并未记录在缓存中", className);
+        }
         return;
+      } else {
+        logger.debug("当前类{}处理成功，已将其移除缓存", className);
       }
 
       byte[] classBytes = FileUtil.readFile(classFile);

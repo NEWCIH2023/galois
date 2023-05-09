@@ -33,8 +33,8 @@ import io.liuguangsheng.galois.service.monitor.FileWatchService;
 import io.liuguangsheng.galois.utils.ClassUtil;
 import io.liuguangsheng.galois.utils.GaloisLog;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -71,7 +71,7 @@ public class AgentInitializeRunner extends AbstractRunner {
           .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
           .map(clazz -> (AgentService) ClassUtil.getInstance(clazz))
           .collect(Collectors.toSet());
-      List<FileChangedListener> fileChangedListeners = new ArrayList<>(64);
+      Map<Integer, FileChangedListener> tmpRankMap = new HashMap<>(64);
 
       for (AgentService agentService : agentServices) {
         if (!agentService.isUseful()) {
@@ -93,12 +93,14 @@ public class AgentInitializeRunner extends AbstractRunner {
           } else if (FileChangedListener.class.isAssignableFrom(factory)) {
             FileChangedListener listener = (FileChangedListener) ClassUtil.getInstance(factory);
             agentService.registerFileChangedListener(listener);
-            fileChangedListeners.add(lazyBean.rank(), listener);
+            tmpRankMap.put(lazyBean.rank(), listener);
           }
         }
       }
 
-      fileChangedListeners.forEach(fileWatchService::registerListener);
+      tmpRankMap.keySet().stream()
+          .sorted((a, b) -> b - a)
+          .forEach(key -> fileWatchService.registerListener(tmpRankMap.get(key)));
       fileWatchService.start();
     } catch (Exception e) {
       logger.error("初始化Galois组件发生异常", e);

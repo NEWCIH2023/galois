@@ -14,7 +14,7 @@ public class Test24 {
 
   @GetMapping("fstr")
   public String str() {
-    return "f3str";
+    return "f3wsr";
   }
 
 }
