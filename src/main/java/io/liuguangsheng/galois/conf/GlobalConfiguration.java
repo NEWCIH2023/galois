@@ -39,14 +39,14 @@ import java.util.Properties;
 public class GlobalConfiguration {
 
   private static final GlobalConfiguration globalConfiguration = new GlobalConfiguration();
+  public static final String GALOIS_PROPERTIES = "galois.properties";
   /**
    * parse config key-value entry in galois.properties
    */
   private final Properties configuration = new Properties();
 
   private GlobalConfiguration() {
-    try (InputStream is = Thread.currentThread().getContextClassLoader()
-        .getResourceAsStream("galois.properties")) {
+    try (InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(GALOIS_PROPERTIES)) {
       configuration.load(is);
     } catch (IOException e) {
       throw new RuntimeException(e);
