@@ -73,8 +73,7 @@ public class MyBatisXmlListener implements FileChangedListener {
       dbf.setValidating(false);
       DocumentBuilder db = dbf.newDocumentBuilder();
       // do no validate dtd
-      db.setEntityResolver(
-          ((publicId, systemId) -> new InputSource(new ByteArrayInputStream(new byte[0]))));
+      db.setEntityResolver(((publicId, systemId) -> new InputSource(new ByteArrayInputStream(new byte[0]))));
       Document document = db.parse(file);
       DocumentType documentType = document.getDoctype();
       return documentType != null && documentType.toString().contains(DOC_TYPE);

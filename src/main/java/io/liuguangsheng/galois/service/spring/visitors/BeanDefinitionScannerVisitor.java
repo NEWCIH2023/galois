@@ -24,6 +24,7 @@
 
 package io.liuguangsheng.galois.service.spring.visitors;
 
+import static io.liuguangsheng.galois.constants.ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER;
 import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
 import static jdk.internal.org.objectweb.asm.Opcodes.ATHROW;
@@ -31,7 +32,6 @@ import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
 import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
-import io.liuguangsheng.galois.constants.ClassNameConstant;
 import io.liuguangsheng.galois.constants.Constant;
 import io.liuguangsheng.galois.service.MethodAdapter;
 import io.liuguangsheng.galois.service.annotation.AsmVisitor;
@@ -54,12 +54,11 @@ public class BeanDefinitionScannerVisitor extends MethodAdapter {
    * Instantiates a new Bean definition scanner visitor.
    */
   public BeanDefinitionScannerVisitor() {
-    super(ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER);
+    super(CLASS_PATH_BEAN_DEFINITION_SCANNER);
   }
 
   @Override
-  public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
-      String[] exceptions) {
+  public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
     MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
 
     if (Objects.equals("doScan", name)) {
@@ -92,16 +91,13 @@ public class BeanDefinitionScannerVisitor extends MethodAdapter {
     @Override
     public void visitInsn(int opcode) {
       if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-        String pClassName = SpringBeanReloader.class.getName()
-            .replace(Constant.DOT, Constant.SLASH);
+        String pClassName = SpringBeanReloader.class.getName().replace(Constant.DOT, Constant.SLASH);
         String vClassName = className.replace(Constant.DOT, Constant.SLASH);
 
         mv.visitCode();
-        mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";",
-            false);
+        mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";", false);
         mv.visitVarInsn(ALOAD, 0);
-        mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setScanner", "(L" + vClassName + ";)V",
-            false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setScanner", "(L" + vClassName + ";)V", false);
       }
 
       super.visitInsn(opcode);

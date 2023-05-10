@@ -1,5 +1,6 @@
 package io.liuguangsheng.galois.service.spring.visitors;
 
+import static io.liuguangsheng.galois.constants.ClassNameConstant.ABSTRACT_HANDLER_METHOD_MAPPING;
 import static jdk.internal.org.objectweb.asm.Opcodes.ACC_PRIVATE;
 import static jdk.internal.org.objectweb.asm.Opcodes.ACC_PUBLIC;
 import static jdk.internal.org.objectweb.asm.Opcodes.ACC_SYNTHETIC;
@@ -10,7 +11,6 @@ import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEINTERFACE;
 import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
-import io.liuguangsheng.galois.constants.ClassNameConstant;
 import io.liuguangsheng.galois.service.MethodAdapter;
 import io.liuguangsheng.galois.service.annotation.AsmVisitor;
 import io.liuguangsheng.galois.service.spring.SpringAgentService;
@@ -34,7 +34,7 @@ public class HandlerMethodMappingVisitor extends MethodAdapter {
    * Instantiates a new Method adapter.
    */
   public HandlerMethodMappingVisitor() {
-    super(ClassNameConstant.ABSTRACT_HANDLER_METHOD_MAPPING);
+    super(ABSTRACT_HANDLER_METHOD_MAPPING);
   }
 
   @Override

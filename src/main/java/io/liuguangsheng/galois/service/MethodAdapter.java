@@ -38,7 +38,6 @@ import java.util.Optional;
 import jdk.internal.org.objectweb.asm.ClassReader;
 import jdk.internal.org.objectweb.asm.ClassVisitor;
 import jdk.internal.org.objectweb.asm.ClassWriter;
-import jdk.internal.org.objectweb.asm.util.CheckClassAdapter;
 import org.slf4j.Logger;
 
 /**

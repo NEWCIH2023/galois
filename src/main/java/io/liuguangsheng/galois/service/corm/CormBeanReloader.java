@@ -110,16 +110,6 @@ public class CormBeanReloader implements BeanReloader<File>,
     logger.info("Reload mybatis mapper by xml file {} success.", mapperFile.getName());
   }
 
-  /**
-   * 注册新的实例对象
-   *
-   * @param object 待新增的实例对象
-   */
-  @Override
-  public void addBean(File object) {
-
-  }
-
   @Override
   public boolean isUseful(File file) {
     return true;

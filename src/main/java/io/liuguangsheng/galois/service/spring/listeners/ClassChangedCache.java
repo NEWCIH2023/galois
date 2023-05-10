@@ -13,9 +13,9 @@ import org.slf4j.Logger;
  */
 public class ClassChangedCache {
 
-  private final Set<String> changedClassNames = new CopyOnWriteArraySet<>();
   private static final ClassChangedCache instance = new ClassChangedCache();
   private static final Logger logger = new GaloisLog(ClassChangedCache.class);
+  private final Set<String> changedClassNames = new CopyOnWriteArraySet<>();
 
   /**
    * Gets instance.
@@ -69,6 +69,5 @@ public class ClassChangedCache {
     }
 
     changedClassNames.forEach(name -> System.out.print(name + ",\t"));
-    System.out.println();
   }
 }

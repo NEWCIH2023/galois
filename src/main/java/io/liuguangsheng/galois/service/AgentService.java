@@ -72,8 +72,7 @@ public abstract class AgentService {
   }
 
   /**
-   * 检测到当前已经加载了名为loadedClassName的类时，则更新该AgentService的enabled值，使其++，当enabled值等于
-   * necessaryClasses的大小时，表示该agentService正式启用
+   * 检测到当前已经加载了名为loadedClassName的类时，则更新该AgentService的enabled值，使其++，当enabled值等于 necessaryClasses的大小时，表示该agentService正式启用
    *
    * @param loadedClassName loaded class name
    * @return 项目是否加载了对应的类名的类 boolean

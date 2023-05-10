@@ -67,8 +67,7 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
   }
 
   /**
-   * Called once the {@link ApplicationContext} has been created and prepared, but before sources
-   * have been loaded.
+   * Called once the {@link ApplicationContext} has been created and prepared, but before sources have been loaded.
    *
    * @param context the application context
    */
@@ -86,9 +85,8 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
   }
 
   /**
-   * The context has been refreshed and the application has started but
-   * {@link CommandLineRunner CommandLineRunners} and {@link ApplicationRunner ApplicationRunners}
-   * have not been called.
+   * The context has been refreshed and the application has started but {@link CommandLineRunner CommandLineRunners} and {@link ApplicationRunner ApplicationRunners} have not been
+   * called.
    *
    * @param context the application context.
    * @since 2.0.0
@@ -98,8 +96,7 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
   }
 
   /**
-   * Called immediately before the run method finishes, when the application context has been
-   * refreshed and all {@link CommandLineRunner CommandLineRunners} and
+   * Called immediately before the run method finishes, when the application context has been refreshed and all {@link CommandLineRunner CommandLineRunners} and
    * {@link ApplicationRunner ApplicationRunners} have been called.
    *
    * @param context the application context.
@@ -112,8 +109,7 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
   /**
    * Called when a failure occurs when running the application.
    *
-   * @param context   the application context or {@code null} if a failure occurred before the
-   *                  context was created
+   * @param context   the application context or {@code null} if a failure occurred before the context was created
    * @param exception the failure
    * @since 2.0.0
    */

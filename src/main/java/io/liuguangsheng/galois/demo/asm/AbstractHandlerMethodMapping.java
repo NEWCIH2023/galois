@@ -82,14 +82,10 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
     ALLOW_CORS_CONFIG.setAllowCredentials(true);
   }
 
-
+  private final MappingRegistry mappingRegistry = new MappingRegistry();
   private boolean detectHandlerMethodsInAncestorContexts = false;
-
   @Nullable
   private HandlerMethodMappingNamingStrategy<T> namingStrategy;
-
-  private final MappingRegistry mappingRegistry = new MappingRegistry();
-
 
   /**
    * Whether to detect handler methods in beans in ancestor ApplicationContexts.
@@ -464,6 +460,65 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
    */
   protected abstract Comparator<T> getMappingComparator(HttpServletRequest request);
 
+  public void updateHandlerMethods(Object handler) {
+    Class<?> userType = ClassUtils.getUserClass(handler.getClass());
+
+    Map<Method, T> methods = MethodIntrospector.selectMethods(userType, (MetadataLookup<T>) method -> getMappingForMethod(method, userType));
+
+    methods.forEach(((method, mapping) -> {
+      Method invocableMethod = AopUtils.selectInvocableMethod(method, userType);
+      unregisterMapping(mapping);
+      registerHandlerMethod(handler, invocableMethod, mapping);
+    }));
+  }
+
+  private static class MappingRegistration<T> {
+
+    private final T mapping;
+
+    private final HandlerMethod handlerMethod;
+
+    private final List<String> directUrls;
+
+    @Nullable
+    private final String mappingName;
+
+    public MappingRegistration(T mapping, HandlerMethod handlerMethod,
+        @Nullable List<String> directUrls, @Nullable String mappingName) {
+
+      Assert.notNull(mapping, "Mapping must not be null");
+      Assert.notNull(handlerMethod, "HandlerMethod must not be null");
+      this.mapping = mapping;
+      this.handlerMethod = handlerMethod;
+      this.directUrls = (directUrls != null ? directUrls : Collections.emptyList());
+      this.mappingName = mappingName;
+    }
+
+    public T getMapping() {
+      return this.mapping;
+    }
+
+    public HandlerMethod getHandlerMethod() {
+      return this.handlerMethod;
+    }
+
+    public List<String> getDirectUrls() {
+      return this.directUrls;
+    }
+
+    @Nullable
+    public String getMappingName() {
+      return this.mappingName;
+    }
+  }
+
+  private static class EmptyHandler {
+
+    @SuppressWarnings("unused")
+    public void handle() {
+      throw new UnsupportedOperationException("Not implemented");
+    }
+  }
 
   /**
    * A registry that maintains all mappings to handler methods, exposing methods to perform lookups and providing concurrent access.
@@ -665,48 +720,6 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
     }
   }
 
-
-  private static class MappingRegistration<T> {
-
-    private final T mapping;
-
-    private final HandlerMethod handlerMethod;
-
-    private final List<String> directUrls;
-
-    @Nullable
-    private final String mappingName;
-
-    public MappingRegistration(T mapping, HandlerMethod handlerMethod,
-        @Nullable List<String> directUrls, @Nullable String mappingName) {
-
-      Assert.notNull(mapping, "Mapping must not be null");
-      Assert.notNull(handlerMethod, "HandlerMethod must not be null");
-      this.mapping = mapping;
-      this.handlerMethod = handlerMethod;
-      this.directUrls = (directUrls != null ? directUrls : Collections.emptyList());
-      this.mappingName = mappingName;
-    }
-
-    public T getMapping() {
-      return this.mapping;
-    }
-
-    public HandlerMethod getHandlerMethod() {
-      return this.handlerMethod;
-    }
-
-    public List<String> getDirectUrls() {
-      return this.directUrls;
-    }
-
-    @Nullable
-    public String getMappingName() {
-      return this.mappingName;
-    }
-  }
-
-
   /**
    * A thin wrapper around a matched HandlerMethod and its mapping, for the purpose of comparing the best match with a comparator in the context of the current request.
    */
@@ -727,7 +740,6 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
     }
   }
 
-
   private class MatchComparator implements Comparator<Match> {
 
     private final Comparator<T> comparator;
@@ -740,26 +752,5 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
     public int compare(Match match1, Match match2) {
       return this.comparator.compare(match1.mapping, match2.mapping);
     }
-  }
-
-
-  private static class EmptyHandler {
-
-    @SuppressWarnings("unused")
-    public void handle() {
-      throw new UnsupportedOperationException("Not implemented");
-    }
-  }
-
-  public void updateHandlerMethods(Object handler) {
-    Class<?> userType = ClassUtils.getUserClass(handler.getClass());
-
-    Map<Method, T> methods = MethodIntrospector.selectMethods(userType, (MetadataLookup<T>) method -> getMappingForMethod(method, userType));
-
-    methods.forEach(((method, mapping) -> {
-      Method invocableMethod = AopUtils.selectInvocableMethod(method, userType);
-      unregisterMapping(mapping);
-      registerHandlerMethod(handler, invocableMethod, mapping);
-    }));
   }
 }

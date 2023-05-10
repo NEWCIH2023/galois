@@ -30,6 +30,7 @@ import io.liuguangsheng.galois.service.BeanReloader;
 import io.liuguangsheng.galois.service.annotation.LazyBean;
 import io.liuguangsheng.galois.service.monitor.FileChangedListener;
 import io.liuguangsheng.galois.service.monitor.FileWatchService;
+import io.liuguangsheng.galois.service.monitor.JdkFileWatchService;
 import io.liuguangsheng.galois.utils.ClassUtil;
 import io.liuguangsheng.galois.utils.GaloisLog;
 import java.lang.reflect.Modifier;
@@ -47,7 +48,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 public class AgentInitializeRunner extends AbstractRunner {
 
-  private static final FileWatchService fileWatchService = FileWatchService.getInstance();
+  private static final FileWatchService fileWatchService = JdkFileWatchService.getInstance();
   private static final Logger logger = new GaloisLog(AgentInitializeRunner.class);
 
   /**
@@ -63,7 +64,7 @@ public class AgentInitializeRunner extends AbstractRunner {
       return;
     }
 
-    logger.info("{} with context {} is {}", getClass().getSimpleName(), context.getId(), "started");
+    logger.info("{} with context {} is {}.", getClass().getSimpleName(), context.getId(), "started");
 
     try {
       Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(SERVICE_PACKAGE, LazyBean.class);
@@ -103,7 +104,7 @@ public class AgentInitializeRunner extends AbstractRunner {
           .forEach(key -> fileWatchService.registerListener(tmpRankMap.get(key)));
       fileWatchService.start();
     } catch (Exception e) {
-      logger.error("初始化Galois组件发生异常", e);
+      logger.error("初始化Galois组件发生异常.", e);
     }
   }
 }

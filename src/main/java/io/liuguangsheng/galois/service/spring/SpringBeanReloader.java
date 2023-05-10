@@ -50,10 +50,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  * @author liuguangsheng
  */
 @LazyBean(value = "SpringBeanReloader", manager = SpringAgentService.class)
-public class SpringBeanReloader implements
-    BeanReloader<Class<?>>,
-    ApplicationContextVisitor.NecessaryMethods,
-    BeanDefinitionScannerVisitor.NecessaryMethods {
+public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationContextVisitor.NecessaryMethods, BeanDefinitionScannerVisitor.NecessaryMethods {
 
   private static final Logger logger = new GaloisLog(SpringBeanReloader.class);
   private static final SpringBeanReloader instance = new SpringBeanReloader();
@@ -118,32 +115,6 @@ public class SpringBeanReloader implements
         updateRequestMapping(bean);
       }
     } catch (InstantiationException ie) {
-      logger.error(
-          "Can't create a new object by newInstance method, ensure that's not an abstract class.");
-    } catch (Throwable e) {
-      logger.error("SpringBeanReloader update bean fail.", e);
-    }
-
-    logger.info("SpringBeanReloader reload class {} success.", clazz.getSimpleName());
-  }
-
-  /**
-   * 注册新的实例对象
-   *
-   * @param clazz 待新增的实例对象
-   */
-  @Override
-  public void addBean(Class<?> clazz) {
-    DefaultListableBeanFactory factory = (DefaultListableBeanFactory) getContext().getAutowireCapableBeanFactory();
-
-    try {
-      Object bean = clazz.newInstance();
-      factory.registerSingleton(UUID.randomUUID().toString(), bean);
-
-      if (isHandler(clazz)) {
-        updateRequestMapping(bean);
-      }
-    } catch (InstantiationException ie) {
       logger.error("Can't create a new object by newInstance method, ensure that's not an abstract class.");
     } catch (Throwable e) {
       logger.error("SpringBeanReloader update bean fail.", e);
@@ -193,8 +164,7 @@ public class SpringBeanReloader implements
   @Override
   public boolean isPrepared() {
     if (scanner == null || context == null) {
-      logger.warn(
-          "SpringBeanReloader not prepare ready. BeanDefinitionScanner or ApplicationContext object is null.");
+      logger.warn("SpringBeanReloader not prepare ready. BeanDefinitionScanner or ApplicationContext object is null.");
       return false;
     }
 

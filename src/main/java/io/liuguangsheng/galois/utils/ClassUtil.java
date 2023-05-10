@@ -25,6 +25,7 @@
 
 package io.liuguangsheng.galois.utils;
 
+import static io.liuguangsheng.galois.constants.Constant.GET_INSTANCE;
 import static org.springframework.core.io.support.ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX;
 import static org.springframework.util.ClassUtils.convertClassNameToResourcePath;
 import io.liuguangsheng.galois.constants.Constant;
@@ -102,7 +103,7 @@ public class ClassUtil {
   public static Object getInstance(Class<?> clazz) {
     try {
       // is static method getInstance exists?
-      Method getInstanceMethod = clazz.getMethod(Constant.GET_INSTANCE);
+      Method getInstanceMethod = clazz.getMethod(GET_INSTANCE);
       return getInstanceMethod.invoke(null);
       // or invoke newInstance method
     } catch (NoSuchMethodException e) {
@@ -158,17 +159,14 @@ public class ClassUtil {
    * @param excludeFilters  exclude filters
    * @return the set
    */
-  public static Set<Class<?>> scanPackageClass(String basePackage, List<TypeFilter> includeFileters,
-      List<TypeFilter> excludeFilters) {
+  public static Set<Class<?>> scanPackageClass(String basePackage, List<TypeFilter> includeFileters, List<TypeFilter> excludeFilters) {
     ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
-    MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(
-        resourcePatternResolver);
+    MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(resourcePatternResolver);
     Set<Class<?>> result = new HashSet<>(128);
 
     try {
       String base = SystemPropertyUtils.resolvePlaceholders(basePackage);
-      String searchPath =
-          CLASSPATH_ALL_URL_PREFIX + convertClassNameToResourcePath(base) + "/**/*.class";
+      String searchPath = CLASSPATH_ALL_URL_PREFIX + convertClassNameToResourcePath(base) + "/**/*.class";
       Resource[] resources = resourcePatternResolver.getResources(searchPath);
       for (Resource resource : resources) {
         if (resource.isReadable()) {
@@ -198,7 +196,6 @@ public class ClassUtil {
           }
         }
       }
-
     } catch (IOException | ClassNotFoundException e) {
       throw new RuntimeException(e);
     }
@@ -298,8 +295,7 @@ public class ClassUtil {
       return null;
     }
 
-    return new File(compileDir + String.join(File.separator, className.split("\\."))
-        + FileType.CLASS_FILE.getFileType());
+    return new File(compileDir + String.join(File.separator, className.split("\\.")) + FileType.CLASS_FILE.getFileType());
   }
 
   /**

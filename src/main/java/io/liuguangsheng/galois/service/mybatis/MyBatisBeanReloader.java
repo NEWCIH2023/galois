@@ -59,13 +59,11 @@ import org.slf4j.Logger;
  * @since 1.0.0
  */
 @LazyBean(value = "MyBatisBeanReloader", manager = MyBatisAgentService.class)
-public class MyBatisBeanReloader implements BeanReloader<File>,
-    MyBatisConfigurationVisitor.NecessaryMethods {
+public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigurationVisitor.NecessaryMethods {
 
   private static final MyBatisBeanReloader mybatisBeanReloder = new MyBatisBeanReloader();
   private static final Logger logger = new GaloisLog(MyBatisBeanReloader.class);
-  private static final List<String> CHILD_NAMES = Arrays.asList("association", "collection",
-      "case");
+  private static final List<String> CHILD_NAMES = Arrays.asList("association", "collection", "case");
   /**
    * The Configuration.
    */
@@ -111,16 +109,6 @@ public class MyBatisBeanReloader implements BeanReloader<File>,
     logger.info("Reload mybatis mapper by xml file {} success.", xmlFile.getName());
   }
 
-  /**
-   * 注册新的实例对象
-   *
-   * @param object 待新增的实例对象
-   */
-  @Override
-  public void addBean(File object) {
-
-  }
-
   @Override
   public boolean isUseful(File file) {
     return true;
@@ -156,12 +144,10 @@ public class MyBatisBeanReloader implements BeanReloader<File>,
    * @param namespace namespace
    */
   @SuppressWarnings("unchecked")
-  private void clearMapperRegistry(String namespace)
-      throws NoSuchFieldException, IllegalAccessException {
+  private void clearMapperRegistry(String namespace) throws NoSuchFieldException, IllegalAccessException {
     Field field = MapperRegistry.class.getDeclaredField("knownMappers");
     field.setAccessible(true);
-    Map<Class<?>, Object> mapConfig = (Map<Class<?>, Object>) field.get(
-        configuration.getMapperRegistry());
+    Map<Class<?>, Object> mapConfig = (Map<Class<?>, Object>) field.get(configuration.getMapperRegistry());
     Class<?> refreshKey = null;
 
     for (Map.Entry<Class<?>, Object> item : mapConfig.entrySet()) {
@@ -224,11 +210,8 @@ public class MyBatisBeanReloader implements BeanReloader<File>,
     for (XNode child : xNode.getChildren()) {
       if (CHILD_NAMES.contains(child.getName())) {
         if (child.getStringAttribute("select") == null) {
-          configuration.getResultMapNames().remove(child.getStringAttribute(Constant.ID,
-              child.getValueBasedIdentifier()));
-          configuration.getResultMapNames()
-              .remove(namespace + "." + child.getStringAttribute(Constant.ID,
-                  child.getValueBasedIdentifier()));
+          configuration.getResultMapNames().remove(child.getStringAttribute(Constant.ID, child.getValueBasedIdentifier()));
+          configuration.getResultMapNames().remove(namespace + "." + child.getStringAttribute(Constant.ID, child.getValueBasedIdentifier()));
 
           if (child.getChildren() != null && !child.getChildren().isEmpty()) {
             clearResultMap(child, namespace);
@@ -248,8 +231,7 @@ public class MyBatisBeanReloader implements BeanReloader<File>,
     for (XNode xNode : list) {
       String id = xNode.getStringAttribute(Constant.ID);
       configuration.getKeyGeneratorNames().remove(id + SelectKeyGenerator.SELECT_KEY_SUFFIX);
-      configuration.getKeyGeneratorNames()
-          .remove(namespace + "." + id + SelectKeyGenerator.SELECT_KEY_SUFFIX);
+      configuration.getKeyGeneratorNames().remove(namespace + "." + id + SelectKeyGenerator.SELECT_KEY_SUFFIX);
 
       Collection<MappedStatement> mappedStatements = configuration.getMappedStatements();
       List<MappedStatement> tempStatements = new ArrayList<>(64);

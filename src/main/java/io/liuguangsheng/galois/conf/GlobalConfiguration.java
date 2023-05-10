@@ -38,8 +38,8 @@ import java.util.Properties;
  */
 public class GlobalConfiguration {
 
-  private static final GlobalConfiguration globalConfiguration = new GlobalConfiguration();
   public static final String GALOIS_PROPERTIES = "galois.properties";
+  private static final GlobalConfiguration globalConfiguration = new GlobalConfiguration();
   /**
    * parse config key-value entry in galois.properties
    */

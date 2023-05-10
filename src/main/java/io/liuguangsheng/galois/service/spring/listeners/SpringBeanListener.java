@@ -46,9 +46,8 @@ import org.slf4j.Logger;
 public class SpringBeanListener implements FileChangedListener {
 
   private static final Logger logger = new GaloisLog(SpringBeanListener.class);
-
-  private final SpringBeanReloader springBeanReloader = SpringBeanReloader.getInstance();
   private static final ClassChangedCache classChangedCache = ClassChangedCache.getInstance();
+  private final SpringBeanReloader springBeanReloader = SpringBeanReloader.getInstance();
 
   @Override
   public boolean isUseful(File file) {

@@ -24,6 +24,7 @@
 
 package io.liuguangsheng.galois.service.spring.visitors;
 
+import static io.liuguangsheng.galois.constants.ClassNameConstant.SPRING_APPLICATION_RUN_LISTENERS;
 import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
 import static jdk.internal.org.objectweb.asm.Opcodes.GETFIELD;
@@ -33,7 +34,6 @@ import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
 import static jdk.internal.org.objectweb.asm.Opcodes.POP;
 import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
-import io.liuguangsheng.galois.constants.ClassNameConstant;
 import io.liuguangsheng.galois.constants.Constant;
 import io.liuguangsheng.galois.service.MethodAdapter;
 import io.liuguangsheng.galois.service.annotation.AsmVisitor;
@@ -57,7 +57,7 @@ public class SpringApplicationRunListenersVisitor extends MethodAdapter {
    * Instantiates a new Spring application run listeners visitor.
    */
   public SpringApplicationRunListenersVisitor() {
-    super(ClassNameConstant.SPRING_APPLICATION_RUN_LISTENERS);
+    super(SPRING_APPLICATION_RUN_LISTENERS);
   }
 
   @Override

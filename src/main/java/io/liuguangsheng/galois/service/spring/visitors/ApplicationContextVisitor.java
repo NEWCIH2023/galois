@@ -24,6 +24,7 @@
 
 package io.liuguangsheng.galois.service.spring.visitors;
 
+import static io.liuguangsheng.galois.constants.ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT;
 import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
 import static jdk.internal.org.objectweb.asm.Opcodes.ATHROW;
@@ -32,7 +33,6 @@ import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
 import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
-import io.liuguangsheng.galois.constants.ClassNameConstant;
 import io.liuguangsheng.galois.constants.Constant;
 import io.liuguangsheng.galois.service.MethodAdapter;
 import io.liuguangsheng.galois.service.annotation.AsmVisitor;
@@ -56,12 +56,11 @@ public class ApplicationContextVisitor extends MethodAdapter {
    * Instantiates a new Application context visitor.
    */
   public ApplicationContextVisitor() {
-    super(ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT);
+    super(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT);
   }
 
   @Override
-  public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
-      String[] exceptions) {
+  public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
     MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
 
     if (Objects.equals("<init>", name) && Objects.equals(descriptor, "()V")) {
@@ -94,16 +93,13 @@ public class ApplicationContextVisitor extends MethodAdapter {
     @Override
     public void visitInsn(int opcode) {
       if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-        String pClassName = SpringBeanReloader.class.getName()
-            .replace(Constant.DOT, Constant.SLASH);
+        String pClassName = SpringBeanReloader.class.getName().replace(Constant.DOT, Constant.SLASH);
         String vClassName = className.replace(Constant.DOT, Constant.SLASH);
 
-        mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";",
-            false);
+        mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";", false);
         mv.visitVarInsn(ALOAD, 0);
         mv.visitTypeInsn(CHECKCAST, vClassName);
-        mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setContext", "(L" + vClassName + ";)V",
-            false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setContext", "(L" + vClassName + ";)V", false);
       }
 
       super.visitInsn(opcode);

@@ -24,6 +24,9 @@
 
 package io.liuguangsheng.galois.service;
 
+import static io.liuguangsheng.galois.constants.ConfConstant.BUILD_TYPE;
+import static io.liuguangsheng.galois.constants.ConfConstant.GALOIS_VERSION;
+import static io.liuguangsheng.galois.constants.Constant.HYPHEN;
 import io.liuguangsheng.galois.conf.GlobalConfiguration;
 import io.liuguangsheng.galois.constants.ConfConstant;
 import io.liuguangsheng.galois.constants.Constant;
@@ -59,10 +62,7 @@ public class BannerService {
     }
 
     String bannerBuilder = Constant.LF + BANNER + Constant.TAB + galoisVersion() + Constant.LF +
-        String.format(
-            " :: SpringBoot (%s) :: Spring (%s) :: MyBatis (%s)%n :: Jdk (%s)",
-            springBootVersion(), springVersion(), mybatisVersion(), jdkVersion()
-        ) +
+        String.format(" :: SpringBoot (%s) :: Spring (%s) :: MyBatis (%s)%n :: Jdk (%s)", springBootVersion(), springVersion(), mybatisVersion(), jdkVersion()) +
         Constant.LF;
     System.out.println(bannerBuilder);
   }
@@ -138,7 +138,7 @@ public class BannerService {
    */
   private static String galoisVersion() {
     return String.format("%s (%s)",
-        globalConfig.getString(ConfConstant.GALOIS_VERSION, Constant.HYPHEN),
-        globalConfig.getString(ConfConstant.BUILD_TYPE));
+        globalConfig.getString(GALOIS_VERSION, HYPHEN),
+        globalConfig.getString(BUILD_TYPE));
   }
 }

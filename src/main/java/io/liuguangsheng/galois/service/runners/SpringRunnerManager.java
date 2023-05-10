@@ -70,7 +70,7 @@ public class SpringRunnerManager implements SpringApplicationRunListenersVisitor
         .sorted(Comparator.comparingInt(AbstractRunner::getRank).reversed())
         .collect(Collectors.toList());
 
-    logger.info("Now register these runner in ordered: {}", result);
+    logger.info("Now register these runner in ordered: {}.", result);
     return result;
   }
 

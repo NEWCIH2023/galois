@@ -24,6 +24,7 @@
 
 package io.liuguangsheng.galois.service.mybatis.visitors;
 
+import static io.liuguangsheng.galois.constants.ClassNameConstant.MYBATIS_CONFIGURATION;
 import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
 import static jdk.internal.org.objectweb.asm.Opcodes.ATHROW;
@@ -31,7 +32,6 @@ import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
 import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
-import io.liuguangsheng.galois.constants.ClassNameConstant;
 import io.liuguangsheng.galois.constants.Constant;
 import io.liuguangsheng.galois.service.MethodAdapter;
 import io.liuguangsheng.galois.service.annotation.AsmVisitor;
@@ -54,12 +54,11 @@ public class MyBatisConfigurationVisitor extends MethodAdapter {
    * Instantiates a new My batis configuration visitor.
    */
   public MyBatisConfigurationVisitor() {
-    super(ClassNameConstant.MYBATIS_CONFIGURATION);
+    super(MYBATIS_CONFIGURATION);
   }
 
   @Override
-  public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
-      String[] exceptions) {
+  public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
     MethodVisitor mv = cv.visitMethod(access, name, descriptor, signature, exceptions);
 
     if (Objects.equals(name, "<init>") && Objects.equals(descriptor, "()V")) {
@@ -92,16 +91,13 @@ public class MyBatisConfigurationVisitor extends MethodAdapter {
     @Override
     public void visitInsn(int opcode) {
       if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-        String pClassName = MyBatisBeanReloader.class.getName()
-            .replace(Constant.DOT, Constant.SLASH);
+        String pClassName = MyBatisBeanReloader.class.getName().replace(Constant.DOT, Constant.SLASH);
         String vClassName = className.replace(Constant.DOT, Constant.SLASH);
 
         mv.visitCode();
-        mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";",
-            false);
+        mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";", false);
         mv.visitVarInsn(ALOAD, 0);
-        mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setConfiguration", "(L" + vClassName + ";)V",
-            false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setConfiguration", "(L" + vClassName + ";)V", false);
         mv.visitInsn(RETURN);
         mv.visitEnd();
       } else {
