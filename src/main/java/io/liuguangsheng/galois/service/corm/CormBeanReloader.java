@@ -87,7 +87,6 @@ public class CormBeanReloader implements BeanReloader<File>,
    */
   @Override
   public void updateBean(File mapperFile) {
-
     try (FileInputStream fis = new FileInputStream(mapperFile)) {
       Properties variables = configuration.getVariables();
       XPathParser parser = new XPathParser(fis, true, variables, new XMLMapperEntityResolver());
@@ -137,8 +136,7 @@ public class CormBeanReloader implements BeanReloader<File>,
    */
   private void reloadXML(File mapperFile) throws IOException {
     InputStream is = Files.newInputStream(mapperFile.toPath());
-    XMLMapperBuilder builder = new XMLMapperBuilder(is, configuration, mapperFile.getName(),
-        configuration.getSqlFragments(), new FileSystemResource(mapperFile));
+    XMLMapperBuilder builder = new XMLMapperBuilder(is, configuration, mapperFile.getName(), configuration.getSqlFragments(), new FileSystemResource(mapperFile));
     builder.parse();
   }
 

@@ -86,9 +86,7 @@ public class JdkFileWatchService implements FileWatchService {
 
     try {
       watchService = FileSystems.getDefault().newWatchService();
-      Paths.get(rootPath)
-          .register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE},
-              MEDIUM, FILE_TREE);
+      Paths.get(rootPath).register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE}, MEDIUM, FILE_TREE);
     } catch (IOException e) {
       logger.error("Start file watch service fail.", e);
       System.exit(0);
@@ -129,8 +127,9 @@ public class JdkFileWatchService implements FileWatchService {
 
             String fileName = event.context().toString();
             if (fileName.endsWith(TILDE) || fileName.startsWith(DOT)) {
-              fileName = fileName.substring(0, fileName.length() - 1);
+              continue;
             }
+
             File file = new File(watchKey.watchable() + File.separator + fileName);
 
             if (logger.isDebugEnabled()) {

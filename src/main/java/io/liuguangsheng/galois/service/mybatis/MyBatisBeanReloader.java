@@ -86,7 +86,6 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
    */
   @Override
   public void updateBean(File xmlFile) {
-
     try (FileInputStream fis = new FileInputStream(xmlFile)) {
       Properties properties = configuration.getVariables();
       XPathParser parser = new XPathParser(fis, true, properties, new XMLMapperEntityResolver());

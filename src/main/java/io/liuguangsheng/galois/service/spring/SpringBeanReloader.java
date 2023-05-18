@@ -109,7 +109,7 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationCo
       }
 
       factory.registerSingleton(beanName, bean);
-      context.refresh();
+//      context.refresh();
 
       if (isHandler(clazz)) {
         updateRequestMapping(bean);
