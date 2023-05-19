@@ -40,19 +40,19 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface AsmVisitor {
-
-  /**
-   * Value string.
-   *
-   * @return the string
-   */
-  String value();
-
-  /**
-   * Manager class.
-   *
-   * @return the class
-   */
-  Class<? extends AgentService> manager();
-
+	
+	/**
+	 * Value string.
+	 *
+	 * @return the string
+	 */
+	String value();
+	
+	/**
+	 * Manager class.
+	 *
+	 * @return the class
+	 */
+	Class<? extends AgentService> manager();
+	
 }

@@ -40,40 +40,40 @@ import jdk.internal.org.objectweb.asm.util.TraceClassVisitor;
  * @since 1.0.0
  */
 public class PrintAsmCode {
-
-  /**
-   * The entry point of application.
-   *
-   * @param args the input arguments
-   * @throws IOException the io exception
-   */
-  public static void main(String[] args) throws IOException {
-    printCode(AbstractHandlerMethodMapping.class.getName(), true);
-  }
-
-  /**
-   * Print code.
-   *
-   * @param className the class name
-   * @param asmCode   the asm code
-   * @throws IOException the io exception
-   */
-  public static void printCode(String className, boolean asmCode) throws IOException {
-    if (StringUtil.isBlank(className)) {
-      className = PrintAsmCode.class.getName();
-    }
-
-    ClassReader cr = new ClassReader(className);
-    Printer printer = asmCode ? new ASMifier() : new Textifier();
-    PrintWriter printWriter = new PrintWriter(System.out, true);
-    TraceClassVisitor cv = new TraceClassVisitor(null, printer, printWriter);
-    cr.accept(cv, ClassReader.SKIP_FRAMES + ClassReader.SKIP_DEBUG);
-  }
-
-  public void updateHandlerMethods(Object handler) {
-  }
-
-  protected void detectHandlerMethods(Object handler) {
-
-  }
+	
+	/**
+	 * The entry point of application.
+	 *
+	 * @param args the input arguments
+	 * @throws IOException the io exception
+	 */
+	public static void main(String[] args) throws IOException {
+		printCode(AbstractHandlerMethodMapping.class.getName(), true);
+	}
+	
+	/**
+	 * Print code.
+	 *
+	 * @param className the class name
+	 * @param asmCode   the asm code
+	 * @throws IOException the io exception
+	 */
+	public static void printCode(String className, boolean asmCode) throws IOException {
+		if (StringUtil.isBlank(className)) {
+			className = PrintAsmCode.class.getName();
+		}
+		
+		ClassReader cr = new ClassReader(className);
+		Printer printer = asmCode ? new ASMifier() : new Textifier();
+		PrintWriter printWriter = new PrintWriter(System.out, true);
+		TraceClassVisitor cv = new TraceClassVisitor(null, printer, printWriter);
+		cr.accept(cv, ClassReader.SKIP_FRAMES + ClassReader.SKIP_DEBUG);
+	}
+	
+	public void updateHandlerMethods(Object handler) {
+	}
+	
+	protected void detectHandlerMethods(Object handler) {
+	
+	}
 }

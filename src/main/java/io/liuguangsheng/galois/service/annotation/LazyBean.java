@@ -42,26 +42,26 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface LazyBean {
-
-  /**
-   * Value string.
-   *
-   * @return the string
-   */
-  String value();
-
-  /**
-   * Belong to class.
-   *
-   * @return the class
-   */
-  Class<? extends AgentService> manager();
-
-  /**
-   * register rank, the heigher value will be handle first
-   *
-   * @return the rank
-   */
-  int rank() default 0;
-
+	
+	/**
+	 * Value string.
+	 *
+	 * @return the string
+	 */
+	String value();
+	
+	/**
+	 * Belong to class.
+	 *
+	 * @return the class
+	 */
+	Class<? extends AgentService> manager();
+	
+	/**
+	 * register rank, the heigher value will be handle first
+	 *
+	 * @return the rank
+	 */
+	int rank() default 0;
+	
 }

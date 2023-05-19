@@ -24,11 +24,6 @@
 
 package io.liuguangsheng.galois.service;
 
-import static io.liuguangsheng.galois.constants.ConfConstant.PRINT_ASM_CODE_ENABLE;
-import static io.liuguangsheng.galois.constants.Constant.DOT;
-import static io.liuguangsheng.galois.constants.Constant.USER_DIR;
-import static io.liuguangsheng.galois.constants.FileType.CLASS_FILE;
-import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
 import io.liuguangsheng.galois.conf.GlobalConfiguration;
 import io.liuguangsheng.galois.utils.GaloisLog;
 import java.io.File;
@@ -40,6 +35,12 @@ import jdk.internal.org.objectweb.asm.ClassVisitor;
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import org.slf4j.Logger;
 
+import static io.liuguangsheng.galois.constants.ConfConstant.PRINT_ASM_CODE_ENABLE;
+import static io.liuguangsheng.galois.constants.Constant.DOT;
+import static io.liuguangsheng.galois.constants.Constant.USER_DIR;
+import static io.liuguangsheng.galois.constants.FileType.CLASS_FILE;
+import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
+
 /**
  * method adapter
  *
@@ -47,121 +48,121 @@ import org.slf4j.Logger;
  * @since 1.0.0
  */
 public abstract class MethodAdapter extends ClassVisitor {
-
-  private static final Logger logger = new GaloisLog(MethodAdapter.class);
-  private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
-  private static int deleteActionCount = 0;
-  /**
-   * The Class name.
-   */
-  protected final String className;
-  /**
-   * The Cr.
-   */
-  protected ClassReader cr;
-  /**
-   * The Cw.
-   */
-  protected ClassWriter cw;
-
-  /**
-   * Instantiates a new Method adapter.
-   *
-   * @param className the class name
-   */
-  protected MethodAdapter(String className) {
-    super(ASM5);
-
-    if (className == null || className.isEmpty()) {
-      throw new NullPointerException("MethodAdapter's class name cannot be null or empty.");
-    }
-
-    this.className = className;
-  }
-
-  /**
-   * Before transform.
-   */
-  protected void beforeTransform() {
-  }
-
-  /**
-   * After transform.
-   *
-   * @param result the result
-   */
-  protected void afterTransform(byte[] result) {
-    debugClassFile(result);
-  }
-
-  /**
-   * convert byte[] of original class file
-   *
-   * @param classBytes the class bytes
-   * @return the byte []
-   */
-  public byte[] transform(byte[] classBytes) {
-
-    try {
-      cr = new ClassReader(classBytes);
-      // COMPUTE_MAXS means automatically compute the maximum stack size and the maximum number of local variables
-      // of methods.
-      // COMPUTE_FRAMES means automatically compute the stack map frames of methods from scratch.
-      cw = new ClassWriter(cr, ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
-      cv = this.cw;
-    } catch (Exception e) {
-      logger.error("Create new methodAdapter for class {} fail.", className, e);
-    }
-
-    cr.accept(this, 0);
-    beforeTransform();
-    byte[] result = cw.toByteArray();
-    afterTransform(result);
-
-    return result;
-  }
-
-  private void debugClassFile(byte[] result) {
-    // 清空之前生成的.class文件
-    if (++deleteActionCount == 1) {
-      Optional.ofNullable(
-          new File(globalConfig.getString(USER_DIR))
-              .listFiles(file -> file.getName().endsWith(CLASS_FILE.getFileType()))
-      ).ifPresent(files ->
-          Arrays.stream(files).forEach(File::delete)
-      );
-    }
-
-    // 生成.class
-    if (globalConfig.getBoolean(PRINT_ASM_CODE_ENABLE, false)) {
-      String newClassName = className.substring(className.lastIndexOf(DOT) + 1);
-      String tempClassFile = newClassName + CLASS_FILE.getFileType();
-
-      try (FileOutputStream fos = new FileOutputStream(tempClassFile)) {
-        fos.write(result);
-      } catch (Throwable e) {
-        logger.error("Dump class file error.", e);
-      }
-      logger.info("Had dump class file to {}.", tempClassFile);
-    }
-
-  }
-
-  /**
-   * check if methodadapter can injecte this version of service
-   *
-   * @return the boolean
-   */
-  public boolean isUseful() {
-    return true;
-  }
-
-  /**
-   * Gets class name.
-   *
-   * @return the class name
-   */
-  public String getClassName() {
-    return className;
-  }
+	
+	private static final Logger logger = new GaloisLog(MethodAdapter.class);
+	private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
+	private static int deleteActionCount = 0;
+	/**
+	 * The Class name.
+	 */
+	protected final String className;
+	/**
+	 * The Cr.
+	 */
+	protected ClassReader cr;
+	/**
+	 * The Cw.
+	 */
+	protected ClassWriter cw;
+	
+	/**
+	 * Instantiates a new Method adapter.
+	 *
+	 * @param className the class name
+	 */
+	protected MethodAdapter(String className) {
+		super(ASM5);
+		
+		if (className == null || className.isEmpty()) {
+			throw new NullPointerException("MethodAdapter's class name cannot be null or empty.");
+		}
+		
+		this.className = className;
+	}
+	
+	/**
+	 * Before transform.
+	 */
+	protected void beforeTransform() {
+	}
+	
+	/**
+	 * After transform.
+	 *
+	 * @param result the result
+	 */
+	protected void afterTransform(byte[] result) {
+		debugClassFile(result);
+	}
+	
+	/**
+	 * convert byte[] of original class file
+	 *
+	 * @param classBytes the class bytes
+	 * @return the byte []
+	 */
+	public byte[] transform(byte[] classBytes) {
+		
+		try {
+			cr = new ClassReader(classBytes);
+			// COMPUTE_MAXS means automatically compute the maximum stack size and the maximum number of local variables
+			// of methods.
+			// COMPUTE_FRAMES means automatically compute the stack map frames of methods from scratch.
+			cw = new ClassWriter(cr, ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
+			cv = this.cw;
+		} catch (Exception e) {
+			logger.error("Create new methodAdapter for class {} fail.", className, e);
+		}
+		
+		cr.accept(this, 0);
+		beforeTransform();
+		byte[] result = cw.toByteArray();
+		afterTransform(result);
+		
+		return result;
+	}
+	
+	private void debugClassFile(byte[] result) {
+		// 清空之前生成的.class文件
+		if (++deleteActionCount == 1) {
+			Optional.ofNullable(
+					new File(globalConfig.getString(USER_DIR))
+							.listFiles(file -> file.getName().endsWith(CLASS_FILE.getFileType()))
+			).ifPresent(files ->
+					Arrays.stream(files).forEach(File::delete)
+			);
+		}
+		
+		// 生成.class
+		if (globalConfig.getBoolean(PRINT_ASM_CODE_ENABLE, false)) {
+			String newClassName = className.substring(className.lastIndexOf(DOT) + 1);
+			String tempClassFile = newClassName + CLASS_FILE.getFileType();
+			
+			try (FileOutputStream fos = new FileOutputStream(tempClassFile)) {
+				fos.write(result);
+			} catch (Throwable e) {
+				logger.error("Dump class file error.", e);
+			}
+			logger.info("Had dump class file to {}.", tempClassFile);
+		}
+		
+	}
+	
+	/**
+	 * check if methodadapter can injecte this version of service
+	 *
+	 * @return the boolean
+	 */
+	public boolean isUseful() {
+		return true;
+	}
+	
+	/**
+	 * Gets class name.
+	 *
+	 * @return the class name
+	 */
+	public String getClassName() {
+		return className;
+	}
 }

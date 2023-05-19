@@ -24,13 +24,6 @@
 
 package io.liuguangsheng.galois.service.corm.visitors;
 
-import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
-import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
-import static jdk.internal.org.objectweb.asm.Opcodes.ATHROW;
-import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
-import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
-import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
-import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
 import com.comtop.corm.session.Configuration;
 import io.liuguangsheng.galois.constants.ClassNameConstant;
 import io.liuguangsheng.galois.constants.Constant;
@@ -41,6 +34,14 @@ import io.liuguangsheng.galois.service.corm.CormBeanReloader;
 import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 
+import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
+import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
+import static jdk.internal.org.objectweb.asm.Opcodes.ATHROW;
+import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
+import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
+import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
+import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
+
 /**
  * comtop configuration visitor
  *
@@ -49,62 +50,62 @@ import jdk.internal.org.objectweb.asm.MethodVisitor;
  */
 @AsmVisitor(value = "ComtopConfigurationVisitor", manager = CormAgentService.class)
 public class ComtopConfigurationVisitor extends MethodAdapter {
-
-  /**
-   * Instantiates a new Comtop configuration visitor.
-   */
-  public ComtopConfigurationVisitor() {
-    super(ClassNameConstant.CT_CONFIGURATION);
-  }
-
-  @Override
-  public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
-      String[] exceptions) {
-    MethodVisitor mv = cv.visitMethod(access, name, descriptor, signature, exceptions);
-
-    if (Objects.equals(name, "<init>") && Objects.equals(descriptor, "()V")) {
-      return new ComtopConfigurationVisitor.ConstructorVisitor(ASM5, mv);
-    }
-
-    return mv;
-  }
-
-  public interface NecessaryMethods {
-
-    void setConfiguration(Configuration configuration);
-  }
-
-  /**
-   * The type Constructor visitor.
-   */
-  class ConstructorVisitor extends MethodVisitor {
-
-    /**
-     * Instantiates a new Constructor visitor.
-     *
-     * @param api the api
-     * @param mv  the mv
-     */
-    public ConstructorVisitor(int api, MethodVisitor mv) {
-      super(api, mv);
-    }
-
-    @Override
-    public void visitInsn(int opcode) {
-      if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-        String pClassName = CormBeanReloader.class.getName().replace(Constant.DOT, Constant.SLASH);
-        String vClassName = className.replace(Constant.DOT, Constant.SLASH);
-
-        mv.visitCode();
-        mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";",
-            false);
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setConfiguration", "(L" + vClassName + ";)V",
-            false);
-        mv.visitEnd();
-      }
-
-      super.visitInsn(opcode);
-    }
-  }
+	
+	/**
+	 * Instantiates a new Comtop configuration visitor.
+	 */
+	public ComtopConfigurationVisitor() {
+		super(ClassNameConstant.CT_CONFIGURATION);
+	}
+	
+	@Override
+	public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
+	                                 String[] exceptions) {
+		MethodVisitor mv = cv.visitMethod(access, name, descriptor, signature, exceptions);
+		
+		if (Objects.equals(name, "<init>") && Objects.equals(descriptor, "()V")) {
+			return new ComtopConfigurationVisitor.ConstructorVisitor(ASM5, mv);
+		}
+		
+		return mv;
+	}
+	
+	public interface NecessaryMethods {
+		
+		void setConfiguration(Configuration configuration);
+	}
+	
+	/**
+	 * The type Constructor visitor.
+	 */
+	class ConstructorVisitor extends MethodVisitor {
+		
+		/**
+		 * Instantiates a new Constructor visitor.
+		 *
+		 * @param api the api
+		 * @param mv  the mv
+		 */
+		public ConstructorVisitor(int api, MethodVisitor mv) {
+			super(api, mv);
+		}
+		
+		@Override
+		public void visitInsn(int opcode) {
+			if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
+				String pClassName = CormBeanReloader.class.getName().replace(Constant.DOT, Constant.SLASH);
+				String vClassName = className.replace(Constant.DOT, Constant.SLASH);
+				
+				mv.visitCode();
+				mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";",
+						false);
+				mv.visitVarInsn(ALOAD, 0);
+				mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setConfiguration", "(L" + vClassName + ";)V",
+						false);
+				mv.visitEnd();
+			}
+			
+			super.visitInsn(opcode);
+		}
+	}
 }

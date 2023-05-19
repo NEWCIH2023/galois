@@ -44,84 +44,84 @@ import org.slf4j.Logger;
  */
 @LazyBean(value = "SpringBeanListener", manager = SpringAgentService.class)
 public class SpringBeanListener implements FileChangedListener {
-
-  private static final Logger logger = new GaloisLog(SpringBeanListener.class);
-  private static final ClassChangedCache classChangedCache = ClassChangedCache.getInstance();
-  private final SpringBeanReloader springBeanReloader = SpringBeanReloader.getInstance();
-
-  @Override
-  public boolean isUseful(File file) {
-    return FileUtil.validFileType(file, FileType.CLASS_FILE);
-  }
-
-  /**
-   * file changed handle
-   *
-   * @param classFile classFile
-   */
-  private void fileChangedHandle(File classFile) {
-
-    try {
-      // 结合class变动与java变动，当两者同时出现时，更新该class
-      String className = ClassUtil.getClassNameFromClass(classFile);
-      if (!classChangedCache.handleIfExisted(className)) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("当前类{}处理失败，并未记录在缓存中", className);
-        }
-        return;
-      } else {
-        logger.debug("当前类{}处理成功，已将其移除缓存", className);
-      }
-
-      byte[] classBytes = FileUtil.readFile(classFile);
-      Class<?> clazz = Class.forName(className);
-      ClassDefinition definition = new ClassDefinition(clazz, classBytes);
-      ClassUtil.getInstrumentation().redefineClasses(definition);
-
-      if (springBeanReloader.isUseful(clazz)) {
-        springBeanReloader.updateBean(clazz);
-      }
-
-      logger.info("Redefine class file {} success.", classFile.getName());
-    } catch (Throwable e) {
-      logger.error("Reload Spring Bean fail.", e);
-    }
-  }
-
-  @Override
-  public void createdHandle(File file) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("SpringBeanListener detect class file created: {}", file.getName());
-    }
-
-    fileChangedHandle(file);
-  }
-
-  /**
-   * handler for file modifed
-   *
-   * @param file file
-   */
-  @Override
-  public void modifiedHandle(File file) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("SpringBeanListener detect class file modified: {}", file.getName());
-    }
-
-    fileChangedHandle(file);
-  }
-
-  @Override
-  public String toString() {
-    return SpringBeanListener.class.getSimpleName();
-  }
-
-  /**
-   * handler for file deleted
-   *
-   * @param file file
-   */
-  @Override
-  public void deletedHandle(File file) {
-  }
+	
+	private static final Logger logger = new GaloisLog(SpringBeanListener.class);
+	private static final ClassChangedCache classChangedCache = ClassChangedCache.getInstance();
+	private final SpringBeanReloader springBeanReloader = SpringBeanReloader.getInstance();
+	
+	@Override
+	public boolean isUseful(File file) {
+		return FileUtil.validFileType(file, FileType.CLASS_FILE);
+	}
+	
+	/**
+	 * file changed handle
+	 *
+	 * @param classFile classFile
+	 */
+	private void fileChangedHandle(File classFile) {
+		
+		try {
+			// 结合class变动与java变动，当两者同时出现时，更新该class
+			String className = ClassUtil.getClassNameFromClass(classFile);
+			if (!classChangedCache.handleIfExisted(className)) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("当前类{}处理失败，并未记录在缓存中", className);
+				}
+				return;
+			} else {
+				logger.debug("当前类{}处理成功，已将其移除缓存", className);
+			}
+			
+			byte[] classBytes = FileUtil.readFile(classFile);
+			Class<?> clazz = Class.forName(className);
+			ClassDefinition definition = new ClassDefinition(clazz, classBytes);
+			ClassUtil.getInstrumentation().redefineClasses(definition);
+			
+			if (springBeanReloader.isUseful(clazz)) {
+				springBeanReloader.updateBean(clazz);
+			}
+			
+			logger.info("Redefine class file {} success.", classFile.getName());
+		} catch (Throwable e) {
+			logger.error("Reload Spring Bean fail.", e);
+		}
+	}
+	
+	@Override
+	public void createdHandle(File file) {
+		if (logger.isDebugEnabled()) {
+			logger.debug("SpringBeanListener detect class file created: {}", file.getName());
+		}
+		
+		fileChangedHandle(file);
+	}
+	
+	/**
+	 * handler for file modifed
+	 *
+	 * @param file file
+	 */
+	@Override
+	public void modifiedHandle(File file) {
+		if (logger.isDebugEnabled()) {
+			logger.debug("SpringBeanListener detect class file modified: {}", file.getName());
+		}
+		
+		fileChangedHandle(file);
+	}
+	
+	@Override
+	public String toString() {
+		return SpringBeanListener.class.getSimpleName();
+	}
+	
+	/**
+	 * handler for file deleted
+	 *
+	 * @param file file
+	 */
+	@Override
+	public void deletedHandle(File file) {
+	}
 }

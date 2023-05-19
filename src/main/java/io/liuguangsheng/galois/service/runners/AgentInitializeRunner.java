@@ -24,7 +24,6 @@
 
 package io.liuguangsheng.galois.service.runners;
 
-import static io.liuguangsheng.galois.constants.ClassNameConstant.SERVICE_PACKAGE;
 import io.liuguangsheng.galois.service.AgentService;
 import io.liuguangsheng.galois.service.BeanReloader;
 import io.liuguangsheng.galois.service.annotation.LazyBean;
@@ -41,70 +40,72 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import static io.liuguangsheng.galois.constants.ClassNameConstant.SERVICE_PACKAGE;
+
 /**
  * agent service init runner
  *
  * @author liuguangsheng
  */
 public class AgentInitializeRunner extends AbstractRunner {
-
-  private static final FileWatchService fileWatchService = JdkFileWatchService.getInstance();
-  private static final Logger logger = new GaloisLog(AgentInitializeRunner.class);
-
-  /**
-   * Instantiates a new Agent service init runner.
-   */
-  public AgentInitializeRunner() {
-    setRank(0);
-  }
-
-  @Override
-  public void started(ConfigurableApplicationContext context) {
-    if (!isCanInvoke()) {
-      return;
-    }
-
-    logger.info("{} with context {} is {}.", getClass().getSimpleName(), context.getId(), "started");
-
-    try {
-      Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(SERVICE_PACKAGE, LazyBean.class);
-      Set<AgentService> agentServices = ClassUtil.scanBaseClass(SERVICE_PACKAGE, AgentService.class).stream()
-          .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
-          .map(clazz -> (AgentService) ClassUtil.getInstance(clazz))
-          .collect(Collectors.toSet());
-      Map<Integer, FileChangedListener> tmpRankMap = new HashMap<>(64);
-
-      for (AgentService agentService : agentServices) {
-        if (!agentService.isUseful()) {
-          continue;
-        }
-
-        for (Class<?> factory : lazyBeanFactorys) {
-          LazyBean lazyBean = factory.getAnnotation(LazyBean.class);
-          boolean byManager = lazyBean.manager().equals(agentService.getClass());
-          if (!ClassUtil.isClass(factory) || !byManager) {
-            continue;
-          }
-
-          if (BeanReloader.class.isAssignableFrom(factory)) {
-            BeanReloader<?> beanReloader = (BeanReloader<?>) ClassUtil.getInstance(factory);
-            if (beanReloader != null && beanReloader.isPrepared()) {
-              agentService.setBeanReloader(beanReloader);
-            }
-          } else if (FileChangedListener.class.isAssignableFrom(factory)) {
-            FileChangedListener listener = (FileChangedListener) ClassUtil.getInstance(factory);
-            agentService.registerFileChangedListener(listener);
-            tmpRankMap.put(lazyBean.rank(), listener);
-          }
-        }
-      }
-
-      tmpRankMap.keySet().stream()
-          .sorted((a, b) -> b - a)
-          .forEach(key -> fileWatchService.registerListener(tmpRankMap.get(key)));
-      fileWatchService.start();
-    } catch (Exception e) {
-      logger.error("初始化Galois组件发生异常.", e);
-    }
-  }
+	
+	private static final FileWatchService fileWatchService = JdkFileWatchService.getInstance();
+	private static final Logger logger = new GaloisLog(AgentInitializeRunner.class);
+	
+	/**
+	 * Instantiates a new Agent service init runner.
+	 */
+	public AgentInitializeRunner() {
+		setRank(0);
+	}
+	
+	@Override
+	public void started(ConfigurableApplicationContext context) {
+		if (!isCanInvoke()) {
+			return;
+		}
+		
+		logger.info("{} with context {} is {}.", getClass().getSimpleName(), context.getId(), "started");
+		
+		try {
+			Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(SERVICE_PACKAGE, LazyBean.class);
+			Set<AgentService> agentServices = ClassUtil.scanBaseClass(SERVICE_PACKAGE, AgentService.class).stream()
+					.filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
+					.map(clazz -> (AgentService) ClassUtil.getInstance(clazz))
+					.collect(Collectors.toSet());
+			Map<Integer, FileChangedListener> tmpRankMap = new HashMap<>(64);
+			
+			for (AgentService agentService : agentServices) {
+				if (!agentService.isUseful()) {
+					continue;
+				}
+				
+				for (Class<?> factory : lazyBeanFactorys) {
+					LazyBean lazyBean = factory.getAnnotation(LazyBean.class);
+					boolean byManager = lazyBean.manager().equals(agentService.getClass());
+					if (!ClassUtil.isClass(factory) || !byManager) {
+						continue;
+					}
+					
+					if (BeanReloader.class.isAssignableFrom(factory)) {
+						BeanReloader<?> beanReloader = (BeanReloader<?>) ClassUtil.getInstance(factory);
+						if (beanReloader != null && beanReloader.isPrepared()) {
+							agentService.setBeanReloader(beanReloader);
+						}
+					} else if (FileChangedListener.class.isAssignableFrom(factory)) {
+						FileChangedListener listener = (FileChangedListener) ClassUtil.getInstance(factory);
+						agentService.registerFileChangedListener(listener);
+						tmpRankMap.put(lazyBean.rank(), listener);
+					}
+				}
+			}
+			
+			tmpRankMap.keySet().stream()
+					.sorted((a, b) -> b - a)
+					.forEach(key -> fileWatchService.registerListener(tmpRankMap.get(key)));
+			fileWatchService.start();
+		} catch (Exception e) {
+			logger.error("初始化Galois组件发生异常.", e);
+		}
+	}
 }

@@ -29,11 +29,11 @@ package io.liuguangsheng.galois.service.monitor;
  * @since 1.0.0
  **/
 public interface FileWatchService {
-
-  void init();
-
-  void start();
-
-  void registerListener(FileChangedListener listener);
-
+	
+	void init();
+	
+	void start();
+	
+	void registerListener(FileChangedListener listener);
+	
 }

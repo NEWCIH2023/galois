@@ -35,24 +35,24 @@ import io.liuguangsheng.galois.service.AgentService;
  * @since 1.0.0
  */
 public class MyBatisAgentService extends AgentService {
-
-  private static final MyBatisAgentService myBatisAgentService = new MyBatisAgentService();
-  private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
-
-  /**
-   * get instance
-   *
-   * @return {@link MyBatisAgentService}
-   * @see MyBatisAgentService
-   */
-  public static MyBatisAgentService getInstance() {
-    return myBatisAgentService;
-  }
-
-  @Override
-  public boolean isUseful() {
-    return super.isUseful() && globalConfig.getBoolean(ConfConstant.RELOADER_MYBATIS_ENABLE);
-  }
-
-
+	
+	private static final MyBatisAgentService myBatisAgentService = new MyBatisAgentService();
+	private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
+	
+	/**
+	 * get instance
+	 *
+	 * @return {@link MyBatisAgentService}
+	 * @see MyBatisAgentService
+	 */
+	public static MyBatisAgentService getInstance() {
+		return myBatisAgentService;
+	}
+	
+	@Override
+	public boolean isUseful() {
+		return super.isUseful() && globalConfig.getBoolean(ConfConstant.RELOADER_MYBATIS_ENABLE);
+	}
+	
+	
 }
