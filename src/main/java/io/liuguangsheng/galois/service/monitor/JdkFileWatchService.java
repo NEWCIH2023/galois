@@ -24,8 +24,9 @@
 
 package io.liuguangsheng.galois.service.monitor;
 
-import io.liuguangsheng.galois.conf.GlobalConfiguration;
 import io.liuguangsheng.galois.utils.GaloisLog;
+import org.slf4j.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -33,17 +34,15 @@ import java.nio.file.Paths;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
 
 import static com.sun.nio.file.ExtendedWatchEventModifier.FILE_TREE;
-import static com.sun.nio.file.SensitivityWatchEventModifier.MEDIUM;
+import static com.sun.nio.file.SensitivityWatchEventModifier.HIGH;
 import static io.liuguangsheng.galois.constants.Constant.COMMA;
 import static io.liuguangsheng.galois.constants.Constant.DOT;
 import static io.liuguangsheng.galois.constants.Constant.TILDE;
-import static io.liuguangsheng.galois.constants.Constant.USER_DIR;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
@@ -55,13 +54,10 @@ import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
  * @author liuguangsheng
  * @since 1.0.0
  */
-public class JdkFileWatchService implements FileWatchService {
+public class JdkFileWatchService extends FileWatchService {
 	
 	private static final Logger logger = new GaloisLog(JdkFileWatchService.class);
-	private static final List<FileChangedListener> listeners = new ArrayList<>(16);
-	private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
 	private static final JdkFileWatchService instance = new JdkFileWatchService();
-	private final String rootPath = globalConfig.getString(USER_DIR);
 	private WatchService watchService;
 	
 	private JdkFileWatchService() {
@@ -81,16 +77,11 @@ public class JdkFileWatchService implements FileWatchService {
 	 */
 	@Override
 	public void init() {
-		if (rootPath == null || rootPath.isEmpty()) {
-			throw new NullPointerException("Empty path for galois listener.");
-		}
-		
 		try {
 			watchService = FileSystems.getDefault().newWatchService();
-			Paths.get(rootPath).register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE}, MEDIUM, FILE_TREE);
+			Paths.get(rootPath).register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE}, HIGH, FILE_TREE);
 		} catch (IOException e) {
 			logger.error("Start file watch service fail.", e);
-			System.exit(0);
 		}
 	}
 	
@@ -99,8 +90,6 @@ public class JdkFileWatchService implements FileWatchService {
 	 */
 	@Override
 	public void start() {
-		init();
-		
 		List<String> listenerNames = listeners.stream()
 				.map(FileChangedListener::toString)
 				.collect(Collectors.toList());
@@ -113,7 +102,7 @@ public class JdkFileWatchService implements FileWatchService {
 				try {
 					// take()是一个阻塞方法，会等待监视器发出的信号才返回。
 					// 还可以使用watcher.poll()方法，非阻塞方法，会立即返回当时监视器中是否有信号
-					WatchKey watchKey = watchService.take();
+					WatchKey watchKey = watchService.poll(3, TimeUnit.SECONDS);
 					if (watchKey == null) {
 						continue;
 					}
@@ -161,18 +150,6 @@ public class JdkFileWatchService implements FileWatchService {
 		
 		fileMonitorThread.setDaemon(true);
 		fileMonitorThread.start();
-	}
-	
-	/**
-	 * add a new listener
-	 *
-	 * @param listener listener
-	 */
-	@Override
-	public void registerListener(FileChangedListener listener) {
-		if (listener != null) {
-			listeners.add(listener);
-		}
 	}
 	
 }

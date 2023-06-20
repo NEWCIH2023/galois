@@ -27,18 +27,19 @@ package io.liuguangsheng.galois.service.runners;
 import io.liuguangsheng.galois.service.AgentService;
 import io.liuguangsheng.galois.service.BeanReloader;
 import io.liuguangsheng.galois.service.annotation.LazyBean;
+import io.liuguangsheng.galois.service.monitor.ApacheFileWatchService;
 import io.liuguangsheng.galois.service.monitor.FileChangedListener;
 import io.liuguangsheng.galois.service.monitor.FileWatchService;
-import io.liuguangsheng.galois.service.monitor.JdkFileWatchService;
 import io.liuguangsheng.galois.utils.ClassUtil;
 import io.liuguangsheng.galois.utils.GaloisLog;
+import org.slf4j.Logger;
+import org.springframework.context.ConfigurableApplicationContext;
+
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.springframework.context.ConfigurableApplicationContext;
 
 import static io.liuguangsheng.galois.constants.ClassNameConstant.SERVICE_PACKAGE;
 
@@ -49,7 +50,7 @@ import static io.liuguangsheng.galois.constants.ClassNameConstant.SERVICE_PACKAG
  */
 public class AgentInitializeRunner extends AbstractRunner {
 	
-	private static final FileWatchService fileWatchService = JdkFileWatchService.getInstance();
+	private static final FileWatchService fileWatchService = ApacheFileWatchService.getInstance();
 	private static final Logger logger = new GaloisLog(AgentInitializeRunner.class);
 	
 	/**
@@ -69,11 +70,13 @@ public class AgentInitializeRunner extends AbstractRunner {
 		
 		try {
 			Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(SERVICE_PACKAGE, LazyBean.class);
-			Set<AgentService> agentServices = ClassUtil.scanBaseClass(SERVICE_PACKAGE, AgentService.class).stream()
+			Set<AgentService> agentServices = ClassUtil.scanBaseClass(SERVICE_PACKAGE, AgentService.class)
+					.stream()
 					.filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
 					.map(clazz -> (AgentService) ClassUtil.getInstance(clazz))
 					.collect(Collectors.toSet());
-			Map<Integer, FileChangedListener> tmpRankMap = new HashMap<>(64);
+			
+			Map<String, FileChangedListener> tmpRankMap = new HashMap<>(64);
 			
 			for (AgentService agentService : agentServices) {
 				if (!agentService.isUseful()) {
@@ -95,17 +98,23 @@ public class AgentInitializeRunner extends AbstractRunner {
 					} else if (FileChangedListener.class.isAssignableFrom(factory)) {
 						FileChangedListener listener = (FileChangedListener) ClassUtil.getInstance(factory);
 						agentService.registerFileChangedListener(listener);
-						tmpRankMap.put(lazyBean.rank(), listener);
+						tmpRankMap.put(lazyBean.value() + "_" + lazyBean.rank(), listener);
 					}
 				}
 			}
 			
 			tmpRankMap.keySet().stream()
-					.sorted((a, b) -> b - a)
+					.sorted((a, b) -> {
+						int aRank = Integer.parseInt(a.substring(a.indexOf("_") + 1));
+						int bRank = Integer.parseInt(b.substring(b.indexOf("_") + 1));
+						return bRank - aRank;
+					})
 					.forEach(key -> fileWatchService.registerListener(tmpRankMap.get(key)));
+			
+			fileWatchService.init();
 			fileWatchService.start();
 		} catch (Exception e) {
-			logger.error("初始化Galois组件发生异常.", e);
+			logger.error("AgentInitializeRunner invoke failed.", e);
 		}
 	}
 }

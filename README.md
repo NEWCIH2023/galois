@@ -25,7 +25,13 @@ Java版本上，目前仅支持JDK 8版本。因为使用了JDK自带的ASM框�
 ## 使用说明
 
 + [给你的JVM装一个插件DCEVM](https://blog.csdn.net/NEWCIH/article/details/129093034?spm=1001.2014.3001.5501)
++ 配置控制台日志Logger
+```xml
+<logger name="io.liuguangsheng.galois" level="INFO"/>
+```
+
 + 配置项目JVM参数
-    + 项目的启动参数中，添加 -javaagent:/XXX/galois.jar
-+ 启动项目查看效果，出现该标识表示应用成功
-  ![img.png](img.png)
+    + 项目的启动参数中，添加 -javaagent:/XXX/galois.jar (jar包的绝对路径)
+
++ 如何打包可用jar包
+  + 更新完maven依赖后，能在 `Plugins` 找到 `assembly`，需要通过 `assembly:assembly` 来打包可用jar包

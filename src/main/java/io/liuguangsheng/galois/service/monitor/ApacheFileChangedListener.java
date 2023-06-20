@@ -24,42 +24,86 @@
 
 package io.liuguangsheng.galois.service.monitor;
 
+import org.apache.commons.io.monitor.FileAlterationListener;
+import org.apache.commons.io.monitor.FileAlterationObserver;
+
 import java.io.File;
 
 /**
- * file monitor service interface
- *
  * @author liuguangsheng
  * @since 1.0.0
- */
-public interface FileChangedListener {
+ **/
+public class ApacheFileChangedListener implements FileAlterationListener {
+	private final FileChangedListener listener;
+	
+	public ApacheFileChangedListener(FileChangedListener listener) {
+		this.listener = listener;
+	}
 	
 	/**
-	 * is listener useful for this file object
 	 *
-	 * @param file the changed file
-	 * @return is the listener monitor this file change
 	 */
-	boolean isUseful(File file);
+	@Override
+	public void onStart(FileAlterationObserver fileAlterationObserver) {
+	
+	}
 	
 	/**
-	 * handler for file created
-	 *
-	 * @param file the changed file
+	 * @param file file
 	 */
-	void createdHandle(File file);
+	@Override
+	public void onDirectoryCreate(File file) {
+	
+	}
 	
 	/**
-	 * handler for file modifed
-	 *
-	 * @param file the changed file
+	 * @param file
 	 */
-	void modifiedHandle(File file);
+	@Override
+	public void onDirectoryChange(File file) {
+	
+	}
 	
 	/**
-	 * handler for file deleted
-	 *
-	 * @param file the changed file
+	 * @param file
 	 */
-	void deletedHandle(File file);
+	@Override
+	public void onDirectoryDelete(File file) {
+	
+	}
+	
+	/**
+	 * @param file
+	 */
+	@Override
+	public void onFileCreate(File file) {
+		if (listener.isUseful(file))
+			listener.createdHandle(file);
+	}
+	
+	/**
+	 * @param file
+	 */
+	@Override
+	public void onFileChange(File file) {
+		if (listener.isUseful(file))
+			listener.modifiedHandle(file);
+	}
+	
+	/**
+	 * @param file
+	 */
+	@Override
+	public void onFileDelete(File file) {
+		if (listener.isUseful(file))
+			listener.deletedHandle(file);
+	}
+	
+	/**
+	 * @param fileAlterationObserver
+	 */
+	@Override
+	public void onStop(FileAlterationObserver fileAlterationObserver) {
+	
+	}
 }

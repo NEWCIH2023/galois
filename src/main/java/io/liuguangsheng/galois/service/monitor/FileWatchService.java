@@ -24,16 +24,30 @@
 
 package io.liuguangsheng.galois.service.monitor;
 
+import io.liuguangsheng.galois.conf.GlobalConfiguration;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static io.liuguangsheng.galois.constants.Constant.USER_DIR;
+
 /**
  * @author liuguangsheng
  * @since 1.0.0
  **/
-public interface FileWatchService {
+public abstract class FileWatchService {
+	protected static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
+	protected final String rootPath = globalConfig.getString(USER_DIR);
+	protected static final List<FileChangedListener> listeners = new ArrayList<>();
 	
-	void init();
+	public abstract void init();
 	
-	void start();
+	public abstract void start();
 	
-	void registerListener(FileChangedListener listener);
+	public void registerListener(FileChangedListener listener) {
+		if (listener != null) {
+			listeners.add(listener);
+		}
+	}
 	
 }

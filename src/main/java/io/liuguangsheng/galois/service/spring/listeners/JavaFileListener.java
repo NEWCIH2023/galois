@@ -29,6 +29,7 @@ import io.liuguangsheng.galois.service.monitor.FileChangedListener;
 import io.liuguangsheng.galois.service.spring.SpringAgentService;
 import io.liuguangsheng.galois.utils.ClassUtil;
 import io.liuguangsheng.galois.utils.FileUtil;
+
 import java.io.File;
 import java.util.Objects;
 
@@ -84,5 +85,10 @@ public class JavaFileListener implements FileChangedListener {
 	@Override
 	public void deletedHandle(File file) {
 	
+	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
 	}
 }

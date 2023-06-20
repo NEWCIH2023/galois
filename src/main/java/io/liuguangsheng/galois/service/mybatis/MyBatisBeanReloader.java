@@ -46,7 +46,6 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -67,9 +66,9 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 	
 	private static final MyBatisBeanReloader mybatisBeanReloder = new MyBatisBeanReloader();
 	private static final Logger logger = new GaloisLog(MyBatisBeanReloader.class);
-	private static final List<String> CHILD_NAMES = Arrays.asList("association", "collection", "case");
 	protected Configuration configuration;
 	public static final String PARAMETER_MAPS = "parameterMaps";
+	public static final String KNOWN_MAPPERS = "knownMappers";
 	
 	private MyBatisBeanReloader() {
 	}
@@ -109,6 +108,7 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 			clearCacheElement(context.evalNode("cache"));
 			clearCacheRefElement(context.evalNode("cache-ref"));
 			reloadXML(xmlFile);
+			
 		} catch (Throwable e) {
 			logger.error("Reload mybatis mapper by xml file fail.", e);
 			return;
@@ -182,8 +182,9 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 	 */
 	@SuppressWarnings("unchecked")
 	private void clearMapperRegistry(String namespace) throws NoSuchFieldException, IllegalAccessException {
-		Field field = MapperRegistry.class.getDeclaredField("knownMappers");
+		Field field = MapperRegistry.class.getDeclaredField(KNOWN_MAPPERS);
 		field.setAccessible(true);
+		
 		Map<Class<?>, Object> mapConfig = (Map<Class<?>, Object>) field.get(configuration.getMapperRegistry());
 		Class<?> refreshKey = null;
 		
@@ -217,13 +218,17 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 	 */
 	@SuppressWarnings({"unchecked"})
 	private void clearParameterMapElement(List<XNode> list, String namespace) throws IllegalAccessException, NoSuchFieldException {
+		
 		for (XNode parameterMapNode : list) {
 			String id = parameterMapNode.getStringAttribute(ID);
 			id = applyCurrentNamespace(id, false, namespace);
+			
 			Field parameterMaps = Configuration.class.getField(PARAMETER_MAPS);
 			parameterMaps.setAccessible(true);
+			
 			((Map<String, Object>) parameterMaps.get(configuration)).remove(id);
 		}
+		
 	}
 	
 	/**
