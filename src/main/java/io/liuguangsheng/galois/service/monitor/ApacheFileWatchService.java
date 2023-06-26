@@ -58,7 +58,9 @@ public class ApacheFileWatchService extends FileWatchService {
 		observer = new FileAlterationObserver(rootPath);
 		
 		try {
-			listeners.stream().map(ApacheFileChangedListener::new).forEach(observer::addListener);
+			listeners.stream()
+					.map(ApacheFileChangedListener::new)
+					.forEach(observer::addListener);
 			observer.initialize();
 			observer.checkAndNotify();
 		} catch (Exception e) {
@@ -73,7 +75,6 @@ public class ApacheFileWatchService extends FileWatchService {
 		} catch (Exception e) {
 			logger.error("Start apache file monitor service failed.", e);
 		}
-		
 		
 		List<String> listenerNames = listeners.stream()
 				.map(FileChangedListener::toString)

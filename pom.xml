@@ -24,7 +24,8 @@
   ~ SOFTWARE.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.liuguangsheng</groupId>
@@ -117,7 +118,7 @@
                 <galois.version>${version}</galois.version>
                 <print-asm-code.enable>false</print-asm-code.enable>
                 <reloader.mybatis.enable>true</reloader.mybatis.enable>
-                <reloader.spring.boot.enable>true</reloader.spring.boot.enable>
+                <reloader.spring.boot.enable>false</reloader.spring.boot.enable>
                 <build.type>DEVELOP</build.type>
             </properties>
         </profile>
@@ -127,7 +128,7 @@
                 <galois.version>${version}</galois.version>
                 <print-asm-code.enable>false</print-asm-code.enable>
                 <reloader.mybatis.enable>true</reloader.mybatis.enable>
-                <reloader.spring.boot.enable>true</reloader.spring.boot.enable>
+                <reloader.spring.boot.enable>false</reloader.spring.boot.enable>
                 <build.type>TEST</build.type>
             </properties>
         </profile>
