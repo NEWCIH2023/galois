@@ -25,7 +25,9 @@
 package io.liuguangsheng.galois.utils;
 
 import io.liuguangsheng.galois.conf.GlobalConfiguration;
+
 import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -39,9 +41,7 @@ import static io.liuguangsheng.galois.constants.Constant.RELEASE;
 public class GaloisLog implements Logger {
 	
 	private final Logger logger;
-	private final boolean isReleaseVersion = Objects.equals(
-			GlobalConfiguration.getInstance().getString(BUILD_TYPE),
-			RELEASE);
+	private final boolean isReleaseVersion = Objects.equals(GlobalConfiguration.getInstance().getString(BUILD_TYPE), RELEASE);
 	
 	/**
 	 * Instantiates a new Galois log.
@@ -361,37 +361,27 @@ public class GaloisLog implements Logger {
 	
 	@Override
 	public void error(String msg) {
-		if (!isReleaseVersion) {
-			logger.error(msg);
-		}
+		logger.error(msg);
 	}
 	
 	@Override
 	public void error(String format, Object arg) {
-		if (!isReleaseVersion) {
-			logger.error(format, arg);
-		}
+		logger.error(format, arg);
 	}
 	
 	@Override
 	public void error(String format, Object arg1, Object arg2) {
-		if (!isReleaseVersion) {
-			logger.error(format, arg1, arg2);
-		}
+		logger.error(format, arg1, arg2);
 	}
 	
 	@Override
 	public void error(String format, Object... arguments) {
-		if (!isReleaseVersion) {
-			logger.error(format, arguments);
-		}
+		logger.error(format, arguments);
 	}
 	
 	@Override
 	public void error(String msg, Throwable t) {
-		if (!isReleaseVersion) {
-			logger.error(msg, t);
-		}
+		logger.error(msg, t);
 	}
 	
 	@Override
@@ -401,36 +391,26 @@ public class GaloisLog implements Logger {
 	
 	@Override
 	public void error(Marker marker, String msg) {
-		if (!isReleaseVersion) {
-			logger.error(marker, msg);
-		}
+		logger.error(marker, msg);
 	}
 	
 	@Override
 	public void error(Marker marker, String format, Object arg) {
-		if (!isReleaseVersion) {
-			logger.error(marker, format, arg);
-		}
+		logger.error(marker, format, arg);
 	}
 	
 	@Override
 	public void error(Marker marker, String format, Object arg1, Object arg2) {
-		if (!isReleaseVersion) {
-			logger.error(marker, format, arg1, arg2);
-		}
+		logger.error(marker, format, arg1, arg2);
 	}
 	
 	@Override
 	public void error(Marker marker, String format, Object... arguments) {
-		if (!isReleaseVersion) {
-			logger.error(marker, format, arguments);
-		}
+		logger.error(marker, format, arguments);
 	}
 	
 	@Override
 	public void error(Marker marker, String msg, Throwable t) {
-		if (!isReleaseVersion) {
-			logger.error(marker, msg, t);
-		}
+		logger.error(marker, msg, t);
 	}
 }
