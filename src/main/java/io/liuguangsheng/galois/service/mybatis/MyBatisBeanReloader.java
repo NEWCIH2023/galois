@@ -281,34 +281,36 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 	}
 	
 	private void clearBuildStatementFromContext(List<XNode> list, String namespace) {
-		String baseId, namespaceId, keyStatementId;
-		
-		for (XNode context : list) {
-			baseId = context.getStringAttribute(ID);
-			namespaceId = applyCurrentNamespace(baseId, false, namespace);
-			keyStatementId = applyCurrentNamespace(baseId + SelectKeyGenerator.SELECT_KEY_SUFFIX, true, namespace);
+		try {
+			String baseId, namespaceId, keyStatementId;
+			Field mappedStatementsField = configuration.getClass().getDeclaredField(MAPPED_STATEMENTS);
+			mappedStatementsField.setAccessible(true);
+			Map<String, Object> mappedStatements = (Map<String, Object>) mappedStatementsField.get(configuration);
 			
-			if (logger.isDebugEnabled() && configuration.getKeyGeneratorNames().size() > 0) {
-				logger.debug("3 =====> keyGeneratorNames 有{}个元素\n{}\n将要删除\n{}", configuration.getKeyGeneratorNames().size(), String.join("\n",
-						configuration.getKeyGeneratorNames()), keyStatementId);
-			}
-			
-			configuration.getKeyGeneratorNames().remove(keyStatementId);
-			
-			Iterator<MappedStatement> mappedStatementIterator = configuration.getMappedStatements().iterator();
-			
-			if (logger.isDebugEnabled() && configuration.getMappedStatements().size() > 0) {
-				logger.debug("3-1 =====> mappedStatements共有{}个元素\n{}\n将要删除\n{}", configuration.getMappedStatements().size(),
-						configuration.getMappedStatements().stream().map(MappedStatement::getId).collect(Collectors.joining("\n")), namespaceId);
-			}
-			
-			MappedStatement tmp;
-			while (mappedStatementIterator.hasNext()) {
-				tmp = mappedStatementIterator.next();
-				if (tmp != null && tmp.getId().equals(namespaceId)) {
-					mappedStatementIterator.remove();
+			for (XNode context : list) {
+				baseId = context.getStringAttribute(ID);
+				namespaceId = applyCurrentNamespace(baseId, false, namespace);
+				keyStatementId = applyCurrentNamespace(baseId + SelectKeyGenerator.SELECT_KEY_SUFFIX, true, namespace);
+				
+				if (logger.isDebugEnabled() && configuration.getKeyGeneratorNames().size() > 0) {
+					logger.debug("3 =====> keyGeneratorNames 有{}个元素\n{}\n将要删除\n{}", configuration.getKeyGeneratorNames().size(), String.join("\n",
+							configuration.getKeyGeneratorNames()), keyStatementId);
 				}
+				
+				configuration.getKeyGeneratorNames().remove(keyStatementId);
+				if (logger.isDebugEnabled() && mappedStatements.size() > 0) {
+					logger.debug("3-1 =====> mappedStatements共有{}个元素\n{}\n将要删除\n{}", mappedStatements.size(),
+							mappedStatements.values().stream()
+									.filter(item -> item.getClass().equals(MappedStatement.class))
+									.map(tmp -> (MappedStatement) tmp)
+									.map(MappedStatement::getId)
+									.collect(Collectors.joining("\n")),
+							namespaceId);
+				}
+				mappedStatements.remove(namespaceId);
 			}
+		} catch (Throwable e) {
+			logger.error("Clear BuildStatement fail.", e);
 		}
 	}
 	
