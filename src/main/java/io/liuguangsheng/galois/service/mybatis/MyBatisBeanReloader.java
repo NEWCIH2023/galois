@@ -45,9 +45,11 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -63,6 +65,7 @@ import static io.liuguangsheng.galois.constants.Constant.NAMESPACE;
  * The type My batis bean reloader.
  */
 
+@SuppressWarnings("unchecked")
 @LazyBean(value = "MyBatisBeanReloader", manager = MyBatisAgentService.class)
 public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigurationVisitor.NecessaryMethods {
 	
@@ -72,6 +75,7 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 	public static final String PARAMETER_MAPS = "parameterMaps";
 	public static final String KNOWN_MAPPERS = "knownMappers";
 	public static final String LOADED_RESOURCES = "loadedResources";
+	public static final String MAPPED_STATEMENTS = "mappedStatements";
 	
 	private MyBatisBeanReloader() {
 	}
@@ -92,7 +96,7 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 			// 优先更新自身变更，再更新同namespace的其它mapper
 			updateSingleBean(mapperLocation, namespace);
 			Set<Resource> otherMappersInNamespace = getAllNamespaceFile(namespace).stream()
-					.filter(resource -> !resource.toString().equals(mapperLocation.toString()))
+					.filter(resource -> !resource.toString().contains(Objects.requireNonNull(mapperLocation.getFilename())))
 					.collect(Collectors.toSet());
 			
 			for (Resource resource : otherMappersInNamespace) {
@@ -143,13 +147,31 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 	}
 	
 	private Set<Resource> getAllNamespaceFile(String namespace) {
-		return configuration.getMappedStatements().stream()
-				.filter(statement -> statement.getId().contains(namespace))
-				.map(statement -> {
-					String tmpPath = statement.getResource().substring(statement.getResource().indexOf('[') + 1, statement.getResource().lastIndexOf(']'));
-					return new PathResource(tmpPath);
-				})
-				.collect(Collectors.toSet());
+		try {
+			Field mappedStatementsField = configuration.getClass().getDeclaredField(MAPPED_STATEMENTS);
+			mappedStatementsField.setAccessible(true);
+			Map<String, Object> mappedStatements = (Map<String, Object>) mappedStatementsField.get(configuration);
+			
+			return mappedStatements.values().stream()
+					.filter(statement -> statement.getClass().equals(MappedStatement.class))
+					.map(statement -> (MappedStatement) statement)
+					.filter(statement -> statement.getId().contains(namespace))
+					.map(statement -> {
+						String tmpPath = statement.getResource();
+						if (tmpPath.contains("[")) {
+							tmpPath = statement.getResource().substring(
+									statement.getResource().indexOf('[') + 1,
+									statement.getResource().lastIndexOf(']')
+							);
+						}
+						return new PathResource(tmpPath);
+					})
+					.collect(Collectors.toSet());
+		} catch (Throwable e) {
+			logger.error("Get all mapper in namespace {} fail.", namespace, e);
+		}
+		
+		return new HashSet<>();
 	}
 	
 	private void reloadXML(Resource mapperLocation) throws IOException {
