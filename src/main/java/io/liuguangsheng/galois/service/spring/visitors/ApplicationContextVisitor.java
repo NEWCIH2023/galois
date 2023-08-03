@@ -29,9 +29,10 @@ import io.liuguangsheng.galois.service.MethodAdapter;
 import io.liuguangsheng.galois.service.annotation.AsmVisitor;
 import io.liuguangsheng.galois.service.spring.SpringAgentService;
 import io.liuguangsheng.galois.service.spring.SpringBeanReloader;
-import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
+
+import java.util.Objects;
 
 import static io.liuguangsheng.galois.constants.ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT;
 import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;

@@ -29,10 +29,11 @@ import io.liuguangsheng.galois.service.MethodAdapter;
 import io.liuguangsheng.galois.service.annotation.AsmVisitor;
 import io.liuguangsheng.galois.service.runners.SpringRunnerManager;
 import io.liuguangsheng.galois.service.spring.SpringAgentService;
-import java.util.List;
-import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.springframework.boot.SpringApplicationRunListener;
+
+import java.util.List;
+import java.util.Objects;
 
 import static io.liuguangsheng.galois.constants.ClassNameConstant.SPRING_APPLICATION_RUN_LISTENERS;
 import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;

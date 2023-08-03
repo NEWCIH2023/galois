@@ -32,9 +32,10 @@ import io.liuguangsheng.galois.service.spring.SpringBeanReloader;
 import io.liuguangsheng.galois.utils.ClassUtil;
 import io.liuguangsheng.galois.utils.FileUtil;
 import io.liuguangsheng.galois.utils.GaloisLog;
+import org.slf4j.Logger;
+
 import java.io.File;
 import java.lang.instrument.ClassDefinition;
-import org.slf4j.Logger;
 
 
 /**

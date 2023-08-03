@@ -29,9 +29,10 @@ import io.liuguangsheng.galois.service.MethodAdapter;
 import io.liuguangsheng.galois.service.annotation.AsmVisitor;
 import io.liuguangsheng.galois.service.mybatis.MyBatisAgentService;
 import io.liuguangsheng.galois.service.mybatis.MyBatisBeanReloader;
-import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.apache.ibatis.session.Configuration;
+
+import java.util.Objects;
 
 import static io.liuguangsheng.galois.constants.ClassNameConstant.MYBATIS_CONFIGURATION;
 import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;

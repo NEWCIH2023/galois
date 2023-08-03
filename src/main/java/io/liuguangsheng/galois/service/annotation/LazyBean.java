@@ -25,6 +25,7 @@
 package io.liuguangsheng.galois.service.annotation;
 
 import io.liuguangsheng.galois.service.AgentService;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

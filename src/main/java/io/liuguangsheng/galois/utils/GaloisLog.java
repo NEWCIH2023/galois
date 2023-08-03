@@ -25,12 +25,11 @@
 package io.liuguangsheng.galois.utils;
 
 import io.liuguangsheng.galois.conf.GlobalConfiguration;
-
-import java.util.Objects;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
+
+import java.util.Objects;
 
 import static io.liuguangsheng.galois.constants.ConfConstant.BUILD_TYPE;
 import static io.liuguangsheng.galois.constants.Constant.RELEASE;

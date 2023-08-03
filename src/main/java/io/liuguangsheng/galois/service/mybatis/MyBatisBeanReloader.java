@@ -44,9 +44,7 @@ import org.springframework.core.io.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.file.Path;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -87,8 +85,7 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 	@Override
 	public void updateBean(File mapperFile) {
 		try {
-			Path mapperPath = mapperFile.toPath();
-			Resource mapperLocation = new PathResource(mapperPath);
+			Resource mapperLocation = new PathResource(mapperFile.toPath());
 			XPathParser parser = new XPathParser(mapperLocation.getInputStream(), true, configuration.getVariables(), new XMLMapperEntityResolver());
 			XNode context = parser.evalNode("/mapper");
 			String namespace = context.getStringAttribute(NAMESPACE);
@@ -102,6 +99,8 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 			for (Resource resource : otherMappersInNamespace) {
 				updateSingleBean(resource, namespace);
 			}
+			
+			logger.info("Reload mybatis mapper by namespace {} success.", namespace);
 		} catch (Throwable e) {
 			logger.error("Update MyBatis bean fail.", e);
 		}
@@ -125,10 +124,7 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 			reloadXML(mapperLocation);
 		} catch (Throwable e) {
 			logger.error("Reload mybatis mapper by xml file fail.", e);
-			return;
 		}
-		
-		logger.info("Reload mybatis mapper by xml file {} success.", mapperLocation);
 	}
 	
 	@Override

@@ -32,6 +32,8 @@ import io.liuguangsheng.galois.service.runners.SpringRunnerManager;
 import io.liuguangsheng.galois.utils.ClassUtil;
 import io.liuguangsheng.galois.utils.GaloisLog;
 import io.liuguangsheng.galois.utils.StringUtil;
+import org.slf4j.Logger;
+
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Modifier;
@@ -43,7 +45,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
 
 import static io.liuguangsheng.galois.constants.Constant.COMMA;
 

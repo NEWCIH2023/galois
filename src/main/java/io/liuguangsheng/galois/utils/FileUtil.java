@@ -26,6 +26,8 @@ package io.liuguangsheng.galois.utils;
 
 import io.liuguangsheng.galois.constants.Constant;
 import io.liuguangsheng.galois.constants.FileType;
+import org.slf4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -35,7 +37,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
-import org.slf4j.Logger;
 
 /**
  * file util

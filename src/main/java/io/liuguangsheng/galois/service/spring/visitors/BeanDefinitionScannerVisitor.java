@@ -29,9 +29,10 @@ import io.liuguangsheng.galois.service.MethodAdapter;
 import io.liuguangsheng.galois.service.annotation.AsmVisitor;
 import io.liuguangsheng.galois.service.spring.SpringAgentService;
 import io.liuguangsheng.galois.service.spring.SpringBeanReloader;
-import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
+
+import java.util.Objects;
 
 import static io.liuguangsheng.galois.constants.ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER;
 import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
