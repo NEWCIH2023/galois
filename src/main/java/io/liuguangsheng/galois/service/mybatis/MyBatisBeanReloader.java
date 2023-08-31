@@ -58,11 +58,7 @@ import static io.liuguangsheng.galois.constants.Constant.NAMESPACE;
 
 /**
  * The type My batis bean reloader.
- * <p>
- * <p>
- * The type My batis bean reloader.
  */
-
 @SuppressWarnings("unchecked")
 @LazyBean(value = "MyBatisBeanReloader", manager = MyBatisAgentService.class)
 public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigurationVisitor.NecessaryMethods {
@@ -86,17 +82,18 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 	public void updateBean(File mapperFile) {
 		try {
 			Resource mapperLocation = new PathResource(mapperFile.toPath());
-			XPathParser parser = new XPathParser(mapperLocation.getInputStream(), true, configuration.getVariables(), new XMLMapperEntityResolver());
+			XPathParser parser = new XPathParser(mapperLocation.getInputStream(), true, configuration.getVariables(),
+					new XMLMapperEntityResolver());
 			XNode context = parser.evalNode("/mapper");
 			String namespace = context.getStringAttribute(NAMESPACE);
 			
-			// 优先更新自身变更，再更新同namespace的其它mapper
 			updateSingleBean(mapperLocation, namespace);
-			Set<Resource> otherMappersInNamespace = getAllNamespaceFile(namespace).stream()
+			Set<Resource> files = getAllNamespaceFile(namespace);
+			Set<Resource> mappers = files.stream()
 					.filter(resource -> !resource.toString().contains(Objects.requireNonNull(mapperLocation.getFilename())))
 					.collect(Collectors.toSet());
 			
-			for (Resource resource : otherMappersInNamespace) {
+			for (Resource resource : mappers) {
 				updateSingleBean(resource, namespace);
 			}
 			
@@ -109,7 +106,8 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 	private void updateSingleBean(Resource mapperLocation, String namespace) {
 		
 		try {
-			XPathParser parser = new XPathParser(mapperLocation.getInputStream(), true, configuration.getVariables(), new XMLMapperEntityResolver());
+			XPathParser parser = new XPathParser(mapperLocation.getInputStream(), true, configuration.getVariables(),
+					new XMLMapperEntityResolver());
 			XNode context = parser.evalNode("/mapper");
 			
 			clearLoadedResources(mapperLocation);
@@ -155,14 +153,10 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 					.map(statement -> {
 						String tmpPath = statement.getResource();
 						if (tmpPath.contains("[")) {
-							tmpPath = statement.getResource().substring(
-									statement.getResource().indexOf('[') + 1,
-									statement.getResource().lastIndexOf(']')
-							);
+							tmpPath = tmpPath.substring(tmpPath.indexOf('[') + 1, tmpPath.lastIndexOf(']'));
 						}
 						return new PathResource(tmpPath);
-					})
-					.collect(Collectors.toSet());
+					}).collect(Collectors.toSet());
 		} catch (Throwable e) {
 			logger.error("Get all mapper in namespace {} fail.", namespace, e);
 		}
@@ -171,7 +165,8 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 	}
 	
 	private void reloadXML(Resource mapperLocation) throws IOException {
-		XMLMapperBuilder builder = new XMLMapperBuilder(mapperLocation.getInputStream(), configuration, mapperLocation.toString(), configuration.getSqlFragments());
+		XMLMapperBuilder builder = new XMLMapperBuilder(mapperLocation.getInputStream(), configuration,
+				mapperLocation.toString(), configuration.getSqlFragments());
 		builder.parse();
 	}
 	
@@ -181,11 +176,6 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 			Field loadedResourcesField = configuration.getClass().getDeclaredField(LOADED_RESOURCES);
 			loadedResourcesField.setAccessible(true);
 			Set<String> loadedResources = (Set<String>) loadedResourcesField.get(configuration);
-			
-			if (logger.isDebugEnabled() && loadedResources.size() > 0) {
-				logger.debug("0 =====> 当前loadedResouces共有{}元素\n{}\n将要删除\n{}", loadedResources.size(), String.join("\n", loadedResources), mapperLocation.toString());
-			}
-			
 			loadedResources.remove(mapperLocation.toString());
 		} catch (NoSuchFieldException | IllegalAccessException e) {
 			throw new RuntimeException(e);
@@ -198,11 +188,6 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 			Field cacheRefMapField = configuration.getClass().getDeclaredField("cacheRefMap");
 			cacheRefMapField.setAccessible(true);
 			Map<String, String> cacheRefMap = (Map<String, String>) cacheRefMapField.get(configuration);
-			
-			if (logger.isDebugEnabled() && cacheRefMap.keySet().size() > 0) {
-				logger.debug("7 =====> cacheRefMap 有{}个元素\n{}\n将要删除\n{}", cacheRefMap.keySet().size(), String.join("\n", cacheRefMap.keySet()), namespace);
-			}
-			
 			cacheRefMap.remove(namespace);
 		} catch (NoSuchFieldException | IllegalAccessException e) {
 			throw new RuntimeException(e);
@@ -218,26 +203,16 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 		Field field = MapperRegistry.class.getDeclaredField(KNOWN_MAPPERS);
 		field.setAccessible(true);
 		Map<Class<?>, Object> mapConfig = (Map<Class<?>, Object>) field.get(configuration.getMapperRegistry());
-		
-		if (logger.isDebugEnabled() && mapConfig.entrySet().size() > 0) {
-			logger.debug("1 =====> mapConfig 共有{}个元素\n{}\n将要删除\n{}", mapConfig.entrySet().size(),
-					mapConfig.keySet().stream().map(Class::getName).collect(Collectors.joining("\n")),
-					mapConfig.keySet().stream().map(Class::getName).filter(item -> item.contains(namespace)).collect(Collectors.joining("\n")));
-		}
-		
 		mapConfig.entrySet().removeIf(entry -> entry.getKey().getName().contains(namespace));
 	}
 	
 	private void clearCachedNames(String namespace) {
-		if (logger.isDebugEnabled() && configuration.getCacheNames().contains(namespace)) {
-			logger.debug("2 =====> cacheNames 有{}个元素\n{}\n将要删除\n{}", configuration.getCacheNames().size(), String.join("\n", configuration.getCacheNames()), namespace);
-		}
-		
 		configuration.getCacheNames().remove(namespace);
 	}
 	
 	@SuppressWarnings({"unchecked"})
-	private void clearParameterMapElement(List<XNode> list, String namespace) throws IllegalAccessException, NoSuchFieldException {
+	private void clearParameterMapElement(List<XNode> list, String namespace) throws IllegalAccessException,
+			NoSuchFieldException {
 		
 		String baseId, namespaceId;
 		for (XNode parameterMapNode : list) {
@@ -245,28 +220,11 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 			namespaceId = applyCurrentNamespace(baseId, false, namespace);
 			Field parameterMaps = Configuration.class.getField(PARAMETER_MAPS);
 			parameterMaps.setAccessible(true);
-			
-			if (logger.isDebugEnabled()) {
-				Map<String, Object> tmp = (Map<String, Object>) parameterMaps.get(configuration);
-				if (tmp.entrySet().size() > 0) {
-					logger.debug("6 =====> parameterMaps 有{}个元素\n{}\n将要删除\n{}",
-							tmp.keySet().size(),
-							tmp.keySet().stream().map(String::toString).collect(Collectors.joining("\n")),
-							namespaceId);
-				}
-			}
-			
 			((Map<String, Object>) parameterMaps.get(configuration)).remove(namespaceId);
 		}
 	}
 	
 	private void clearResultMapElements(List<XNode> list, String namespace) {
-		if (logger.isDebugEnabled() && configuration.getResultMapNames().size() > 0 && list.size() > 0) {
-			logger.debug("5 =====> resultMapNames有{}个元素\n{}\n将要删除\n{}", configuration.getResultMapNames().size(), String.join("\n", configuration.getResultMapNames()),
-					String.join("\n", Stream.concat(list.stream().map(node -> node.getStringAttribute(ID, node.getValueBasedIdentifier())),
-							list.stream().map(node -> applyCurrentNamespace(node.getStringAttribute(ID, node.getValueBasedIdentifier()), false, namespace))).collect(Collectors.joining("\n"))));
-		}
-		
 		String baseId, namespaceId;
 		for (XNode resultMapNode : list) {
 			baseId = resultMapNode.getStringAttribute(ID, resultMapNode.getValueBasedIdentifier());
@@ -287,22 +245,7 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 				baseId = context.getStringAttribute(ID);
 				namespaceId = applyCurrentNamespace(baseId, false, namespace);
 				keyStatementId = applyCurrentNamespace(baseId + SelectKeyGenerator.SELECT_KEY_SUFFIX, true, namespace);
-				
-				if (logger.isDebugEnabled() && configuration.getKeyGeneratorNames().size() > 0) {
-					logger.debug("3 =====> keyGeneratorNames 有{}个元素\n{}\n将要删除\n{}", configuration.getKeyGeneratorNames().size(), String.join("\n",
-							configuration.getKeyGeneratorNames()), keyStatementId);
-				}
-				
 				configuration.getKeyGeneratorNames().remove(keyStatementId);
-				if (logger.isDebugEnabled() && mappedStatements.size() > 0) {
-					logger.debug("3-1 =====> mappedStatements共有{}个元素\n{}\n将要删除\n{}", mappedStatements.size(),
-							mappedStatements.values().stream()
-									.filter(item -> item.getClass().equals(MappedStatement.class))
-									.map(tmp -> (MappedStatement) tmp)
-									.map(MappedStatement::getId)
-									.collect(Collectors.joining("\n")),
-							namespaceId);
-				}
 				mappedStatements.remove(namespaceId);
 			}
 		} catch (Throwable e) {
@@ -311,12 +254,6 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 	}
 	
 	private void clearSqlElement(List<XNode> list, String namespace) {
-		if (logger.isDebugEnabled() && list.size() > 0) {
-			logger.debug("4 =====> sqlFraments 共有{}个元素\n{}\n将要删除\n{}", configuration.getSqlFragments().keySet().size(), String.join("\n",
-							configuration.getSqlFragments().keySet()),
-					list.stream().map(tmp -> tmp.getStringAttribute(ID)).collect(Collectors.joining("\n")) + "\n" + list.stream().map(tmp -> applyCurrentNamespace(tmp.getStringAttribute(ID), false, namespace)).collect(Collectors.joining("\n")));
-		}
-		
 		String baseId, namespaceId;
 		for (XNode context : list) {
 			baseId = context.getStringAttribute(ID);
