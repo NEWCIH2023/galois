@@ -35,6 +35,7 @@ import java.util.Map;
 import static io.liuguangsheng.galois.constants.ConfConstant.BUILD_TYPE;
 import static io.liuguangsheng.galois.constants.ConfConstant.GALOIS_VERSION;
 import static io.liuguangsheng.galois.constants.Constant.HYPHEN;
+import static io.liuguangsheng.galois.constants.Constant.KNOWN_MAPPERS;
 
 /**
  * print banner when galois starting
@@ -44,7 +45,7 @@ import static io.liuguangsheng.galois.constants.Constant.HYPHEN;
  */
 public class BannerService {
 	
-	private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
+	private static final GlobalConfiguration config = GlobalConfiguration.getInstance();
 	private static final String BANNER = " ██████╗  █████╗ ██╗      ██████╗ ██╗███████╗\n" +
 			"██╔════╝ ██╔══██╗██║     ██╔═══██╗██║██╔════╝\n" +
 			"██║  ███╗███████║██║     ██║   ██║██║███████╗\n" +
@@ -59,12 +60,13 @@ public class BannerService {
 	 * print banner
 	 */
 	public static void printBanner() {
-		if (!globalConfig.getBoolean(ConfConstant.BANNER_ENABLE, true)) {
+		if (!config.getBool(ConfConstant.BANNER_ENABLE, true)) {
 			return;
 		}
 		
 		String bannerBuilder = Constant.LF + BANNER + Constant.TAB + galoisVersion() + Constant.LF +
-				String.format(" :: SpringBoot (%s) :: Spring (%s) :: MyBatis (%s)%n :: Jdk (%s)", springBootVersion(), springVersion(), mybatisVersion(), jdkVersion()) +
+				String.format(" :: SpringBoot (%s) :: Spring (%s) :: MyBatis (%s)%n :: Jdk (%s)", springBootVersion(),
+						springVersion(), mybatisVersion(), jdkVersion()) +
 				Constant.LF;
 		System.out.println(bannerBuilder);
 	}
@@ -124,7 +126,7 @@ public class BannerService {
 	private static String mybatisVersion() {
 		try {
 			Class<?> mapperRegistry = Class.forName("org.apache.ibatis.binding.MapperRegistry");
-			Field knownMappers = mapperRegistry.getDeclaredField("knownMappers");
+			Field knownMappers = mapperRegistry.getDeclaredField(KNOWN_MAPPERS);
 			boolean flag = knownMappers.getType().equals(Map.class);
 			return flag ? ">= 3.2.0" : "<= 3.1.0";
 		} catch (Exception e) {
@@ -139,8 +141,6 @@ public class BannerService {
 	 * @see String
 	 */
 	private static String galoisVersion() {
-		return String.format("%s (%s)",
-				globalConfig.getString(GALOIS_VERSION, HYPHEN),
-				globalConfig.getString(BUILD_TYPE));
+		return String.format("%s (%s)", config.getStr(GALOIS_VERSION, HYPHEN), config.getStr(BUILD_TYPE));
 	}
 }

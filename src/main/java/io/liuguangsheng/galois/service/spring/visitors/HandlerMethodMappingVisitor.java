@@ -32,7 +32,7 @@ import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import jdk.internal.org.objectweb.asm.Type;
 
-import static io.liuguangsheng.galois.constants.ClassNameConstant.ABSTRACT_HANDLER_METHOD_MAPPING;
+import static io.liuguangsheng.galois.constants.ClassNameConstant.CLASS_ABSTRACT_HANDLER_METHOD_MAPPING;
 import static jdk.internal.org.objectweb.asm.Opcodes.ACC_PRIVATE;
 import static jdk.internal.org.objectweb.asm.Opcodes.ACC_PUBLIC;
 import static jdk.internal.org.objectweb.asm.Opcodes.ACC_SYNTHETIC;
@@ -59,7 +59,7 @@ public class HandlerMethodMappingVisitor extends MethodAdapter {
 	 * Instantiates a new Method adapter.
 	 */
 	public HandlerMethodMappingVisitor() {
-		super(ABSTRACT_HANDLER_METHOD_MAPPING);
+		super(CLASS_ABSTRACT_HANDLER_METHOD_MAPPING);
 	}
 	
 	@Override

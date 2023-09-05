@@ -155,7 +155,7 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationCo
 	 * @return {@link boolean}
 	 */
 	@Override
-	public boolean isUseful(Class<?> clazz) {
+	public boolean isSuitable(Class<?> clazz) {
 		int m = clazz.getModifiers();
 		return !Modifier.isInterface(m) && !Modifier.isAbstract(m) && !Modifier.isPrivate(m) && !Modifier.isStatic(m) && !Modifier.isNative(m);
 	}
@@ -164,7 +164,7 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationCo
 	 * 判断当前beanReloader是否准备完成
 	 */
 	@Override
-	public boolean isPrepared() {
+	public boolean isReady() {
 		if (scanner == null || context == null) {
 			logger.warn("SpringBeanReloader not prepare ready. BeanDefinitionScanner or ApplicationContext object is null.");
 			return false;

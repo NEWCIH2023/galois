@@ -77,7 +77,7 @@ public class ApacheFileChangedListener implements FileAlterationListener {
 	 */
 	@Override
 	public void onFileCreate(File file) {
-		if (listener.isUseful(file))
+		if (listener.isSuitable(file))
 			listener.createdHandle(file);
 	}
 	
@@ -86,7 +86,7 @@ public class ApacheFileChangedListener implements FileAlterationListener {
 	 */
 	@Override
 	public void onFileChange(File file) {
-		if (listener.isUseful(file))
+		if (listener.isSuitable(file))
 			listener.modifiedHandle(file);
 	}
 	
@@ -95,7 +95,7 @@ public class ApacheFileChangedListener implements FileAlterationListener {
 	 */
 	@Override
 	public void onFileDelete(File file) {
-		if (listener.isUseful(file))
+		if (listener.isSuitable(file))
 			listener.deletedHandle(file);
 	}
 	

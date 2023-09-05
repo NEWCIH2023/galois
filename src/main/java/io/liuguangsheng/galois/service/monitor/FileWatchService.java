@@ -36,8 +36,8 @@ import static io.liuguangsheng.galois.constants.Constant.USER_DIR;
  * @since 1.0.0
  **/
 public abstract class FileWatchService {
-	protected static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
-	protected final String rootPath = globalConfig.getString(USER_DIR);
+	protected static final GlobalConfiguration config = GlobalConfiguration.getInstance();
+	protected final String rootPath = config.getStr(USER_DIR);
 	protected static final List<FileChangedListener> listeners = new ArrayList<>();
 	
 	public abstract void init();

@@ -41,7 +41,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static io.liuguangsheng.galois.constants.ClassNameConstant.SERVICE_PACKAGE;
+import static io.liuguangsheng.galois.constants.ClassNameConstant.CLASS_SERVICE_PACKAGE;
 
 /**
  * agent service init runner
@@ -69,8 +69,8 @@ public class AgentInitializeRunner extends AbstractRunner {
 		logger.info("{} with context {} is {}.", getClass().getSimpleName(), context.getId(), "started");
 		
 		try {
-			Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(SERVICE_PACKAGE, LazyBean.class);
-			Set<AgentService> agentServices = ClassUtil.scanBaseClass(SERVICE_PACKAGE, AgentService.class)
+			Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(CLASS_SERVICE_PACKAGE, LazyBean.class);
+			Set<AgentService> agentServices = ClassUtil.scanBaseClass(CLASS_SERVICE_PACKAGE, AgentService.class)
 					.stream()
 					.filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
 					.map(clazz -> (AgentService) ClassUtil.getInstance(clazz))
@@ -79,7 +79,7 @@ public class AgentInitializeRunner extends AbstractRunner {
 			Map<String, FileChangedListener> tmpRankMap = new HashMap<>(64);
 			
 			for (AgentService agentService : agentServices) {
-				if (!agentService.isUseful()) {
+				if (!agentService.isSuitable()) {
 					continue;
 				}
 				
@@ -92,7 +92,7 @@ public class AgentInitializeRunner extends AbstractRunner {
 					
 					if (BeanReloader.class.isAssignableFrom(factory)) {
 						BeanReloader<?> beanReloader = (BeanReloader<?>) ClassUtil.getInstance(factory);
-						if (beanReloader != null && beanReloader.isPrepared()) {
+						if (beanReloader != null && beanReloader.isReady()) {
 							agentService.setBeanReloader(beanReloader);
 						}
 					} else if (FileChangedListener.class.isAssignableFrom(factory)) {

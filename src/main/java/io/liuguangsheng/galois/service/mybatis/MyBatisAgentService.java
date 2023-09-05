@@ -28,6 +28,8 @@ import io.liuguangsheng.galois.conf.GlobalConfiguration;
 import io.liuguangsheng.galois.constants.ConfConstant;
 import io.liuguangsheng.galois.service.AgentService;
 
+import static io.liuguangsheng.galois.constants.ConfConstant.RELOADER_MYBATIS_ENABLE;
+
 /**
  * mybatis agent service
  *
@@ -37,7 +39,7 @@ import io.liuguangsheng.galois.service.AgentService;
 public class MyBatisAgentService extends AgentService {
 	
 	private static final MyBatisAgentService myBatisAgentService = new MyBatisAgentService();
-	private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
+	private static final GlobalConfiguration config = GlobalConfiguration.getInstance();
 	
 	/**
 	 * get instance
@@ -50,8 +52,8 @@ public class MyBatisAgentService extends AgentService {
 	}
 	
 	@Override
-	public boolean isUseful() {
-		return super.isUseful() && globalConfig.getBoolean(ConfConstant.RELOADER_MYBATIS_ENABLE);
+	public boolean isSuitable() {
+		return super.isSuitable() && config.getBool(RELOADER_MYBATIS_ENABLE);
 	}
 	
 	

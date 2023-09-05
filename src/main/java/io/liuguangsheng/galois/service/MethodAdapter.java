@@ -51,7 +51,7 @@ import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
 public abstract class MethodAdapter extends ClassVisitor {
 	
 	private static final Logger logger = new GaloisLog(MethodAdapter.class);
-	private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
+	private static final GlobalConfiguration config = GlobalConfiguration.getInstance();
 	private static int deleteActionCount = 0;
 	/**
 	 * The Class name.
@@ -106,7 +106,8 @@ public abstract class MethodAdapter extends ClassVisitor {
 		
 		try {
 			cr = new ClassReader(classBytes);
-			// COMPUTE_MAXS means automatically compute the maximum stack size and the maximum number of local variables
+			// COMPUTE_MAXS means automatically compute the maximum stack size and the maximum number of local
+			// variables
 			// of methods.
 			// COMPUTE_FRAMES means automatically compute the stack map frames of methods from scratch.
 			cw = new ClassWriter(cr, ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
@@ -126,16 +127,11 @@ public abstract class MethodAdapter extends ClassVisitor {
 	private void debugClassFile(byte[] result) {
 		// 清空之前生成的.class文件
 		if (++deleteActionCount == 1) {
-			Optional.ofNullable(
-					new File(globalConfig.getString(USER_DIR))
-							.listFiles(file -> file.getName().endsWith(CLASS_FILE.getFileType()))
-			).ifPresent(files ->
-					Arrays.stream(files).forEach(File::delete)
-			);
+			Optional.ofNullable(new File(config.getStr(USER_DIR)).listFiles(file -> file.getName().endsWith(CLASS_FILE.getFileType()))).ifPresent(files -> Arrays.stream(files).forEach(File::delete));
 		}
 		
 		// 生成.class
-		if (globalConfig.getBoolean(PRINT_ASM_CODE_ENABLE, false)) {
+		if (config.getBool(PRINT_ASM_CODE_ENABLE, false)) {
 			String newClassName = className.substring(className.lastIndexOf(DOT) + 1);
 			String tempClassFile = newClassName + CLASS_FILE.getFileType();
 			
@@ -146,7 +142,6 @@ public abstract class MethodAdapter extends ClassVisitor {
 			}
 			logger.info("Had dump class file to {}.", tempClassFile);
 		}
-		
 	}
 	
 	/**
@@ -154,7 +149,7 @@ public abstract class MethodAdapter extends ClassVisitor {
 	 *
 	 * @return the boolean
 	 */
-	public boolean isUseful() {
+	public boolean isSuitable() {
 		return true;
 	}
 	

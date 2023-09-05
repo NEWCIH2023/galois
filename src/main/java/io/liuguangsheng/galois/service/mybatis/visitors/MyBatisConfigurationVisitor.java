@@ -34,7 +34,9 @@ import org.apache.ibatis.session.Configuration;
 
 import java.util.Objects;
 
-import static io.liuguangsheng.galois.constants.ClassNameConstant.MYBATIS_CONFIGURATION;
+import static io.liuguangsheng.galois.constants.ClassNameConstant.CLASS_MYBATIS_CONFIGURATION;
+import static io.liuguangsheng.galois.constants.Constant.DOT;
+import static io.liuguangsheng.galois.constants.Constant.SLASH;
 import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
 import static jdk.internal.org.objectweb.asm.Opcodes.ATHROW;
@@ -56,14 +58,15 @@ public class MyBatisConfigurationVisitor extends MethodAdapter {
 	 * Instantiates a new My batis configuration visitor.
 	 */
 	public MyBatisConfigurationVisitor() {
-		super(MYBATIS_CONFIGURATION);
+		super(CLASS_MYBATIS_CONFIGURATION);
 	}
 	
 	@Override
-	public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
+	public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
+	                                 String[] exceptions) {
 		MethodVisitor mv = cv.visitMethod(access, name, descriptor, signature, exceptions);
 		
-		if (Objects.equals(name, "<init>") && Objects.equals(descriptor, "()V")) {
+		if ("<init>".equals(name) && "()V".equals(descriptor)) {
 			return new MyBatisConfigurationVisitor.ConstructorVisitor(ASM5, mv);
 		}
 		
@@ -93,8 +96,8 @@ public class MyBatisConfigurationVisitor extends MethodAdapter {
 		@Override
 		public void visitInsn(int opcode) {
 			if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-				String pClassName = MyBatisBeanReloader.class.getName().replace(Constant.DOT, Constant.SLASH);
-				String vClassName = className.replace(Constant.DOT, Constant.SLASH);
+				String pClassName = MyBatisBeanReloader.class.getName().replace(DOT, SLASH);
+				String vClassName = className.replace(DOT, SLASH);
 				
 				mv.visitCode();
 				mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";", false);

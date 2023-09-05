@@ -34,7 +34,7 @@ import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebSe
 
 import java.util.Objects;
 
-import static io.liuguangsheng.galois.constants.ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT;
+import static io.liuguangsheng.galois.constants.ClassNameConstant.CLASS_WEB_SERVER_APPLICATION_CONTEXT;
 import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
 import static jdk.internal.org.objectweb.asm.Opcodes.ATHROW;
@@ -58,7 +58,7 @@ public class ApplicationContextVisitor extends MethodAdapter {
 	 * Instantiates a new Application context visitor.
 	 */
 	public ApplicationContextVisitor() {
-		super(ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT);
+		super(CLASS_WEB_SERVER_APPLICATION_CONTEXT);
 	}
 	
 	@Override

@@ -40,7 +40,8 @@ import static io.liuguangsheng.galois.constants.Constant.RELEASE;
 public class GaloisLog implements Logger {
 	
 	private final Logger logger;
-	private final boolean isReleaseVersion = Objects.equals(GlobalConfiguration.getInstance().getString(BUILD_TYPE), RELEASE);
+	private static final GlobalConfiguration config = GlobalConfiguration.getInstance();
+	private final boolean isReleaseVersion = RELEASE.equals(config.getStr(BUILD_TYPE));
 	
 	/**
 	 * Instantiates a new Galois log.

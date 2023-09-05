@@ -51,7 +51,7 @@ public class JavaFileListener implements FileChangedListener {
 	 * @return is the listener monitor this file change
 	 */
 	@Override
-	public boolean isUseful(File file) {
+	public boolean isSuitable(File file) {
 		return Objects.equals(FileUtil.getFileType(file), JAVA_FILE.getFileType());
 	}
 	

@@ -46,7 +46,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static io.liuguangsheng.galois.constants.ClassNameConstant.CLASS_SERVICE_PACKAGE;
 import static io.liuguangsheng.galois.constants.Constant.COMMA;
+import static io.liuguangsheng.galois.constants.Constant.DOT;
+import static io.liuguangsheng.galois.constants.Constant.SLASH;
 
 /**
  * premain agent服务入口
@@ -77,7 +80,7 @@ public class PremainService {
 	 */
 	public static void premain(String agentArgs, Instrumentation inst) {
 		if (inst == null) {
-			logger.error("Your program do not support instrumentation.");
+			logger.error("Your program do not support instrumentation, Please remove this javaagent.");
 			System.exit(0);
 		}
 		
@@ -95,7 +98,7 @@ public class PremainService {
 	 */
 	private static void scanAgentService() {
 		// scan agent service over abstract class named AgentService
-		Set<Class<?>> agentClasses = ClassUtil.scanBaseClass(ClassNameConstant.SERVICE_PACKAGE, AgentService.class);
+		Set<Class<?>> agentClasses = ClassUtil.scanBaseClass(CLASS_SERVICE_PACKAGE, AgentService.class);
 		
 		for (Class<?> agentClass : agentClasses) {
 			if (Modifier.isAbstract(agentClass.getModifiers())) {
@@ -113,7 +116,7 @@ public class PremainService {
 	 * scan asm visitor
 	 */
 	private static void scanAsmVisitor() {
-		Set<Class<?>> visitorClasses = ClassUtil.scanBaseClass(ClassNameConstant.SERVICE_PACKAGE, MethodAdapter.class);
+		Set<Class<?>> visitorClasses = ClassUtil.scanBaseClass(CLASS_SERVICE_PACKAGE, MethodAdapter.class);
 		
 		if (logger.isDebugEnabled()) {
 			List<String> visitorClassNameList = visitorClasses.stream()
@@ -135,7 +138,8 @@ public class PremainService {
 				continue;
 			}
 			
-			Optional.ofNullable(ClassUtil.getInstance(visitor.manager())).ifPresent(object -> ((AgentService) object).registerMethodAdapter(methodAdapter));
+			Optional.ofNullable(ClassUtil.getInstance(visitor.manager()))
+					.ifPresent(object -> ((AgentService) object).registerMethodAdapter(methodAdapter));
 		}
 	}
 	
@@ -143,13 +147,14 @@ public class PremainService {
 	 * scan runner
 	 */
 	private static void scanRunner() {
-		Set<Class<?>> runnerClasses = ClassUtil.scanBaseClass(ClassNameConstant.SERVICE_PACKAGE, AbstractRunner.class);
+		Set<Class<?>> runnerClasses = ClassUtil.scanBaseClass(CLASS_SERVICE_PACKAGE, AbstractRunner.class);
 		for (Class<?> runnerClass : runnerClasses) {
 			if (Modifier.isAbstract(runnerClass.getModifiers())) {
 				continue;
 			}
 			
-			Optional.ofNullable(ClassUtil.getInstance(runnerClass)).ifPresent(object -> runManager.addRunner((AbstractRunner) object));
+			Optional.ofNullable(ClassUtil.getInstance(runnerClass))
+					.ifPresent(object -> runManager.addRunner((AbstractRunner) object));
 		}
 		
 	}
@@ -162,12 +167,13 @@ public class PremainService {
 	static class CustomTransformer implements ClassFileTransformer {
 		
 		@Override
-		public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) {
+		public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
+		                        ProtectionDomain protectionDomain, byte[] classfileBuffer) {
 			if (StringUtil.isBlank(className)) {
 				return null;
 			}
 			
-			String newClassName = className.replace(Constant.SLASH, Constant.DOT);
+			String newClassName = className.replace(SLASH, DOT);
 			Collection<AgentService> agentServices = agentServiceMap.values();
 			
 			for (AgentService agentService : agentServices) {

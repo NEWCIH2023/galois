@@ -53,6 +53,7 @@ import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
  *
  * @author liuguangsheng
  * @since 1.0.0
+ * @deprecated
  */
 public class JdkFileWatchService extends FileWatchService {
 	
@@ -79,7 +80,8 @@ public class JdkFileWatchService extends FileWatchService {
 	public void init() {
 		try {
 			watchService = FileSystems.getDefault().newWatchService();
-			Paths.get(rootPath).register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE}, HIGH, FILE_TREE);
+			Paths.get(rootPath).register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE}
+					, HIGH, FILE_TREE);
 		} catch (IOException e) {
 			logger.error("Start file watch service fail.", e);
 		}
@@ -95,7 +97,8 @@ public class JdkFileWatchService extends FileWatchService {
 				.collect(Collectors.toList());
 		String listenerNameStr = String.join(COMMA, listenerNames);
 		
-		logger.info("JdkFileWatchService Started in path {} with {} listeners {}.", rootPath, listenerNames.size(), listenerNameStr);
+		logger.info("JdkFileWatchService Started in path {} with {} listeners {}.", rootPath, listenerNames.size(),
+				listenerNameStr);
 		
 		Thread fileMonitorThread = new Thread(() -> {
 			while (true) {
@@ -131,7 +134,7 @@ public class JdkFileWatchService extends FileWatchService {
 						}
 						
 						listeners.stream()
-								.filter(listener -> listener.isUseful(file))
+								.filter(listener -> listener.isSuitable(file))
 								.forEach(listener -> {
 									if (kind == ENTRY_CREATE) {
 										listener.createdHandle(file);

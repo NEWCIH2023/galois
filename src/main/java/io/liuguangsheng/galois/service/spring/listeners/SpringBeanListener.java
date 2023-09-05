@@ -51,7 +51,7 @@ public class SpringBeanListener implements FileChangedListener {
 	private final SpringBeanReloader springBeanReloader = SpringBeanReloader.getInstance();
 	
 	@Override
-	public boolean isUseful(File file) {
+	public boolean isSuitable(File file) {
 		return FileUtil.validFileType(file, FileType.CLASS_FILE);
 	}
 	
@@ -79,7 +79,7 @@ public class SpringBeanListener implements FileChangedListener {
 			ClassDefinition definition = new ClassDefinition(clazz, classBytes);
 			ClassUtil.getInstrumentation().redefineClasses(definition);
 			
-			if (springBeanReloader.isUseful(clazz)) {
+			if (springBeanReloader.isSuitable(clazz)) {
 				springBeanReloader.updateBean(clazz);
 			}
 			

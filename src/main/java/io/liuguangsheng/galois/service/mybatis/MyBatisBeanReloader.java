@@ -52,9 +52,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static io.liuguangsheng.galois.constants.Constant.CACHE_REF_MAP;
 import static io.liuguangsheng.galois.constants.Constant.DOT;
 import static io.liuguangsheng.galois.constants.Constant.ID;
+import static io.liuguangsheng.galois.constants.Constant.KNOWN_MAPPERS;
+import static io.liuguangsheng.galois.constants.Constant.LOADED_RESOURCES;
+import static io.liuguangsheng.galois.constants.Constant.MAPPED_STATEMENTS;
 import static io.liuguangsheng.galois.constants.Constant.NAMESPACE;
+import static io.liuguangsheng.galois.constants.Constant.PARAMETER_MAPS;
 
 /**
  * The type My batis bean reloader.
@@ -66,10 +71,7 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 	private static final MyBatisBeanReloader mybatisBeanReloder = new MyBatisBeanReloader();
 	private static final Logger logger = new GaloisLog(MyBatisBeanReloader.class);
 	protected Configuration configuration;
-	public static final String PARAMETER_MAPS = "parameterMaps";
-	public static final String KNOWN_MAPPERS = "knownMappers";
-	public static final String LOADED_RESOURCES = "loadedResources";
-	public static final String MAPPED_STATEMENTS = "mappedStatements";
+	private static final String NODE_MAPPER = "/mapper";
 	
 	private MyBatisBeanReloader() {
 	}
@@ -84,14 +86,13 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 			Resource mapperLocation = new PathResource(mapperFile.toPath());
 			XPathParser parser = new XPathParser(mapperLocation.getInputStream(), true, configuration.getVariables(),
 					new XMLMapperEntityResolver());
-			XNode context = parser.evalNode("/mapper");
+			XNode context = parser.evalNode(NODE_MAPPER);
 			String namespace = context.getStringAttribute(NAMESPACE);
 			
 			updateSingleBean(mapperLocation, namespace);
 			Set<Resource> files = getAllNamespaceFile(namespace);
-			Set<Resource> mappers = files.stream()
-					.filter(resource -> !resource.toString().contains(Objects.requireNonNull(mapperLocation.getFilename())))
-					.collect(Collectors.toSet());
+			Set<Resource> mappers =
+					files.stream().filter(resource -> !resource.toString().contains(Objects.requireNonNull(mapperLocation.getFilename()))).collect(Collectors.toSet());
 			
 			for (Resource resource : mappers) {
 				updateSingleBean(resource, namespace);
@@ -126,12 +127,12 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 	}
 	
 	@Override
-	public boolean isUseful(File file) {
+	public boolean isSuitable(File file) {
 		return true;
 	}
 	
 	@Override
-	public boolean isPrepared() {
+	public boolean isReady() {
 		if (configuration == null) {
 			logger.error("MybatisBeanReloader not prepare ready. Configuration object is null.");
 			return false;
@@ -146,17 +147,13 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 			mappedStatementsField.setAccessible(true);
 			Map<String, Object> mappedStatements = (Map<String, Object>) mappedStatementsField.get(configuration);
 			
-			return mappedStatements.values().stream()
-					.filter(statement -> statement.getClass().equals(MappedStatement.class))
-					.map(statement -> (MappedStatement) statement)
-					.filter(statement -> statement.getId().contains(namespace))
-					.map(statement -> {
-						String tmpPath = statement.getResource();
-						if (tmpPath.contains("[")) {
-							tmpPath = tmpPath.substring(tmpPath.indexOf('[') + 1, tmpPath.lastIndexOf(']'));
-						}
-						return new PathResource(tmpPath);
-					}).collect(Collectors.toSet());
+			return mappedStatements.values().stream().filter(statement -> statement.getClass().equals(MappedStatement.class)).map(statement -> (MappedStatement) statement).filter(statement -> statement.getId().contains(namespace)).map(statement -> {
+				String tmpPath = statement.getResource();
+				if (tmpPath.contains("[")) {
+					tmpPath = tmpPath.substring(tmpPath.indexOf('[') + 1, tmpPath.lastIndexOf(']'));
+				}
+				return new PathResource(tmpPath);
+			}).collect(Collectors.toSet());
 		} catch (Throwable e) {
 			logger.error("Get all mapper in namespace {} fail.", namespace, e);
 		}
@@ -185,7 +182,7 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 	@SuppressWarnings("unchecked")
 	private void clearCacheRefElement(String namespace) {
 		try {
-			Field cacheRefMapField = configuration.getClass().getDeclaredField("cacheRefMap");
+			Field cacheRefMapField = configuration.getClass().getDeclaredField(CACHE_REF_MAP);
 			cacheRefMapField.setAccessible(true);
 			Map<String, String> cacheRefMap = (Map<String, String>) cacheRefMapField.get(configuration);
 			cacheRefMap.remove(namespace);
@@ -272,7 +269,7 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 		this.configuration = configuration;
 	}
 	
-	public String applyCurrentNamespace(String base, boolean isReference, String namespace) {
+	public static String applyCurrentNamespace(String base, boolean isReference, String namespace) {
 		if (base == null) {
 			return null;
 		}

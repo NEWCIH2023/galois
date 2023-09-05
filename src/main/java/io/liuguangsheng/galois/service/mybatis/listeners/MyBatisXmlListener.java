@@ -51,15 +51,12 @@ import java.io.File;
 @LazyBean(value = "MyBatisXmlListener", manager = MyBatisAgentService.class)
 public class MyBatisXmlListener implements FileChangedListener {
 	
-	/**
-	 * The constant DOC_TYPE.
-	 */
-	public static final String DOC_TYPE = "mapper";
+	private static final String DOC_TYPE_MAPPER = "mapper";
 	private static final Logger logger = new GaloisLog(MyBatisXmlListener.class);
 	private static final MyBatisBeanReloader reloader = MyBatisBeanReloader.getInstance();
 	
 	@Override
-	public boolean isUseful(File file) {
+	public boolean isSuitable(File file) {
 		boolean fileTypeCheck = FileUtil.validFileType(file, FileType.XML_FILE);
 		
 		if (!fileTypeCheck) {
@@ -71,14 +68,12 @@ public class MyBatisXmlListener implements FileChangedListener {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			dbf.setValidating(false);
 			DocumentBuilder db = dbf.newDocumentBuilder();
-			// do no validate dtd
-			db.setEntityResolver(((publicId, systemId) -> new InputSource(new ByteArrayInputStream(new byte[0]))));
+			db.setEntityResolver((p, s) -> new InputSource(new ByteArrayInputStream(new byte[0])));
 			Document document = db.parse(file);
 			DocumentType documentType = document.getDoctype();
-			return documentType != null && documentType.toString().contains(DOC_TYPE);
-			
+			return documentType != null && documentType.toString().contains(DOC_TYPE_MAPPER);
 		} catch (Throwable e) {
-			logger.error("Parse xml file fail. Check it's file type.", e);
+			logger.error("Parse xml file failed. Check its file type.", e);
 			return false;
 		}
 	}

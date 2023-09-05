@@ -68,7 +68,7 @@ public abstract class AgentService {
 	 *
 	 * @return 当项目已经加载了必须的类之后 ，该AgentService将成为可用状态
 	 */
-	public boolean isUseful() {
+	public boolean isSuitable() {
 		return enabled == necessaryClasses.size();
 	}
 	

@@ -46,12 +46,12 @@ public interface BeanReloader<T> {
 	 * @param object 用来判断当前实例对象是否可以被框架重新加载
 	 * @return 验证结果 boolean
 	 */
-	boolean isUseful(T object);
+	boolean isSuitable(T object);
 	
 	/**
 	 * 判断当前beanReloader是否准备完成
 	 *
 	 * @return
 	 */
-	boolean isPrepared();
+	boolean isReady();
 }

@@ -40,7 +40,7 @@ public interface FileChangedListener {
 	 * @param file the changed file
 	 * @return is the listener monitor this file change
 	 */
-	boolean isUseful(File file);
+	boolean isSuitable(File file);
 	
 	/**
 	 * handler for file created

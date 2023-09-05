@@ -25,11 +25,15 @@
 package io.liuguangsheng.galois.service.monitor;
 
 import io.liuguangsheng.galois.utils.GaloisLog;
+import org.apache.commons.io.filefilter.FileFileFilter;
+import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.slf4j.Logger;
 
+import java.io.FileFilter;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static io.liuguangsheng.galois.constants.Constant.COMMA;
@@ -55,7 +59,9 @@ public class ApacheFileWatchService extends FileWatchService {
 	 */
 	@Override
 	public void init() {
-		observer = new FileAlterationObserver(rootPath);
+		String buildPath = Objects.requireNonNull(getClass().getClassLoader().getResource("")).getPath();
+		FileFilter fileFilter = pathname -> !pathname.toURI().getPath().startsWith(buildPath);
+		observer = new FileAlterationObserver(rootPath, fileFilter);
 		
 		try {
 			listeners.stream()
@@ -81,6 +87,7 @@ public class ApacheFileWatchService extends FileWatchService {
 				.collect(Collectors.toList());
 		String listenerNameStr = String.join(COMMA, listenerNames);
 		
-		logger.info("ApacheFileWatchService Started in path {} with {} listeners {}.", rootPath, listenerNames.size(), listenerNameStr);
+		logger.info("ApacheFileWatchService Started in path {} with {} listeners {}.", rootPath, listenerNames.size(),
+				listenerNameStr);
 	}
 }

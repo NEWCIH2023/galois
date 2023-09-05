@@ -35,7 +35,7 @@ import org.springframework.boot.SpringApplicationRunListener;
 import java.util.List;
 import java.util.Objects;
 
-import static io.liuguangsheng.galois.constants.ClassNameConstant.SPRING_APPLICATION_RUN_LISTENERS;
+import static io.liuguangsheng.galois.constants.ClassNameConstant.CLASS_SPRING_APPLICATION_RUN_LISTENERS;
 import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
 import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
 import static jdk.internal.org.objectweb.asm.Opcodes.GETFIELD;
@@ -59,7 +59,7 @@ public class SpringApplicationRunListenersVisitor extends MethodAdapter {
 	 * Instantiates a new Spring application run listeners visitor.
 	 */
 	public SpringApplicationRunListenersVisitor() {
-		super(SPRING_APPLICATION_RUN_LISTENERS);
+		super(CLASS_SPRING_APPLICATION_RUN_LISTENERS);
 	}
 	
 	@Override
