@@ -163,7 +163,7 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
 	 *
 	 * @return the boolean
 	 */
-	protected boolean isCanInvoke() {
+	protected boolean canInvoke() {
 		return --invokeCount == 0;
 	}
 }

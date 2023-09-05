@@ -62,7 +62,7 @@ public class AgentInitializeRunner extends AbstractRunner {
 	
 	@Override
 	public void started(ConfigurableApplicationContext context) {
-		if (!isCanInvoke()) {
+		if (!canInvoke()) {
 			return;
 		}
 		
@@ -70,11 +70,11 @@ public class AgentInitializeRunner extends AbstractRunner {
 		
 		try {
 			Set<Class<?>> lazyBeanFactorys = ClassUtil.scanAnnotationClass(CLASS_SERVICE_PACKAGE, LazyBean.class);
-			Set<AgentService> agentServices = ClassUtil.scanBaseClass(CLASS_SERVICE_PACKAGE, AgentService.class)
-					.stream()
-					.filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
-					.map(clazz -> (AgentService) ClassUtil.getInstance(clazz))
-					.collect(Collectors.toSet());
+			Set<AgentService> agentServices =
+					ClassUtil.scanBaseClass(CLASS_SERVICE_PACKAGE, AgentService.class).stream()
+							.filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
+							.map(clazz -> (AgentService) ClassUtil.getInstance(clazz))
+							.collect(Collectors.toSet());
 			
 			Map<String, FileChangedListener> tmpRankMap = new HashMap<>(64);
 			
