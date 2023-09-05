@@ -227,6 +227,6 @@
 
     <scm>
         <developerConnection>scm:git:https://gitee.com/newcih/galois.git</developerConnection>
-        <tag>galois-1.1.2</tag>
+        <tag>galois-1.4.1</tag>
     </scm>
 </project>
