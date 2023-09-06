@@ -29,7 +29,7 @@
 
     <groupId>org.liuguangsheng</groupId>
     <artifactId>galois</artifactId>
-    <version>1.5.1</version>
+    <version>1.5.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>galois</name>
     <properties>
@@ -227,6 +227,6 @@
 
     <scm>
         <developerConnection>scm:git:https://gitee.com/newcih/galois.git</developerConnection>
-        <tag>galois-1.5.1</tag>
+        <tag>galois-1.4.1</tag>
     </scm>
 </project>
