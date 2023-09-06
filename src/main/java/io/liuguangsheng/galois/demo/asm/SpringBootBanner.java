@@ -22,38 +22,34 @@
  * SOFTWARE.
  */
 
-package io.liuguangsheng.galois.service.annotation;
+package io.liuguangsheng.galois.demo.asm;
 
-import io.liuguangsheng.galois.service.AgentService;
+import io.liuguangsheng.galois.service.spring.BannerService;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.io.PrintStream;
 
 /**
- * The interface Asm visitor.
+ * Default Banner implementation which writes the 'Spring' banner.
+ *
+ * @author Phillip Webb
  */
-@Documented
-@Inherited
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface AsmVisitor {
+public class SpringBootBanner {
 
-    /**
-     * Value string.
-     *
-     * @return the string
-     */
-    String value();
+    private static final String[] BANNER = {"",
+            "  .   ____          _            __ _ _",
+            " /\\\\ / ___'_ __ _ _(_)_ __  __ _ \\ \\ \\ \\",
+            "( ( )\\___ | '_ | '_| | '_ \\/ _` | \\ \\ \\ \\",
+            " \\\\/  ___)| |_)| | | | | || (_| |  ) ) ) )",
+            "  '  |____| .__|_| |_|_| |_\\__, | / / / /",
+            " =========|_|==============|___/=/_/_/_/"};
 
-    /**
-     * Manager class.
-     *
-     * @return the class
-     */
-    Class<? extends AgentService> manager();
+    private static final String SPRING_BOOT = " :: Spring Boot :: ";
+
+    private static final int STRAP_LINE_SIZE = 42;
+
+    public void printBanner(Class<?> sourceClass,
+                            PrintStream printStream) {
+        new BannerService().printBanner();
+    }
 
 }

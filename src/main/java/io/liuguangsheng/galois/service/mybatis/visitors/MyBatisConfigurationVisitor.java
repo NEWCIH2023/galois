@@ -53,61 +53,61 @@ import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
  */
 @AsmVisitor(value = "MyBatisConfigurationVisitor", manager = MyBatisAgentService.class)
 public class MyBatisConfigurationVisitor extends MethodAdapter {
-	
-	/**
-	 * Instantiates a new My batis configuration visitor.
-	 */
-	public MyBatisConfigurationVisitor() {
-		super(CLASS_MYBATIS_CONFIGURATION);
-	}
-	
-	@Override
-	public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
-	                                 String[] exceptions) {
-		MethodVisitor mv = cv.visitMethod(access, name, descriptor, signature, exceptions);
-		
-		if ("<init>".equals(name) && "()V".equals(descriptor)) {
-			return new MyBatisConfigurationVisitor.ConstructorVisitor(ASM5, mv);
-		}
-		
-		return mv;
-	}
-	
-	public interface NecessaryMethods {
-		
-		void setConfiguration(Configuration configuration);
-	}
-	
-	/**
-	 * The type Constructor visitor.
-	 */
-	class ConstructorVisitor extends MethodVisitor {
-		
-		/**
-		 * Instantiates a new Constructor visitor.
-		 *
-		 * @param api the api
-		 * @param mv  the mv
-		 */
-		public ConstructorVisitor(int api, MethodVisitor mv) {
-			super(api, mv);
-		}
-		
-		@Override
-		public void visitInsn(int opcode) {
-			if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-				String pClassName = MyBatisBeanReloader.class.getName().replace(DOT, SLASH);
-				String vClassName = className.replace(DOT, SLASH);
-				
-				mv.visitCode();
-				mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";", false);
-				mv.visitVarInsn(ALOAD, 0);
-				mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setConfiguration", "(L" + vClassName + ";)V", false);
-				mv.visitInsn(RETURN);
-				mv.visitEnd();
-			} else {
-				super.visitInsn(opcode);
-			}
-		}
-	}
+
+    /**
+     * Instantiates a new My batis configuration visitor.
+     */
+    public MyBatisConfigurationVisitor() {
+        super(CLASS_MYBATIS_CONFIGURATION);
+    }
+
+    @Override
+    public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
+                                     String[] exceptions) {
+        MethodVisitor mv = cv.visitMethod(access, name, descriptor, signature, exceptions);
+
+        if ("<init>".equals(name) && "()V".equals(descriptor)) {
+            return new MyBatisConfigurationVisitor.ConstructorVisitor(ASM5, mv);
+        }
+
+        return mv;
+    }
+
+    public interface NecessaryMethods {
+
+        void setConfiguration(Configuration configuration);
+    }
+
+    /**
+     * The type Constructor visitor.
+     */
+    class ConstructorVisitor extends MethodVisitor {
+
+        /**
+         * Instantiates a new Constructor visitor.
+         *
+         * @param api the api
+         * @param mv  the mv
+         */
+        public ConstructorVisitor(int api, MethodVisitor mv) {
+            super(api, mv);
+        }
+
+        @Override
+        public void visitInsn(int opcode) {
+            if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
+                String pClassName = MyBatisBeanReloader.class.getName().replace(DOT, SLASH);
+                String vClassName = className.replace(DOT, SLASH);
+
+                mv.visitCode();
+                mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";", false);
+                mv.visitVarInsn(ALOAD, 0);
+                mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setConfiguration", "(L" + vClassName + ";)V", false);
+                mv.visitInsn(RETURN);
+                mv.visitEnd();
+            } else {
+                super.visitInsn(opcode);
+            }
+        }
+    }
 }

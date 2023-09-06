@@ -78,7 +78,7 @@ public abstract class AgentService {
 	 * @param loadedClassName loaded class name
 	 * @return 项目是否加载了对应的类名的类 boolean
 	 */
-	public boolean checkNecessaryClass(String loadedClassName) {
+	public boolean isNecessaryClass(String loadedClassName) {
 		if (necessaryClasses.contains(loadedClassName)) {
 			enabled++;
 			return true;

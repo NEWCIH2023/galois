@@ -27,7 +27,7 @@ package io.liuguangsheng.galois.service.spring.visitors;
 import io.liuguangsheng.galois.constants.Constant;
 import io.liuguangsheng.galois.service.MethodAdapter;
 import io.liuguangsheng.galois.service.annotation.AsmVisitor;
-import io.liuguangsheng.galois.service.runners.SpringRunnerManager;
+import io.liuguangsheng.galois.service.spring.runners.SpringRunnerManager;
 import io.liuguangsheng.galois.service.spring.SpringAgentService;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.springframework.boot.SpringApplicationRunListener;

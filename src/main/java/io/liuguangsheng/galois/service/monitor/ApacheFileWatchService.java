@@ -45,49 +45,34 @@ import static io.liuguangsheng.galois.constants.Constant.COMMA;
  * @since 1.0.0
  */
 public class ApacheFileWatchService extends FileWatchService {
-	private static final Logger logger = new GaloisLog(ApacheFileWatchService.class);
-	private static final ApacheFileWatchService instance = new ApacheFileWatchService();
-	private static final long interval = 1000;
-	private FileAlterationObserver observer;
-	
-	public static ApacheFileWatchService getInstance() {
-		return instance;
-	}
-	
-	/**
-	 * init
-	 */
-	@Override
-	public void init() {
-		String buildPath = Objects.requireNonNull(getClass().getClassLoader().getResource("")).getPath();
-		FileFilter fileFilter = pathname -> !pathname.toURI().getPath().startsWith(buildPath);
-		observer = new FileAlterationObserver(rootPath, fileFilter);
-		
-		try {
-			listeners.stream()
-					.map(ApacheFileChangedListener::new)
-					.forEach(observer::addListener);
-			observer.initialize();
-			observer.checkAndNotify();
-		} catch (Exception e) {
-			logger.error("Initial apache file watchservice failed.", e);
-		}
-	}
-	
-	@Override
-	public void start() {
-		try {
-			new FileAlterationMonitor(interval, observer).start();
-		} catch (Exception e) {
-			logger.error("Start apache file monitor service failed.", e);
-		}
-		
-		List<String> listenerNames = listeners.stream()
-				.map(FileChangedListener::toString)
-				.collect(Collectors.toList());
-		String listenerNameStr = String.join(COMMA, listenerNames);
-		
-		logger.info("ApacheFileWatchService Started in path {} with {} listeners {}.", rootPath, listenerNames.size(),
-				listenerNameStr);
-	}
+    private static final Logger logger = new GaloisLog(ApacheFileWatchService.class);
+    private static final ApacheFileWatchService instance = new ApacheFileWatchService();
+    private static final long interval = 1000;
+    private FileAlterationObserver observer;
+
+    public static ApacheFileWatchService getInstance() {
+        return instance;
+    }
+
+    @Override
+    public void start() {
+        String buildPath = Objects.requireNonNull(getClass().getClassLoader().getResource("")).getPath();
+        FileFilter fileFilter = pathname -> !pathname.toURI().getPath().startsWith(buildPath);
+        observer = new FileAlterationObserver(rootPath, fileFilter);
+
+        try {
+            listeners.stream().map(ApacheFileChangedListener::new).forEach(observer::addListener);
+            observer.initialize();
+            observer.checkAndNotify();
+            new FileAlterationMonitor(interval, observer).start();
+        } catch (Exception e) {
+            logger.error("Invoke apache file monitor service failed.", e);
+        }
+
+        List<String> listenerNames = listeners.stream().map(FileChangedListener::toString).collect(Collectors.toList());
+        String listenerNameStr = String.join(COMMA, listenerNames);
+
+        logger.info("ApacheFileWatchService Started in path {} with {} listeners {}.", rootPath, listenerNames.size()
+                , listenerNameStr);
+    }
 }

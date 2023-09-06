@@ -31,41 +31,43 @@ package io.liuguangsheng.galois.constants;
  * @since 1.0.0
  */
 public class ConfConstant {
-	
-	/**
-	 * The constant BUILD_TYPE.
-	 */
-	public static final String BUILD_TYPE = "build.type";
-	/**
-	 * The constant PRINT_THROWABLE.
-	 */
-	public static final String PRINT_THROWABLE = "print.throwable";
-	/**
-	 * The constant LOGGING_ENABLE.
-	 */
-	public static final String LOGGING_ENABLE = "logging.enable";
-	/**
-	 * The constant LOGGING_LEVEL.
-	 */
-	public static final String LOGGING_LEVEL = "logging.level";
-	/**
-	 * The constant BANNER_ENABLE.
-	 */
-	public static final String BANNER_ENABLE = "banner.enable";
-	/**
-	 * The constant RELOADER_SPRING_BOOT_ENABLE.
-	 */
-	public static final String RELOADER_SPRING_BOOT_ENABLE = "reloader.spring.boot.enable";
-	/**
-	 * The constant PRINT_ASM_CODE_ENABLE.
-	 */
-	public static final String PRINT_ASM_CODE_ENABLE = "print-asm-code.enable";
-	/**
-	 * The constant RELOADER_MYBATIS_ENABLE.
-	 */
-	public static final String RELOADER_MYBATIS_ENABLE = "reloader.mybatis.enable";
-	/**
-	 * The constant GALOIS_VERSION.
-	 */
-	public static final String GALOIS_VERSION = "galois.version";
+
+    /**
+     * The constant BUILD_TYPE.
+     */
+    public static final String BUILD_TYPE = "build.type";
+    /**
+     * The constant PRINT_THROWABLE.
+     */
+    public static final String PRINT_THROWABLE = "print.throwable";
+    /**
+     * The constant LOGGING_ENABLE.
+     */
+    public static final String LOGGING_ENABLE = "logging.enable";
+    /**
+     * The constant LOGGING_LEVEL.
+     */
+    public static final String LOGGING_LEVEL = "logging.level";
+    /**
+     * The constant BANNER_ENABLE.
+     */
+    public static final String BANNER_ENABLE = "banner.enable";
+    /**
+     * The constant RELOADER_SPRING_BOOT_ENABLE.
+     */
+    public static final String RELOADER_SPRING_BOOT_ENABLE = "reloader.spring.boot.enable";
+    /**
+     * The constant PRINT_ASM_CODE_ENABLE.
+     */
+    public static final String PRINT_ASM_CODE_ENABLE = "print-asm-code.enable";
+    /**
+     * The constant RELOADER_MYBATIS_ENABLE.
+     */
+    public static final String RELOADER_MYBATIS_ENABLE = "reloader.mybatis.enable";
+    /**
+     * The constant GALOIS_VERSION.
+     */
+    public static final String GALOIS_VERSION = "galois.version";
+    public static final String GALOIS_GITEE_URL = "galois.gitee.url";
+    public static final String GALOIS_GITHUB_URL = "galois.github.url";
 }

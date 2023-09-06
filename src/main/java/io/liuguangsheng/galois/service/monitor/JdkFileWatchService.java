@@ -56,103 +56,94 @@ import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
  * @deprecated
  */
 public class JdkFileWatchService extends FileWatchService {
-	
-	private static final Logger logger = new GaloisLog(JdkFileWatchService.class);
-	private static final JdkFileWatchService instance = new JdkFileWatchService();
-	private WatchService watchService;
-	
-	private JdkFileWatchService() {
-	}
-	
-	/**
-	 * Gets instance.
-	 *
-	 * @return the instance
-	 */
-	public static JdkFileWatchService getInstance() {
-		return instance;
-	}
-	
-	/**
-	 * init
-	 */
-	@Override
-	public void init() {
-		try {
-			watchService = FileSystems.getDefault().newWatchService();
-			Paths.get(rootPath).register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE}
-					, HIGH, FILE_TREE);
-		} catch (IOException e) {
-			logger.error("Start file watch service fail.", e);
-		}
-	}
-	
-	/**
-	 * begin file monitor service
-	 */
-	@Override
-	public void start() {
-		List<String> listenerNames = listeners.stream()
-				.map(FileChangedListener::toString)
-				.collect(Collectors.toList());
-		String listenerNameStr = String.join(COMMA, listenerNames);
-		
-		logger.info("JdkFileWatchService Started in path {} with {} listeners {}.", rootPath, listenerNames.size(),
-				listenerNameStr);
-		
-		Thread fileMonitorThread = new Thread(() -> {
-			while (true) {
-				try {
-					// take()是一个阻塞方法，会等待监视器发出的信号才返回。
-					// 还可以使用watcher.poll()方法，非阻塞方法，会立即返回当时监视器中是否有信号
-					WatchKey watchKey = watchService.poll(3, TimeUnit.SECONDS);
-					if (watchKey == null) {
-						continue;
-					}
-					
-					List<WatchEvent<?>> events = watchKey.pollEvents();
-					for (WatchEvent<?> event : events) {
-						WatchEvent.Kind<?> kind = event.kind();
-						
-						if (event.context() == null || watchKey.watchable() == null || event.count() > 1 || kind == OVERFLOW) {
-							continue;
-						}
-						
-						String fileName = event.context().toString();
-						if (fileName.endsWith(TILDE) || fileName.startsWith(DOT)) {
-							continue;
-						}
-						
-						File file = new File(watchKey.watchable() + File.separator + fileName);
-						
-						if (logger.isDebugEnabled()) {
-							logger.debug("[{}] monitor file {} {}.", event.count(), kind, file);
-						}
-						
-						if (file.isDirectory()) {
-							continue;
-						}
-						
-						listeners.stream()
-								.filter(listener -> listener.isSuitable(file))
-								.forEach(listener -> {
-									if (kind == ENTRY_CREATE) {
-										listener.createdHandle(file);
-									} else if (kind == ENTRY_MODIFY) {
-										listener.modifiedHandle(file);
-									}
-								});
-					}
-					
-					watchKey.reset();
-				} catch (Throwable e) {
-					logger.error("File monitor handle event failed.", e);
-				}
-			}
-		});
-		
-		fileMonitorThread.setDaemon(true);
-		fileMonitorThread.start();
-	}
-	
+
+    private static final Logger logger = new GaloisLog(JdkFileWatchService.class);
+    private static final JdkFileWatchService instance = new JdkFileWatchService();
+    private WatchService watchService;
+
+    private JdkFileWatchService() {
+    }
+
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
+    public static JdkFileWatchService getInstance() {
+        return instance;
+    }
+
+    /**
+     * begin file monitor service
+     */
+    @Override
+    public void start() {
+        try {
+            watchService = FileSystems.getDefault().newWatchService();
+            Paths.get(rootPath)
+                    .register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE}, HIGH,
+                            FILE_TREE);
+        } catch (IOException e) {
+            logger.error("Start file watch service fail.", e);
+        }
+
+        List<String> listenerNames = listeners.stream().map(FileChangedListener::toString).collect(Collectors.toList());
+        String listenerNameStr = String.join(COMMA, listenerNames);
+
+        logger.info("JdkFileWatchService Started in path {} with {} listeners {}.", rootPath, listenerNames.size(),
+                listenerNameStr);
+
+        Thread fileMonitorThread = new Thread(() -> {
+            while (true) {
+                try {
+                    // take()是一个阻塞方法，会等待监视器发出的信号才返回。
+                    // 还可以使用watcher.poll()方法，非阻塞方法，会立即返回当时监视器中是否有信号
+                    WatchKey watchKey = watchService.poll(3, TimeUnit.SECONDS);
+                    if (watchKey == null) {
+                        continue;
+                    }
+
+                    List<WatchEvent<?>> events = watchKey.pollEvents();
+                    for (WatchEvent<?> event : events) {
+                        WatchEvent.Kind<?> kind = event.kind();
+
+                        if (event.context() == null || watchKey.watchable() == null || event.count() > 1 || kind == OVERFLOW) {
+                            continue;
+                        }
+
+                        String fileName = event.context().toString();
+                        if (fileName.endsWith(TILDE) || fileName.startsWith(DOT)) {
+                            continue;
+                        }
+
+                        File file = new File(watchKey.watchable() + File.separator + fileName);
+
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("[{}] monitor file {} {}.", event.count(), kind, file);
+                        }
+
+                        if (file.isDirectory()) {
+                            continue;
+                        }
+
+                        listeners.stream().filter(listener -> listener.isSuitable(file)).forEach(listener -> {
+                            if (kind == ENTRY_CREATE) {
+                                listener.createdHandle(file);
+                            } else if (kind == ENTRY_MODIFY) {
+                                listener.modifiedHandle(file);
+                            }
+                        });
+                    }
+
+                    watchKey.reset();
+                } catch (Throwable e) {
+                    logger.error("File monitor handle event failed.", e);
+                }
+            }
+        });
+
+        fileMonitorThread.setDaemon(true);
+        fileMonitorThread.start();
+    }
+
 }

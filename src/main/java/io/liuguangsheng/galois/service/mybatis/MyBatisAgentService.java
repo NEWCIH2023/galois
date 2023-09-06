@@ -27,6 +27,7 @@ package io.liuguangsheng.galois.service.mybatis;
 import io.liuguangsheng.galois.conf.GlobalConfiguration;
 import io.liuguangsheng.galois.constants.ConfConstant;
 import io.liuguangsheng.galois.service.AgentService;
+import io.liuguangsheng.galois.service.mybatis.visitors.MyBatisConfigurationVisitor;
 
 import static io.liuguangsheng.galois.constants.ConfConstant.RELOADER_MYBATIS_ENABLE;
 
@@ -37,24 +38,27 @@ import static io.liuguangsheng.galois.constants.ConfConstant.RELOADER_MYBATIS_EN
  * @since 1.0.0
  */
 public class MyBatisAgentService extends AgentService {
-	
-	private static final MyBatisAgentService myBatisAgentService = new MyBatisAgentService();
-	private static final GlobalConfiguration config = GlobalConfiguration.getInstance();
-	
-	/**
-	 * get instance
-	 *
-	 * @return {@link MyBatisAgentService}
-	 * @see MyBatisAgentService
-	 */
-	public static MyBatisAgentService getInstance() {
-		return myBatisAgentService;
-	}
-	
-	@Override
-	public boolean isSuitable() {
-		return super.isSuitable() && config.getBool(RELOADER_MYBATIS_ENABLE);
-	}
-	
-	
+
+    private static final GlobalConfiguration config = GlobalConfiguration.getInstance();
+    private static final MyBatisAgentService myBatisAgentService = new MyBatisAgentService();
+
+    private MyBatisAgentService() {
+    }
+
+    /**
+     * get instance
+     *
+     * @return {@link MyBatisAgentService}
+     * @see MyBatisAgentService
+     */
+    public static MyBatisAgentService getInstance() {
+        return myBatisAgentService;
+    }
+
+    @Override
+    public boolean isSuitable() {
+        return super.isSuitable() && config.getBool(RELOADER_MYBATIS_ENABLE);
+    }
+
+
 }

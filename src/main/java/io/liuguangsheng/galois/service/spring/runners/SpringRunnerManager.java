@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.liuguangsheng.galois.service.runners;
+package io.liuguangsheng.galois.service.spring.runners;
 
 import io.liuguangsheng.galois.service.spring.visitors.SpringApplicationRunListenersVisitor;
 import io.liuguangsheng.galois.utils.GaloisLog;
