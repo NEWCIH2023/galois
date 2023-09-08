@@ -68,6 +68,5 @@ public class ConfConstant {
      * The constant GALOIS_VERSION.
      */
     public static final String GALOIS_VERSION = "galois.version";
-    public static final String GALOIS_GITEE_URL = "galois.gitee.url";
-    public static final String GALOIS_GITHUB_URL = "galois.github.url";
+    public static final String GALOIS_GIT_URL = "galois.git.url";
 }

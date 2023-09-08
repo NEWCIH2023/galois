@@ -107,8 +107,7 @@ public abstract class MethodAdapter extends ClassVisitor {
         try {
             cr = new ClassReader(classBytes);
             // COMPUTE_MAXS means automatically compute the maximum stack size and the maximum number of local
-            // variables
-            // of methods.
+            // variables of methods.
             // COMPUTE_FRAMES means automatically compute the stack map frames of methods from scratch.
             cw = new ClassWriter(cr, ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
             cv = this.cw;

@@ -30,8 +30,6 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
-import java.util.Objects;
-
 import static io.liuguangsheng.galois.constants.ConfConstant.BUILD_TYPE;
 import static io.liuguangsheng.galois.constants.Constant.RELEASE;
 

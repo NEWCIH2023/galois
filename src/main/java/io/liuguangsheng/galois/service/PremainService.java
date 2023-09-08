@@ -25,7 +25,6 @@
 package io.liuguangsheng.galois.service;
 
 import io.liuguangsheng.galois.service.annotation.AsmVisitor;
-import io.liuguangsheng.galois.service.spring.BannerService;
 import io.liuguangsheng.galois.service.spring.runners.AbstractRunner;
 import io.liuguangsheng.galois.service.spring.runners.SpringRunnerManager;
 import io.liuguangsheng.galois.utils.ClassUtil;
@@ -44,9 +43,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static io.liuguangsheng.galois.constants.ClassNameConstant.PACKAGE_SERVICE;
-import static io.liuguangsheng.galois.constants.Constant.COMMA;
-import static io.liuguangsheng.galois.constants.Constant.DOT;
-import static io.liuguangsheng.galois.constants.Constant.SLASH;
+import static io.liuguangsheng.galois.constants.Constant.*;
 
 /**
  * premain agent服务入口

@@ -40,39 +40,42 @@ import java.util.stream.Collectors;
  * @author liuguangsheng
  */
 public class SpringRunnerManager implements SpringApplicationRunListenersVisitor.NecessaryMethods {
-	
-	private static final SpringRunnerManager instance = new SpringRunnerManager();
-	private static final Logger logger = new GaloisLog(SpringRunnerManager.class);
-	private final List<AbstractRunner> runners = new ArrayList<>();
-	
-	/**
-	 * Gets instance.
-	 *
-	 * @return the instance
-	 */
-	public static SpringRunnerManager getInstance() {
-		return instance;
-	}
-	
-	/**
-	 * Add runner.
-	 *
-	 * @param runner the runner
-	 */
-	public void addRunner(AbstractRunner runner) {
-		if (runner != null) {
-			runners.add(runner);
-		}
-	}
-	
-	@Override
-	public List<SpringApplicationRunListener> getRunners() {
-		List<SpringApplicationRunListener> result = runners.stream()
-				.sorted(Comparator.comparingInt(AbstractRunner::getRank).reversed())
-				.collect(Collectors.toList());
-		
-		logger.info("Now register these runner in ordered: {}.", result);
-		return result;
-	}
-	
+
+    private static final Logger logger = new GaloisLog(SpringRunnerManager.class);
+    private final List<AbstractRunner> runners = new ArrayList<>();
+
+    private static class SpringRunnerManagerHolder {
+        private static final SpringRunnerManager instance = new SpringRunnerManager();
+    }
+
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
+    public static SpringRunnerManager getInstance() {
+        return SpringRunnerManagerHolder.instance;
+    }
+
+    /**
+     * Add runner.
+     *
+     * @param runner the runner
+     */
+    public void addRunner(AbstractRunner runner) {
+        if (runner != null) {
+            runners.add(runner);
+        }
+    }
+
+    @Override
+    public List<SpringApplicationRunListener> getRunners() {
+        List<SpringApplicationRunListener> result = runners.stream()
+                .sorted(Comparator.comparingInt(AbstractRunner::getRank).reversed())
+                .collect(Collectors.toList());
+
+        logger.info("Now register these runner in ordered: {}.", result);
+        return result;
+    }
+
 }

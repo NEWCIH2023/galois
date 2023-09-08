@@ -34,27 +34,30 @@ import io.liuguangsheng.galois.service.AgentService;
  * @author liuguangsheng
  */
 public class SpringAgentService extends AgentService {
-	
-	private static final GlobalConfiguration config = GlobalConfiguration.getInstance();
-	private static final SpringAgentService instance = new SpringAgentService();
-	
-	/**
-	 * Get instance spring agent service.
-	 *
-	 * @return the spring agent service
-	 */
-	public static SpringAgentService getInstance() {
-		return instance;
-	}
-	
-	/**
-	 * 当前AgentService是否可启用
-	 *
-	 * @return 当项目已经加载了必须的类之后，该AgentService将成为可用状态
-	 */
-	@Override
-	public boolean isSuitable() {
-		return super.isSuitable() && config.getBool(ConfConstant.RELOADER_SPRING_BOOT_ENABLE);
-	}
-	
+
+    private static final GlobalConfiguration config = GlobalConfiguration.getInstance();
+
+    private static class SpringAgentServiceHolder {
+        private static final SpringAgentService instance = new SpringAgentService();
+    }
+
+    /**
+     * Get instance spring agent service.
+     *
+     * @return the spring agent service
+     */
+    public static SpringAgentService getInstance() {
+        return SpringAgentServiceHolder.instance;
+    }
+
+    /**
+     * 当前AgentService是否可启用
+     *
+     * @return 当项目已经加载了必须的类之后，该AgentService将成为可用状态
+     */
+    @Override
+    public boolean isSuitable() {
+        return super.isSuitable() && config.getBool(ConfConstant.RELOADER_SPRING_BOOT_ENABLE);
+    }
+
 }

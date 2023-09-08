@@ -25,7 +25,6 @@
 
 package io.liuguangsheng.galois.utils;
 
-import io.liuguangsheng.galois.constants.Constant;
 import io.liuguangsheng.galois.constants.FileType;
 import jdk.internal.org.objectweb.asm.ClassReader;
 import org.slf4j.Logger;
@@ -57,7 +56,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static io.liuguangsheng.galois.constants.Constant.GET_INSTANCE;
+import static io.liuguangsheng.galois.constants.Constant.*;
 import static org.springframework.core.io.support.ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX;
 import static org.springframework.util.ClassUtils.convertClassNameToResourcePath;
 
@@ -239,7 +238,7 @@ public class ClassUtil {
      */
     public static String getClassNameFromClass(File classFile) throws IOException {
         ClassReader classReader = new ClassReader(Files.newInputStream(classFile.toPath()));
-        return classReader.getClassName().replace(Constant.SLASH, Constant.DOT);
+        return classReader.getClassName().replace(SLASH, DOT);
     }
 
     /**
@@ -265,7 +264,7 @@ public class ClassUtil {
 
                 classNameMatcher = classNamePattern.matcher(tmp);
                 if (classNameMatcher.find()) {
-                    result += Constant.DOT + classNameMatcher.group(1);
+                    result += DOT + classNameMatcher.group(1);
                     break;
                 }
             }

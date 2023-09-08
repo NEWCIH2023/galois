@@ -24,7 +24,6 @@
 
 package io.liuguangsheng.galois.service.mybatis.visitors;
 
-import io.liuguangsheng.galois.constants.Constant;
 import io.liuguangsheng.galois.service.MethodAdapter;
 import io.liuguangsheng.galois.service.annotation.AsmVisitor;
 import io.liuguangsheng.galois.service.mybatis.MyBatisAgentService;
@@ -32,18 +31,10 @@ import io.liuguangsheng.galois.service.mybatis.MyBatisBeanReloader;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.apache.ibatis.session.Configuration;
 
-import java.util.Objects;
-
 import static io.liuguangsheng.galois.constants.ClassNameConstant.CLASS_MYBATIS_CONFIGURATION;
 import static io.liuguangsheng.galois.constants.Constant.DOT;
 import static io.liuguangsheng.galois.constants.Constant.SLASH;
-import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
-import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
-import static jdk.internal.org.objectweb.asm.Opcodes.ATHROW;
-import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
-import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
-import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
-import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
+import static jdk.internal.org.objectweb.asm.Opcodes.*;
 
 /**
  * mybatis configuration visitor

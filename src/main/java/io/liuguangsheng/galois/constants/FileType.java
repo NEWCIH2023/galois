@@ -31,43 +31,43 @@ package io.liuguangsheng.galois.constants;
  * @since 1.0.0
  */
 public enum FileType {
-	
-	/**
-	 * Class file file type.
-	 */
-	CLASS_FILE(".class"),
-	/**
-	 * Xml file file type.
-	 */
-	XML_FILE(".xml"),
-	/**
-	 * Java file file type.
-	 */
-	JAVA_FILE(".java");
-	
-	private final String fileType;
-	private final String name;
-	
-	FileType(String fileType) {
-		this.fileType = fileType;
-		this.name = fileType.substring(1);
-	}
-	
-	/**
-	 * Gets file type.
-	 *
-	 * @return the file type
-	 */
-	public String getFileType() {
-		return fileType;
-	}
-	
-	/**
-	 * Gets name.
-	 *
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
+
+    /**
+     * Class file file type.
+     */
+    CLASS_FILE(".class"),
+    /**
+     * Xml file file type.
+     */
+    XML_FILE(".xml"),
+    /**
+     * Java file file type.
+     */
+    JAVA_FILE(".java");
+
+    private final String fileType;
+    private final String name;
+
+    FileType(String fileType) {
+        this.fileType = fileType;
+        this.name = fileType.substring(1);
+    }
+
+    /**
+     * Gets file type.
+     *
+     * @return the file type
+     */
+    public String getFileType() {
+        return fileType;
+    }
+
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
 }

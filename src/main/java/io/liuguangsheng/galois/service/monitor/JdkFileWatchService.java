@@ -29,24 +29,15 @@ import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Paths;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
+import java.nio.file.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.sun.nio.file.ExtendedWatchEventModifier.FILE_TREE;
 import static com.sun.nio.file.SensitivityWatchEventModifier.HIGH;
-import static io.liuguangsheng.galois.constants.Constant.COMMA;
-import static io.liuguangsheng.galois.constants.Constant.DOT;
-import static io.liuguangsheng.galois.constants.Constant.TILDE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
-import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
+import static io.liuguangsheng.galois.constants.Constant.*;
+import static java.nio.file.StandardWatchEventKinds.*;
 
 /**
  * file monitor service based on {@link java.nio.file.WatchService}

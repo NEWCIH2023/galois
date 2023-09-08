@@ -25,13 +25,12 @@
 package io.liuguangsheng.galois.service.monitor;
 
 import io.liuguangsheng.galois.utils.GaloisLog;
-import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.slf4j.Logger;
 
 import java.io.FileFilter;
+import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -46,19 +45,22 @@ import static io.liuguangsheng.galois.constants.Constant.COMMA;
  */
 public class ApacheFileWatchService extends FileWatchService {
     private static final Logger logger = new GaloisLog(ApacheFileWatchService.class);
-    private static final ApacheFileWatchService instance = new ApacheFileWatchService();
     private static final long interval = 1000;
-    private FileAlterationObserver observer;
+
+    private static class ApacheFileWatchServiceHolder {
+        private static final ApacheFileWatchService instance = new ApacheFileWatchService();
+    }
 
     public static ApacheFileWatchService getInstance() {
-        return instance;
+        return ApacheFileWatchServiceHolder.instance;
     }
 
     @Override
     public void start() {
-        String buildPath = Objects.requireNonNull(getClass().getClassLoader().getResource("")).getPath();
+        URL buildUrl = getClass().getClassLoader().getResource("");
+        String buildPath = Objects.requireNonNull(buildUrl, "Can't get build path by classLoader.").getPath();
         FileFilter fileFilter = pathname -> !pathname.toURI().getPath().startsWith(buildPath);
-        observer = new FileAlterationObserver(rootPath, fileFilter);
+        FileAlterationObserver observer = new FileAlterationObserver(rootPath, fileFilter);
 
         try {
             listeners.stream().map(ApacheFileChangedListener::new).forEach(observer::addListener);

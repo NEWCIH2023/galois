@@ -41,54 +41,54 @@ import static io.liuguangsheng.galois.constants.FileType.JAVA_FILE;
  **/
 @LazyBean(value = "JavaFileListener", manager = SpringAgentService.class, rank = 1)
 public class JavaFileListener implements FileChangedListener {
-	
-	private static final ClassChangedCache classChangedCache = ClassChangedCache.getInstance();
-	
-	/**
-	 * is listener useful for this file object
-	 *
-	 * @param file the changed file
-	 * @return is the listener monitor this file change
-	 */
-	@Override
-	public boolean isSuitable(File file) {
-		return Objects.equals(FileUtil.getFileType(file), JAVA_FILE.getFileType());
-	}
-	
-	/**
-	 * handler for file created
-	 *
-	 * @param file the changed file
-	 */
-	@Override
-	public void createdHandle(File file) {
-		String className = ClassUtil.getClassNameFromSource(file);
-		classChangedCache.hadChanged(className);
-	}
-	
-	/**
-	 * handler for file modifed
-	 *
-	 * @param file the changed file
-	 */
-	@Override
-	public void modifiedHandle(File file) {
-		String className = ClassUtil.getClassNameFromSource(file);
-		classChangedCache.hadChanged(className);
-	}
-	
-	/**
-	 * handler for file deleted
-	 *
-	 * @param file the changed file
-	 */
-	@Override
-	public void deletedHandle(File file) {
-	
-	}
-	
-	@Override
-	public String toString() {
-		return getClass().getSimpleName();
-	}
+
+    private static final ClassChangedCache classChangedCache = ClassChangedCache.getInstance();
+
+    /**
+     * is listener useful for this file object
+     *
+     * @param file the changed file
+     * @return is the listener monitor this file change
+     */
+    @Override
+    public boolean isSuitable(File file) {
+        return Objects.equals(FileUtil.getFileType(file), JAVA_FILE.getFileType());
+    }
+
+    /**
+     * handler for file created
+     *
+     * @param file the changed file
+     */
+    @Override
+    public void createdHandle(File file) {
+        String className = ClassUtil.getClassNameFromSource(file);
+        classChangedCache.hadChanged(className);
+    }
+
+    /**
+     * handler for file modifed
+     *
+     * @param file the changed file
+     */
+    @Override
+    public void modifiedHandle(File file) {
+        String className = ClassUtil.getClassNameFromSource(file);
+        classChangedCache.hadChanged(className);
+    }
+
+    /**
+     * handler for file deleted
+     *
+     * @param file the changed file
+     */
+    @Override
+    public void deletedHandle(File file) {
+
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName();
+    }
 }

@@ -34,76 +34,76 @@ import java.io.File;
  * @since 1.0.0
  **/
 public class ApacheFileChangedListener implements FileAlterationListener {
-	private final FileChangedListener listener;
-	
-	public ApacheFileChangedListener(FileChangedListener listener) {
-		this.listener = listener;
-	}
-	
-	/**
-	 *
-	 */
-	@Override
-	public void onStart(FileAlterationObserver fileAlterationObserver) {
-	
-	}
-	
-	/**
-	 * @param file file
-	 */
-	@Override
-	public void onDirectoryCreate(File file) {
-	
-	}
-	
-	/**
-	 * @param file
-	 */
-	@Override
-	public void onDirectoryChange(File file) {
-	
-	}
-	
-	/**
-	 * @param file
-	 */
-	@Override
-	public void onDirectoryDelete(File file) {
-	
-	}
-	
-	/**
-	 * @param file
-	 */
-	@Override
-	public void onFileCreate(File file) {
-		if (listener.isSuitable(file))
-			listener.createdHandle(file);
-	}
-	
-	/**
-	 * @param file
-	 */
-	@Override
-	public void onFileChange(File file) {
-		if (listener.isSuitable(file))
-			listener.modifiedHandle(file);
-	}
-	
-	/**
-	 * @param file
-	 */
-	@Override
-	public void onFileDelete(File file) {
-		if (listener.isSuitable(file))
-			listener.deletedHandle(file);
-	}
-	
-	/**
-	 * @param fileAlterationObserver
-	 */
-	@Override
-	public void onStop(FileAlterationObserver fileAlterationObserver) {
-	
-	}
+    private final FileChangedListener listener;
+
+    public ApacheFileChangedListener(FileChangedListener listener) {
+        this.listener = listener;
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void onStart(FileAlterationObserver fileAlterationObserver) {
+
+    }
+
+    /**
+     * @param file file
+     */
+    @Override
+    public void onDirectoryCreate(File file) {
+
+    }
+
+    /**
+     * @param file
+     */
+    @Override
+    public void onDirectoryChange(File file) {
+
+    }
+
+    /**
+     * @param file
+     */
+    @Override
+    public void onDirectoryDelete(File file) {
+
+    }
+
+    /**
+     * @param file
+     */
+    @Override
+    public void onFileCreate(File file) {
+        if (listener.isSuitable(file))
+            listener.createdHandle(file);
+    }
+
+    /**
+     * @param file
+     */
+    @Override
+    public void onFileChange(File file) {
+        if (listener.isSuitable(file))
+            listener.modifiedHandle(file);
+    }
+
+    /**
+     * @param file
+     */
+    @Override
+    public void onFileDelete(File file) {
+        if (listener.isSuitable(file))
+            listener.deletedHandle(file);
+    }
+
+    /**
+     * @param fileAlterationObserver
+     */
+    @Override
+    public void onStop(FileAlterationObserver fileAlterationObserver) {
+
+    }
 }

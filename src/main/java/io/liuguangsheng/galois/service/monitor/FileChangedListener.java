@@ -33,33 +33,33 @@ import java.io.File;
  * @since 1.0.0
  */
 public interface FileChangedListener {
-	
-	/**
-	 * is listener useful for this file object
-	 *
-	 * @param file the changed file
-	 * @return is the listener monitor this file change
-	 */
-	boolean isSuitable(File file);
-	
-	/**
-	 * handler for file created
-	 *
-	 * @param file the changed file
-	 */
-	void createdHandle(File file);
-	
-	/**
-	 * handler for file modifed
-	 *
-	 * @param file the changed file
-	 */
-	void modifiedHandle(File file);
-	
-	/**
-	 * handler for file deleted
-	 *
-	 * @param file the changed file
-	 */
-	void deletedHandle(File file);
+
+    /**
+     * is listener useful for this file object
+     *
+     * @param file the changed file
+     * @return is the listener monitor this file change
+     */
+    boolean isSuitable(File file);
+
+    /**
+     * handler for file created
+     *
+     * @param file the changed file
+     */
+    void createdHandle(File file);
+
+    /**
+     * handler for file modifed
+     *
+     * @param file the changed file
+     */
+    void modifiedHandle(File file);
+
+    /**
+     * handler for file deleted
+     *
+     * @param file the changed file
+     */
+    void deletedHandle(File file);
 }

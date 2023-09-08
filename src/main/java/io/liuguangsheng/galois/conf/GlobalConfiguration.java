@@ -38,135 +38,138 @@ import java.util.Properties;
  * @since 1.0.0
  */
 public class GlobalConfiguration {
-	
-	private static final String GALOIS_PROPERTIES = "galois.properties";
-	private static final Properties configuration = new Properties();
-	private static final GlobalConfiguration globalConfiguration = new GlobalConfiguration();
-	
-	private GlobalConfiguration() {
-		ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		try (InputStream is = loader.getResourceAsStream(GALOIS_PROPERTIES)) {
-			configuration.load(is);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	/**
-	 * get instance
-	 *
-	 * @return {@link GlobalConfiguration}
-	 * @see GlobalConfiguration
-	 */
-	public static GlobalConfiguration getInstance() {
-		return globalConfiguration;
-	}
-	
-	/**
-	 * get string
-	 *
-	 * @param key key
-	 * @return {@link String}
-	 * @see String
-	 */
-	public String getStr(String key) {
-		return getStr(key, Constant.EMPTY);
-	}
-	
-	/**
-	 * get string
-	 *
-	 * @param key          key
-	 * @param defaultValue defaultValue
-	 * @return {@link String}
-	 * @see String
-	 */
-	public String getStr(String key, String defaultValue) {
-		if (StringUtil.isBlank(key)) {
-			return defaultValue;
-		}
-		
-		String result = configuration.getProperty(key);
-		
-		if (StringUtil.isBlank(result)) {
-			return System.getProperty(key, defaultValue);
-		}
-		
-		return result;
-	}
-	
-	/**
-	 * get boolean
-	 *
-	 * @param key key
-	 * @return {@link boolean}
-	 */
-	public boolean getBool(String key) {
-		return getBool(key, false);
-	}
-	
-	/**
-	 * get boolean
-	 *
-	 * @param key          key
-	 * @param defaultValue defaultValue
-	 * @return {@link boolean}
-	 */
-	public boolean getBool(String key, boolean defaultValue) {
-		String result = getStr(key, defaultValue ? Constant.TRUE : Constant.FALSE);
-		return Constant.TRUE.equalsIgnoreCase(result);
-	}
-	
-	/**
-	 * get long
-	 *
-	 * @param key key
-	 * @return {@link long}
-	 */
-	public long getLong(String key) {
-		return getLong(key, 0L);
-	}
-	
-	/**
-	 * get long
-	 *
-	 * @param key          key
-	 * @param defaultValue defaultValue
-	 * @return {@link long}
-	 */
-	public long getLong(String key, long defaultValue) {
-		String result = getStr(key, String.valueOf(defaultValue));
-		try {
-			return Long.parseLong(result);
-		} catch (Exception e) {
-			return -1L;
-		}
-	}
-	
-	/**
-	 * get integer
-	 *
-	 * @param key key
-	 * @return {@link int}
-	 */
-	public int getInt(String key) {
-		return getInt(key, 0);
-	}
-	
-	/**
-	 * get integer
-	 *
-	 * @param key          key
-	 * @param defaultValue defaultValue
-	 * @return {@link int}
-	 */
-	public int getInt(String key, int defaultValue) {
-		String result = getStr(key, String.valueOf(defaultValue));
-		try {
-			return Integer.parseInt(result);
-		} catch (Exception e) {
-			return -1;
-		}
-	}
-	
+
+    private static final String GALOIS_PROPERTIES = "galois.properties";
+    private static final Properties configuration = new Properties();
+
+    private static class GlobalConfigurationHolder {
+        private static final GlobalConfiguration globalConfiguration = new GlobalConfiguration();
+    }
+
+    private GlobalConfiguration() {
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        try (InputStream is = loader.getResourceAsStream(GALOIS_PROPERTIES)) {
+            configuration.load(is);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * get instance
+     *
+     * @return {@link GlobalConfiguration}
+     * @see GlobalConfiguration
+     */
+    public static GlobalConfiguration getInstance() {
+        return GlobalConfigurationHolder.globalConfiguration;
+    }
+
+    /**
+     * get string
+     *
+     * @param key key
+     * @return {@link String}
+     * @see String
+     */
+    public String getStr(String key) {
+        return getStr(key, Constant.EMPTY);
+    }
+
+    /**
+     * get string
+     *
+     * @param key          key
+     * @param defaultValue defaultValue
+     * @return {@link String}
+     * @see String
+     */
+    public String getStr(String key, String defaultValue) {
+        if (StringUtil.isBlank(key)) {
+            return defaultValue;
+        }
+
+        String result = configuration.getProperty(key);
+
+        if (StringUtil.isBlank(result)) {
+            return System.getProperty(key, defaultValue);
+        }
+
+        return result;
+    }
+
+    /**
+     * get boolean
+     *
+     * @param key key
+     * @return {@link boolean}
+     */
+    public boolean getBool(String key) {
+        return getBool(key, false);
+    }
+
+    /**
+     * get boolean
+     *
+     * @param key          key
+     * @param defaultValue defaultValue
+     * @return {@link boolean}
+     */
+    public boolean getBool(String key, boolean defaultValue) {
+        String result = getStr(key, defaultValue ? Constant.TRUE : Constant.FALSE);
+        return Constant.TRUE.equalsIgnoreCase(result);
+    }
+
+    /**
+     * get long
+     *
+     * @param key key
+     * @return {@link long}
+     */
+    public long getLong(String key) {
+        return getLong(key, 0L);
+    }
+
+    /**
+     * get long
+     *
+     * @param key          key
+     * @param defaultValue defaultValue
+     * @return {@link long}
+     */
+    public long getLong(String key, long defaultValue) {
+        String result = getStr(key, String.valueOf(defaultValue));
+        try {
+            return Long.parseLong(result);
+        } catch (Exception e) {
+            return -1L;
+        }
+    }
+
+    /**
+     * get integer
+     *
+     * @param key key
+     * @return {@link int}
+     */
+    public int getInt(String key) {
+        return getInt(key, 0);
+    }
+
+    /**
+     * get integer
+     *
+     * @param key          key
+     * @param defaultValue defaultValue
+     * @return {@link int}
+     */
+    public int getInt(String key, int defaultValue) {
+        String result = getStr(key, String.valueOf(defaultValue));
+        try {
+            return Integer.parseInt(result);
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
 }

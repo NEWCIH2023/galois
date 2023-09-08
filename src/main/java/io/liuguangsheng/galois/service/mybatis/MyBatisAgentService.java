@@ -25,9 +25,7 @@
 package io.liuguangsheng.galois.service.mybatis;
 
 import io.liuguangsheng.galois.conf.GlobalConfiguration;
-import io.liuguangsheng.galois.constants.ConfConstant;
 import io.liuguangsheng.galois.service.AgentService;
-import io.liuguangsheng.galois.service.mybatis.visitors.MyBatisConfigurationVisitor;
 
 import static io.liuguangsheng.galois.constants.ConfConstant.RELOADER_MYBATIS_ENABLE;
 
@@ -40,7 +38,10 @@ import static io.liuguangsheng.galois.constants.ConfConstant.RELOADER_MYBATIS_EN
 public class MyBatisAgentService extends AgentService {
 
     private static final GlobalConfiguration config = GlobalConfiguration.getInstance();
-    private static final MyBatisAgentService myBatisAgentService = new MyBatisAgentService();
+
+    private static class MyBatisAgentServiceHolder {
+        private static final MyBatisAgentService instance = new MyBatisAgentService();
+    }
 
     private MyBatisAgentService() {
     }
@@ -52,7 +53,7 @@ public class MyBatisAgentService extends AgentService {
      * @see MyBatisAgentService
      */
     public static MyBatisAgentService getInstance() {
-        return myBatisAgentService;
+        return MyBatisAgentServiceHolder.instance;
     }
 
     @Override

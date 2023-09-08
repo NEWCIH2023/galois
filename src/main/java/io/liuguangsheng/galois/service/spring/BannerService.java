@@ -25,18 +25,15 @@
 package io.liuguangsheng.galois.service.spring;
 
 import io.liuguangsheng.galois.conf.GlobalConfiguration;
-import io.liuguangsheng.galois.constants.ConfConstant;
-import io.liuguangsheng.galois.constants.Constant;
 import io.liuguangsheng.galois.service.spring.visitors.SpringBootBannerVisitor;
+import io.liuguangsheng.galois.utils.StringUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 
 import static io.liuguangsheng.galois.constants.ConfConstant.*;
-import static io.liuguangsheng.galois.constants.Constant.HYPHEN;
-import static io.liuguangsheng.galois.constants.Constant.KNOWN_MAPPERS;
-import static io.liuguangsheng.galois.constants.Constant.LF;
+import static io.liuguangsheng.galois.constants.Constant.*;
 
 /**
  * print banner when galois starting
@@ -53,12 +50,15 @@ public class BannerService implements SpringBootBannerVisitor.NecessaryMethods {
      */
     @Override
     public void printBanner() {
-        if (!config.getBool(ConfConstant.BANNER_ENABLE, true)) {
+        if (!config.getBool(BANNER_ENABLE, true)) {
             return;
         }
 
-        String banner = String.format(" :: Galois ::    (v%s) \uD83C\uDF10%s | \uD83C\uDF10%s ", galoisVersion(),
-                config.getStr(GALOIS_GITEE_URL), config.getStr(GALOIS_GITHUB_URL));
+        String banner = String.format(" :: Galois :: (v%s) ", galoisVersion());
+        String galoisGitUrl = config.getStr(GALOIS_GIT_URL);
+        if (StringUtil.isNotBlank(galoisGitUrl)) {
+            banner += String.join(" | ", galoisGitUrl.split(COMMA));
+        }
         System.out.println(banner);
     }
 
