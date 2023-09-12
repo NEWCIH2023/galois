@@ -27,6 +27,9 @@ package io.liuguangsheng.galois.service.spring;
 import io.liuguangsheng.galois.conf.GlobalConfiguration;
 import io.liuguangsheng.galois.service.spring.visitors.SpringBootBannerVisitor;
 import io.liuguangsheng.galois.utils.StringUtil;
+import org.springframework.boot.ansi.AnsiColor;
+import org.springframework.boot.ansi.AnsiOutput;
+import org.springframework.boot.ansi.AnsiStyle;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -54,12 +57,14 @@ public class BannerService implements SpringBootBannerVisitor.NecessaryMethods {
             return;
         }
 
-        String banner = String.format(" :: Galois :: (v%s) ", galoisVersion());
+        String galoisName = " :: Galois :: ";
+        String gitUrl = "";
         String galoisGitUrl = config.getStr(GALOIS_GIT_URL);
         if (StringUtil.isNotBlank(galoisGitUrl)) {
-            banner += String.join(" | ", galoisGitUrl.split(COMMA));
+            gitUrl += String.join(" | ", galoisGitUrl.split(COMMA));
         }
-        System.out.println(banner);
+        System.out.println(AnsiOutput.toString(AnsiColor.GREEN, galoisName,
+                AnsiColor.DEFAULT, SPACE, AnsiStyle.FAINT, galoisVersion() + SPACE + gitUrl));
     }
 
     /**
