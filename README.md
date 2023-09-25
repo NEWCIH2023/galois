@@ -55,3 +55,4 @@ Java版本上，目前仅支持JDK 8版本。因为使用了JDK自带的ASM框�
           refid=XXXX>`这种标签，会直接在解析阶段，就读取对应refid的内容，并解析成`sqlSource`
           属性，而不是一直保持引用，在每次执行时动态解析。所以，如果仅仅更改了a.
           xml一个mapper文件，就只热部署a.xml一个mapper文件的话，会导致a.xml里面被其它mapper通过`refid`引用的片段，无法得到更新。因此需要热部署整个`namespace`
+
