@@ -29,7 +29,7 @@
 
     <groupId>org.liuguangsheng</groupId>
     <artifactId>galois</artifactId>
-    <version>1.5.5-SNAPSHOT</version>
+    <version>1.5.5</version>
     <packaging>jar</packaging>
     <name>galois</name>
     <properties>
