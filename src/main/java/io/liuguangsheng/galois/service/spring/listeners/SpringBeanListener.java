@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,9 +32,10 @@ import io.liuguangsheng.galois.service.spring.SpringBeanReloader;
 import io.liuguangsheng.galois.utils.ClassUtil;
 import io.liuguangsheng.galois.utils.FileUtil;
 import io.liuguangsheng.galois.utils.GaloisLog;
+import org.slf4j.Logger;
+
 import java.io.File;
 import java.lang.instrument.ClassDefinition;
-import org.slf4j.Logger;
 
 
 /**
@@ -46,12 +47,12 @@ import org.slf4j.Logger;
 public class SpringBeanListener implements FileChangedListener {
 
     private static final Logger logger = new GaloisLog(SpringBeanListener.class);
-
+    private static final ClassChangedCache classChangedCache = ClassChangedCache.getInstance();
     private final SpringBeanReloader springBeanReloader = SpringBeanReloader.getInstance();
 
     @Override
-    public boolean isUseful(File file) {
-        return FileUtil.validFileType(file, FileType.CLASS_FILE);
+    public boolean isSuitable(File file) {
+        return FileUtil.matchFileType(file, FileType.CLASS_FILE);
     }
 
     /**
@@ -64,10 +65,24 @@ public class SpringBeanListener implements FileChangedListener {
         try {
             // 结合class变动与java变动，当两者同时出现时，更新该class
             String className = ClassUtil.getClassNameFromClass(classFile);
+            if (!classChangedCache.handleIfExisted(className)) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("当前类{}处理失败，并未记录在缓存中", className);
+                }
+                return;
+            } else {
+                logger.debug("当前类{}处理成功，已将其移除缓存", className);
+            }
+
             byte[] classBytes = FileUtil.readFile(classFile);
             Class<?> clazz = Class.forName(className);
             ClassDefinition definition = new ClassDefinition(clazz, classBytes);
             ClassUtil.getInstrumentation().redefineClasses(definition);
+
+            if (springBeanReloader.isSuitable(clazz)) {
+                springBeanReloader.updateBean(clazz);
+            }
+
             logger.info("Redefine class file {} success.", classFile.getName());
         } catch (Throwable e) {
             logger.error("Reload Spring Bean fail.", e);
@@ -109,6 +124,5 @@ public class SpringBeanListener implements FileChangedListener {
      */
     @Override
     public void deletedHandle(File file) {
-
     }
 }

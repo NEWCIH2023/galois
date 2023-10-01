@@ -4,6 +4,9 @@ logs/
 .DS_Store
 **/*.class
 **/*.log
+*.ps1
+*.sh
+demoProject/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
@@ -14,3 +17,4 @@ buildNumber.properties
 .mvn/timing.properties
 # https://github.com/takari/maven-wrapper#usage-without-binary-jar
 .mvn/wrapper/maven-wrapper.jar
+src/main/java/io/liuguangsheng/galois/service/corm/

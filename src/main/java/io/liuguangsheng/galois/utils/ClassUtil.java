@@ -2,7 +2,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,23 +25,7 @@
 
 package io.liuguangsheng.galois.utils;
 
-import io.liuguangsheng.galois.constants.Constant;
 import io.liuguangsheng.galois.constants.FileType;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.instrument.Instrumentation;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import jdk.internal.org.objectweb.asm.ClassReader;
 import org.slf4j.Logger;
 import org.springframework.core.io.Resource;
@@ -55,6 +39,24 @@ import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.core.type.filter.TypeFilter;
 import org.springframework.util.SystemPropertyUtils;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.instrument.Instrumentation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static io.liuguangsheng.galois.constants.Constant.*;
 import static org.springframework.core.io.support.ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX;
 import static org.springframework.util.ClassUtils.convertClassNameToResourcePath;
 
@@ -102,7 +104,7 @@ public class ClassUtil {
     public static Object getInstance(Class<?> clazz) {
         try {
             // is static method getInstance exists?
-            Method getInstanceMethod = clazz.getMethod(Constant.GET_INSTANCE);
+            Method getInstanceMethod = clazz.getMethod(GET_INSTANCE);
             return getInstanceMethod.invoke(null);
             // or invoke newInstance method
         } catch (NoSuchMethodException e) {
@@ -140,7 +142,8 @@ public class ClassUtil {
      * @return the set
      */
     @SafeVarargs
-    public static Set<Class<?>> scanAnnotationClass(String basePackage, Class<? extends Annotation>... annotations) {
+    public static Set<Class<?>> scanAnnotationClass(String basePackage,
+                                                    Class<? extends Annotation>... annotations) {
         List<TypeFilter> includeFilters = new ArrayList<>(16);
         for (Class<? extends Annotation> annotation : annotations) {
             includeFilters.add(new AnnotationTypeFilter(annotation));
@@ -195,7 +198,6 @@ public class ClassUtil {
                     }
                 }
             }
-
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -221,6 +223,11 @@ public class ClassUtil {
         ClassUtil.instrumentation = instrumentation;
     }
 
+    public static boolean isClass(Class<?> clazz) {
+        int m = clazz.getModifiers();
+        return !Modifier.isAbstract(m) && !Modifier.isInterface(m);
+    }
+
     /**
      * get class name from class
      *
@@ -231,7 +238,7 @@ public class ClassUtil {
      */
     public static String getClassNameFromClass(File classFile) throws IOException {
         ClassReader classReader = new ClassReader(Files.newInputStream(classFile.toPath()));
-        return classReader.getClassName().replace(Constant.SLASH, Constant.DOT);
+        return classReader.getClassName().replace(SLASH, DOT);
     }
 
     /**
@@ -257,7 +264,7 @@ public class ClassUtil {
 
                 classNameMatcher = classNamePattern.matcher(tmp);
                 if (classNameMatcher.find()) {
-                    result += Constant.DOT + classNameMatcher.group(1);
+                    result += DOT + classNameMatcher.group(1);
                     break;
                 }
             }

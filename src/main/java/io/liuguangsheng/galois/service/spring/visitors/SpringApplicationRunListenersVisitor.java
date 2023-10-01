@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,26 +24,19 @@
 
 package io.liuguangsheng.galois.service.spring.visitors;
 
-import io.liuguangsheng.galois.constants.ClassNameConstant;
 import io.liuguangsheng.galois.constants.Constant;
 import io.liuguangsheng.galois.service.MethodAdapter;
 import io.liuguangsheng.galois.service.annotation.AsmVisitor;
-import io.liuguangsheng.galois.service.runners.SpringRunnerManager;
 import io.liuguangsheng.galois.service.spring.SpringAgentService;
-import java.util.List;
-import java.util.Objects;
+import io.liuguangsheng.galois.service.spring.runners.SpringRunnerManager;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.springframework.boot.SpringApplicationRunListener;
 
-import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
-import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
-import static jdk.internal.org.objectweb.asm.Opcodes.GETFIELD;
-import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEINTERFACE;
-import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
-import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
-import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
-import static jdk.internal.org.objectweb.asm.Opcodes.POP;
-import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
+import java.util.List;
+import java.util.Objects;
+
+import static io.liuguangsheng.galois.constants.ClassNameConstant.CLASS_SPRING_APPLICATION_RUN_LISTENERS;
+import static jdk.internal.org.objectweb.asm.Opcodes.*;
 
 /**
  * spring application run listeners visitor
@@ -58,7 +51,7 @@ public class SpringApplicationRunListenersVisitor extends MethodAdapter {
      * Instantiates a new Spring application run listeners visitor.
      */
     public SpringApplicationRunListenersVisitor() {
-        super(ClassNameConstant.SPRING_APPLICATION_RUN_LISTENERS);
+        super(CLASS_SPRING_APPLICATION_RUN_LISTENERS);
     }
 
     @Override
@@ -98,17 +91,15 @@ public class SpringApplicationRunListenersVisitor extends MethodAdapter {
                 mv.visitCode();
                 mv.visitVarInsn(ALOAD, 0);
                 mv.visitFieldInsn(GETFIELD, pClassName, "listeners", "Ljava/util/List;");
-                mv.visitMethodInsn(INVOKESTATIC, vClassName, "getInstance", "()L" + vClassName + ";",
-                        false);
+                mv.visitMethodInsn(INVOKESTATIC, vClassName, "getInstance", "()L" + vClassName + ";", false);
                 mv.visitMethodInsn(INVOKEVIRTUAL, vClassName, "getRunners", "()Ljava/util/List;", false);
-                mv.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "addAll", "(Ljava/util/Collection;)Z",
-                        true);
+                mv.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "addAll", "(Ljava/util/Collection;)Z", true);
                 mv.visitInsn(POP);
                 mv.visitInsn(RETURN);
                 mv.visitEnd();
+            } else {
+                super.visitInsn(opcode);
             }
-
-            super.visitInsn(opcode);
         }
     }
 }

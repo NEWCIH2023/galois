@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,15 +31,15 @@ import io.liuguangsheng.galois.service.mybatis.MyBatisAgentService;
 import io.liuguangsheng.galois.service.mybatis.MyBatisBeanReloader;
 import io.liuguangsheng.galois.utils.FileUtil;
 import io.liuguangsheng.galois.utils.GaloisLog;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXParseException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayInputStream;
+import java.io.File;
 
 
 /**
@@ -51,16 +51,13 @@ import org.xml.sax.SAXParseException;
 @LazyBean(value = "MyBatisXmlListener", manager = MyBatisAgentService.class)
 public class MyBatisXmlListener implements FileChangedListener {
 
-    /**
-     * The constant DOC_TYPE.
-     */
-    public static final String DOC_TYPE = "mapper";
+    private static final String DOC_TYPE_MAPPER = "mapper";
     private static final Logger logger = new GaloisLog(MyBatisXmlListener.class);
     private static final MyBatisBeanReloader reloader = MyBatisBeanReloader.getInstance();
 
     @Override
-    public boolean isUseful(File file) {
-        boolean fileTypeCheck = FileUtil.validFileType(file, FileType.XML_FILE);
+    public boolean isSuitable(File file) {
+        boolean fileTypeCheck = FileUtil.matchFileType(file, FileType.XML_FILE);
 
         if (!fileTypeCheck) {
             return false;
@@ -71,15 +68,12 @@ public class MyBatisXmlListener implements FileChangedListener {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setValidating(false);
             DocumentBuilder db = dbf.newDocumentBuilder();
-            // do no validate dtd
-            db.setEntityResolver(((publicId, systemId) -> new InputSource(new ByteArrayInputStream(new byte[0]))));
+            db.setEntityResolver((p, s) -> new InputSource(new ByteArrayInputStream(new byte[0])));
             Document document = db.parse(file);
             DocumentType documentType = document.getDoctype();
-            return documentType != null && documentType.toString().contains(DOC_TYPE);
-        } catch (SAXParseException ignored) {
-            return false;
+            return documentType != null && documentType.toString().contains(DOC_TYPE_MAPPER);
         } catch (Throwable e) {
-            logger.error("Parse xml file fail. Check it's file type.", e);
+            logger.error("Parse xml file failed. Check its file type.", e);
             return false;
         }
     }
@@ -87,7 +81,7 @@ public class MyBatisXmlListener implements FileChangedListener {
     @Override
     public void createdHandle(File file) {
         if (logger.isDebugEnabled()) {
-            logger.debug("MybatisXmlListener detect file created: {}.", file.getName());
+            logger.debug("MybatisXmlListener detect file created: {}", file.getName());
         }
 
         reloader.updateBean(file);
@@ -96,7 +90,7 @@ public class MyBatisXmlListener implements FileChangedListener {
     @Override
     public void modifiedHandle(File file) {
         if (logger.isDebugEnabled()) {
-            logger.debug("MybatisXmlListener detect file modified: {}.", file.getName());
+            logger.debug("MybatisXmlListener detect file modified: {}", file.getName());
         }
 
         reloader.updateBean(file);
@@ -104,7 +98,7 @@ public class MyBatisXmlListener implements FileChangedListener {
 
     @Override
     public void deletedHandle(File file) {
-        // TODO
+
     }
 
     @Override

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,23 +24,17 @@
 
 package io.liuguangsheng.galois.service.mybatis.visitors;
 
-import io.liuguangsheng.galois.constants.ClassNameConstant;
-import io.liuguangsheng.galois.constants.Constant;
 import io.liuguangsheng.galois.service.MethodAdapter;
 import io.liuguangsheng.galois.service.annotation.AsmVisitor;
 import io.liuguangsheng.galois.service.mybatis.MyBatisAgentService;
 import io.liuguangsheng.galois.service.mybatis.MyBatisBeanReloader;
-import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.apache.ibatis.session.Configuration;
 
-import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
-import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
-import static jdk.internal.org.objectweb.asm.Opcodes.ATHROW;
-import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
-import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
-import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
-import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
+import static io.liuguangsheng.galois.constants.ClassNameConstant.CLASS_MYBATIS_CONFIGURATION;
+import static io.liuguangsheng.galois.constants.Constant.DOT;
+import static io.liuguangsheng.galois.constants.Constant.SLASH;
+import static jdk.internal.org.objectweb.asm.Opcodes.*;
 
 /**
  * mybatis configuration visitor
@@ -55,7 +49,7 @@ public class MyBatisConfigurationVisitor extends MethodAdapter {
      * Instantiates a new My batis configuration visitor.
      */
     public MyBatisConfigurationVisitor() {
-        super(ClassNameConstant.MYBATIS_CONFIGURATION);
+        super(CLASS_MYBATIS_CONFIGURATION);
     }
 
     @Override
@@ -63,7 +57,7 @@ public class MyBatisConfigurationVisitor extends MethodAdapter {
                                      String[] exceptions) {
         MethodVisitor mv = cv.visitMethod(access, name, descriptor, signature, exceptions);
 
-        if (Objects.equals(name, "<init>") && Objects.equals(descriptor, "()V")) {
+        if ("<init>".equals(name) && "()V".equals(descriptor)) {
             return new MyBatisConfigurationVisitor.ConstructorVisitor(ASM5, mv);
         }
 
@@ -93,19 +87,18 @@ public class MyBatisConfigurationVisitor extends MethodAdapter {
         @Override
         public void visitInsn(int opcode) {
             if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-                String pClassName = MyBatisBeanReloader.class.getName().replace(Constant.DOT, Constant.SLASH);
-                String vClassName = className.replace(Constant.DOT, Constant.SLASH);
+                String pClassName = MyBatisBeanReloader.class.getName().replace(DOT, SLASH);
+                String vClassName = className.replace(DOT, SLASH);
 
                 mv.visitCode();
-                mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";",
-                        false);
+                mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";", false);
                 mv.visitVarInsn(ALOAD, 0);
-                mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setConfiguration", "(L" + vClassName + ";)V",
-                        false);
+                mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setConfiguration", "(L" + vClassName + ";)V", false);
+                mv.visitInsn(RETURN);
                 mv.visitEnd();
+            } else {
+                super.visitInsn(opcode);
             }
-
-            super.visitInsn(opcode);
         }
     }
 }

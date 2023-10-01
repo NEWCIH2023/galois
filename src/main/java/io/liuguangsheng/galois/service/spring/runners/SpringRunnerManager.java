@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,16 +22,17 @@
  * SOFTWARE.
  */
 
-package io.liuguangsheng.galois.service.runners;
+package io.liuguangsheng.galois.service.spring.runners;
 
 import io.liuguangsheng.galois.service.spring.visitors.SpringApplicationRunListenersVisitor;
 import io.liuguangsheng.galois.utils.GaloisLog;
+import org.slf4j.Logger;
+import org.springframework.boot.SpringApplicationRunListener;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.springframework.boot.SpringApplicationRunListener;
 
 /**
  * spring runner manager
@@ -40,9 +41,12 @@ import org.springframework.boot.SpringApplicationRunListener;
  */
 public class SpringRunnerManager implements SpringApplicationRunListenersVisitor.NecessaryMethods {
 
-    private static final SpringRunnerManager instance = new SpringRunnerManager();
     private static final Logger logger = new GaloisLog(SpringRunnerManager.class);
     private final List<AbstractRunner> runners = new ArrayList<>();
+
+    private static class SpringRunnerManagerHolder {
+        private static final SpringRunnerManager instance = new SpringRunnerManager();
+    }
 
     /**
      * Gets instance.
@@ -50,7 +54,7 @@ public class SpringRunnerManager implements SpringApplicationRunListenersVisitor
      * @return the instance
      */
     public static SpringRunnerManager getInstance() {
-        return instance;
+        return SpringRunnerManagerHolder.instance;
     }
 
     /**
@@ -70,7 +74,7 @@ public class SpringRunnerManager implements SpringApplicationRunListenersVisitor
                 .sorted(Comparator.comparingInt(AbstractRunner::getRank).reversed())
                 .collect(Collectors.toList());
 
-        logger.info("Now register these runner in ordered: {}", result);
+        logger.info("Now register these runner in ordered: {}.", result);
         return result;
     }
 

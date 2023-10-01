@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -68,4 +68,5 @@ public class ConfConstant {
      * The constant GALOIS_VERSION.
      */
     public static final String GALOIS_VERSION = "galois.version";
+    public static final String GALOIS_GIT_URL = "galois.git.url";
 }

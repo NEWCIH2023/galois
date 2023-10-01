@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,12 +25,8 @@
 package io.liuguangsheng.galois.service.annotation;
 
 import io.liuguangsheng.galois.service.AgentService;
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+
+import java.lang.annotation.*;
 
 /**
  * The interface Asm visitor.
@@ -40,6 +36,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface AsmVisitor {
+
     /**
      * Value string.
      *
@@ -53,4 +50,5 @@ public @interface AsmVisitor {
      * @return the class
      */
     Class<? extends AgentService> manager();
+
 }

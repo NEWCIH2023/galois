@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,8 +35,11 @@ import io.liuguangsheng.galois.service.AgentService;
  */
 public class SpringAgentService extends AgentService {
 
-    private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
-    private static final SpringAgentService instance = new SpringAgentService();
+    private static final GlobalConfiguration config = GlobalConfiguration.getInstance();
+
+    private static class SpringAgentServiceHolder {
+        private static final SpringAgentService instance = new SpringAgentService();
+    }
 
     /**
      * Get instance spring agent service.
@@ -44,7 +47,7 @@ public class SpringAgentService extends AgentService {
      * @return the spring agent service
      */
     public static SpringAgentService getInstance() {
-        return instance;
+        return SpringAgentServiceHolder.instance;
     }
 
     /**
@@ -53,8 +56,8 @@ public class SpringAgentService extends AgentService {
      * @return 当项目已经加载了必须的类之后，该AgentService将成为可用状态
      */
     @Override
-    public boolean isUseful() {
-        return super.isUseful() && globalConfig.getBoolean(ConfConstant.RELOADER_SPRING_BOOT_ENABLE);
+    public boolean isSuitable() {
+        return super.isSuitable() && config.getBool(ConfConstant.RELOADER_SPRING_BOOT_ENABLE);
     }
 
 }

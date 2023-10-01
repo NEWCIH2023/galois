@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ package io.liuguangsheng.galois.conf;
 
 import io.liuguangsheng.galois.constants.Constant;
 import io.liuguangsheng.galois.utils.StringUtil;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -38,14 +39,16 @@ import java.util.Properties;
  */
 public class GlobalConfiguration {
 
-    private static final GlobalConfiguration globalConfiguration = new GlobalConfiguration();
-    /**
-     * parse config key-value entry in galois.properties
-     */
-    private final Properties configuration = new Properties();
+    private static final String GALOIS_PROPERTIES = "galois.properties";
+    private static final Properties configuration = new Properties();
+
+    private static class GlobalConfigurationHolder {
+        private static final GlobalConfiguration globalConfiguration = new GlobalConfiguration();
+    }
 
     private GlobalConfiguration() {
-        try (InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("galois.properties")) {
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        try (InputStream is = loader.getResourceAsStream(GALOIS_PROPERTIES)) {
             configuration.load(is);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -59,7 +62,7 @@ public class GlobalConfiguration {
      * @see GlobalConfiguration
      */
     public static GlobalConfiguration getInstance() {
-        return globalConfiguration;
+        return GlobalConfigurationHolder.globalConfiguration;
     }
 
     /**
@@ -69,8 +72,8 @@ public class GlobalConfiguration {
      * @return {@link String}
      * @see String
      */
-    public String getString(String key) {
-        return getString(key, Constant.EMPTY);
+    public String getStr(String key) {
+        return getStr(key, Constant.EMPTY);
     }
 
     /**
@@ -81,7 +84,7 @@ public class GlobalConfiguration {
      * @return {@link String}
      * @see String
      */
-    public String getString(String key, String defaultValue) {
+    public String getStr(String key, String defaultValue) {
         if (StringUtil.isBlank(key)) {
             return defaultValue;
         }
@@ -101,8 +104,8 @@ public class GlobalConfiguration {
      * @param key key
      * @return {@link boolean}
      */
-    public boolean getBoolean(String key) {
-        return getBoolean(key, false);
+    public boolean getBool(String key) {
+        return getBool(key, false);
     }
 
     /**
@@ -112,8 +115,8 @@ public class GlobalConfiguration {
      * @param defaultValue defaultValue
      * @return {@link boolean}
      */
-    public boolean getBoolean(String key, boolean defaultValue) {
-        String result = getString(key, defaultValue ? Constant.TRUE : Constant.FALSE);
+    public boolean getBool(String key, boolean defaultValue) {
+        String result = getStr(key, defaultValue ? Constant.TRUE : Constant.FALSE);
         return Constant.TRUE.equalsIgnoreCase(result);
     }
 
@@ -135,7 +138,7 @@ public class GlobalConfiguration {
      * @return {@link long}
      */
     public long getLong(String key, long defaultValue) {
-        String result = getString(key, String.valueOf(defaultValue));
+        String result = getStr(key, String.valueOf(defaultValue));
         try {
             return Long.parseLong(result);
         } catch (Exception e) {
@@ -149,8 +152,8 @@ public class GlobalConfiguration {
      * @param key key
      * @return {@link int}
      */
-    public int getInteger(String key) {
-        return getInteger(key, 0);
+    public int getInt(String key) {
+        return getInt(key, 0);
     }
 
     /**
@@ -160,8 +163,8 @@ public class GlobalConfiguration {
      * @param defaultValue defaultValue
      * @return {@link int}
      */
-    public int getInteger(String key, int defaultValue) {
-        String result = getString(key, String.valueOf(defaultValue));
+    public int getInt(String key, int defaultValue) {
+        String result = getStr(key, String.valueOf(defaultValue));
         try {
             return Integer.parseInt(result);
         } catch (Exception e) {

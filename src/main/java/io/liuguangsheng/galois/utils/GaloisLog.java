@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,15 +28,20 @@ import io.liuguangsheng.galois.conf.GlobalConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
-import static io.liuguangsheng.galois.constants.ConfConstant.PRINT_THROWABLE;
+import static io.liuguangsheng.galois.constants.ConfConstant.BUILD_TYPE;
+import static io.liuguangsheng.galois.constants.Constant.RELEASE;
 
 /**
  * The type Galois log.
  */
 public class GaloisLog implements Logger {
+
     private final Logger logger;
-    private final boolean printThrowable = GlobalConfiguration.getInstance().getBoolean(PRINT_THROWABLE);
+    private static final GlobalConfiguration config = GlobalConfiguration.getInstance();
+    private final boolean isReleaseVersion = RELEASE.equals(config.getStr(BUILD_TYPE));
+    private static final Marker marker = MarkerFactory.getMarker("[Galois]");
 
     /**
      * Instantiates a new Galois log.
@@ -68,29 +73,31 @@ public class GaloisLog implements Logger {
 
     @Override
     public void trace(String msg) {
-        logger.trace(msg);
+        logger.trace(marker, msg);
     }
 
     @Override
     public void trace(String format, Object arg) {
-        logger.trace(format, arg);
+        logger.trace(marker, format, arg);
     }
 
     @Override
     public void trace(String format, Object arg1, Object arg2) {
-        logger.trace(format, arg1, arg2);
+        logger.trace(marker, format, arg1, arg2);
     }
 
     @Override
     public void trace(String format, Object... arguments) {
-        logger.trace(format, arguments);
+        logger.trace(marker, format, arguments);
     }
 
     @Override
     public void trace(String msg, Throwable t) {
-        if (printThrowable) {
+        if (isReleaseVersion) {
             logger.trace(msg, t);
-        } else logger.trace(msg);
+        } else {
+            logger.trace(msg);
+        }
     }
 
     @Override
@@ -124,9 +131,11 @@ public class GaloisLog implements Logger {
 
     @Override
     public void trace(Marker marker, String msg, Throwable t) {
-        if (printThrowable) {
+        if (isReleaseVersion) {
             logger.trace(marker, msg, t);
-        } else logger.trace(marker, msg);
+        } else {
+            logger.trace(marker, msg);
+        }
 
     }
 
@@ -160,9 +169,11 @@ public class GaloisLog implements Logger {
 
     @Override
     public void debug(String msg, Throwable t) {
-        if (printThrowable) {
+        if (isReleaseVersion) {
             logger.debug(msg, t);
-        } else logger.debug(msg);
+        } else {
+            logger.debug(msg);
+        }
     }
 
     @Override
@@ -196,9 +207,11 @@ public class GaloisLog implements Logger {
 
     @Override
     public void debug(Marker marker, String msg, Throwable t) {
-        if (printThrowable) {
+        if (isReleaseVersion) {
             logger.debug(marker, msg, t);
-        } else logger.debug(marker, msg);
+        } else {
+            logger.debug(marker, msg);
+        }
     }
 
     @Override
@@ -208,33 +221,34 @@ public class GaloisLog implements Logger {
 
     @Override
     public void info(String msg) {
-        logger.info(msg);
+        logger.info(marker, msg);
 
     }
 
     @Override
     public void info(String format, Object arg) {
-        logger.info(format, arg);
+        logger.info(marker, format, arg);
 
     }
 
     @Override
     public void info(String format, Object arg1, Object arg2) {
-        logger.info(format, arg1, arg2);
+        logger.info(marker, format, arg1, arg2);
 
     }
 
     @Override
     public void info(String format, Object... arguments) {
-        logger.info(format, arguments);
-
+        logger.info(marker, format, arguments);
     }
 
     @Override
     public void info(String msg, Throwable t) {
-        if (printThrowable) {
-            logger.info(msg, t);
-        } else logger.info(msg);
+        if (isReleaseVersion) {
+            logger.info(marker, msg, t);
+        } else {
+            logger.info(marker, msg);
+        }
     }
 
     @Override
@@ -264,9 +278,11 @@ public class GaloisLog implements Logger {
 
     @Override
     public void info(Marker marker, String msg, Throwable t) {
-        if (printThrowable) {
+        if (isReleaseVersion) {
             logger.info(marker, msg, t);
-        } else logger.info(marker, msg);
+        } else {
+            logger.info(marker, msg);
+        }
     }
 
     @Override
@@ -296,9 +312,11 @@ public class GaloisLog implements Logger {
 
     @Override
     public void warn(String msg, Throwable t) {
-        if (printThrowable) {
+        if (isReleaseVersion) {
             logger.warn(msg, t);
-        } else logger.warn(msg);
+        } else {
+            logger.warn(msg);
+        }
     }
 
     @Override
@@ -328,9 +346,11 @@ public class GaloisLog implements Logger {
 
     @Override
     public void warn(Marker marker, String msg, Throwable t) {
-        if (printThrowable) {
+        if (isReleaseVersion) {
             logger.warn(marker, msg, t);
-        } else logger.warn(marker, msg);
+        } else {
+            logger.warn(marker, msg);
+        }
     }
 
     @Override
@@ -360,9 +380,7 @@ public class GaloisLog implements Logger {
 
     @Override
     public void error(String msg, Throwable t) {
-        if (printThrowable) {
-            logger.error(msg, t);
-        } else logger.error(msg);
+        logger.error(msg, t);
     }
 
     @Override
@@ -392,8 +410,6 @@ public class GaloisLog implements Logger {
 
     @Override
     public void error(Marker marker, String msg, Throwable t) {
-        if (printThrowable) {
-            logger.error(marker, msg, t);
-        } else logger.error(marker, msg);
+        logger.error(marker, msg, t);
     }
 }

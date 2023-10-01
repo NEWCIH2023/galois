@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +25,9 @@
 package io.liuguangsheng.galois.service.mybatis;
 
 import io.liuguangsheng.galois.conf.GlobalConfiguration;
-import io.liuguangsheng.galois.constants.ConfConstant;
 import io.liuguangsheng.galois.service.AgentService;
+
+import static io.liuguangsheng.galois.constants.ConfConstant.RELOADER_MYBATIS_ENABLE;
 
 /**
  * mybatis agent service
@@ -36,8 +37,14 @@ import io.liuguangsheng.galois.service.AgentService;
  */
 public class MyBatisAgentService extends AgentService {
 
-    private static final MyBatisAgentService myBatisAgentService = new MyBatisAgentService();
-    private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
+    private static final GlobalConfiguration config = GlobalConfiguration.getInstance();
+
+    private static class MyBatisAgentServiceHolder {
+        private static final MyBatisAgentService instance = new MyBatisAgentService();
+    }
+
+    private MyBatisAgentService() {
+    }
 
     /**
      * get instance
@@ -46,12 +53,12 @@ public class MyBatisAgentService extends AgentService {
      * @see MyBatisAgentService
      */
     public static MyBatisAgentService getInstance() {
-        return myBatisAgentService;
+        return MyBatisAgentServiceHolder.instance;
     }
 
     @Override
-    public boolean isUseful() {
-        return super.isUseful() && globalConfig.getBoolean(ConfConstant.RELOADER_MYBATIS_ENABLE);
+    public boolean isSuitable() {
+        return super.isSuitable() && config.getBool(RELOADER_MYBATIS_ENABLE);
     }
 
 

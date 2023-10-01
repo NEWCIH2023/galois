@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,16 +29,22 @@ import io.liuguangsheng.galois.service.annotation.LazyBean;
 import io.liuguangsheng.galois.service.spring.visitors.ApplicationContextVisitor;
 import io.liuguangsheng.galois.service.spring.visitors.BeanDefinitionScannerVisitor;
 import io.liuguangsheng.galois.utils.GaloisLog;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Objects;
+import java.util.UUID;
+
+import static io.liuguangsheng.galois.service.spring.visitors.HandlerMethodMappingVisitor.UPDATE_HANDLER_METHODS;
 
 /**
  * Spring的Bean重载服务
@@ -50,7 +56,6 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationCo
         BeanDefinitionScannerVisitor.NecessaryMethods {
 
     private static final Logger logger = new GaloisLog(SpringBeanReloader.class);
-    private static final SpringBeanReloader instance = new SpringBeanReloader();
     /**
      * The Scanner.
      */
@@ -60,13 +65,17 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationCo
      */
     protected AnnotationConfigServletWebServerApplicationContext context;
 
+    private static class SpringBeanReloaderHolder {
+        private static final SpringBeanReloader instance = new SpringBeanReloader();
+    }
+
     /**
      * Gets instance.
      *
      * @return the instance
      */
     public static SpringBeanReloader getInstance() {
-        return instance;
+        return SpringBeanReloaderHolder.instance;
     }
 
     /**
@@ -76,19 +85,37 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationCo
      */
     @Override
     public void updateBean(Class<?> clazz) {
-        if (scanner == null || context == null) {
-            logger.warn("SpringBeanReloader not prepare ready. BeanDefinitionScanner or ApplicationContext object is "
-                    + "null.");
-            return;
-        }
-
         DefaultListableBeanFactory factory = (DefaultListableBeanFactory) getContext().getAutowireCapableBeanFactory();
-        String beanName = factory.getBeanNamesForType(clazz)[0];
+        String[] beanNames = factory.getBeanNamesForType(clazz);
+        String beanName = null;
 
         try {
             Object bean = clazz.newInstance();
-            factory.destroySingleton(beanName);
+
+            if (beanNames.length != 0) {
+                // if an old bean that had managered by spring container
+                beanName = beanNames[0];
+                factory.destroySingleton(beanName);
+            } else {
+                // if a new bean that hadn't managered by spring container
+                beanName = bean.getClass().getSimpleName();
+                if (beanName.length() > 1) {
+                    beanName = Character.toLowerCase(beanName.charAt(0)) + beanName.substring(1);
+                } else {
+                    beanName = beanName.toLowerCase();
+                }
+
+                String[] allBeanNames = factory.getBeanDefinitionNames();
+                for (String bn : allBeanNames) {
+                    if (Objects.equals(bn, beanName)) {
+                        beanName = UUID.randomUUID().toString();
+                        break;
+                    }
+                }
+            }
+
             factory.registerSingleton(beanName, bean);
+//      context.refresh();
 
             if (isHandler(clazz)) {
                 updateRequestMapping(bean);
@@ -102,31 +129,19 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationCo
         logger.info("SpringBeanReloader reload class {} success.", clazz.getSimpleName());
     }
 
-
     /**
      * update request mapping
      *
-     * @param bean
-     * @throws NoSuchMethodException
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
+     * @param bean 待更新mapping信息的controller对象
      */
-    private void updateRequestMapping(Object bean) throws NoSuchMethodException, InvocationTargetException,
-            IllegalAccessException {
-        RequestMappingHandlerMapping mappingHandler = context.getBean(RequestMappingHandlerMapping.class);
-        String[] beanNames = context.getBeanNamesForType(bean.getClass());
-
-        if (beanNames.length == 0) {
-            return;
-        }
-
-        String beanName = beanNames[0];
-        Method processCandidateBean = RequestMappingHandlerMapping.class.getMethod("processCandidateBean",
-                String.class);
-        processCandidateBean.setAccessible(true);
-        processCandidateBean.invoke(mappingHandler, beanName);
+    private void updateRequestMapping(Object bean)
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        RequestMappingHandlerMapping handlerMapping = getContext().getBean(RequestMappingHandlerMapping.class);
+        Method updateHandlerMethods = handlerMapping.getClass().getMethod(UPDATE_HANDLER_METHODS, Object.class);
+        // 清空method缓存，避免获取到带有旧注解value的mapping方法
+        ReflectionUtils.clearCache();
+        updateHandlerMethods.invoke(handlerMapping, bean);
     }
-
 
     /**
      * is controller
@@ -144,14 +159,23 @@ public class SpringBeanReloader implements BeanReloader<Class<?>>, ApplicationCo
      * @return {@link boolean}
      */
     @Override
-    public boolean isUseful(Class<?> clazz) {
+    public boolean isSuitable(Class<?> clazz) {
         int m = clazz.getModifiers();
-        if (Modifier.isInterface(m) || Modifier.isAbstract(m) || Modifier.isPrivate(m) || Modifier.isStatic(m) || Modifier.isNative(m)) {
+        return !Modifier.isInterface(m) && !Modifier.isAbstract(m) && !Modifier.isPrivate(m) && !Modifier.isStatic(m) && !Modifier.isNative(m);
+    }
+
+    /**
+     * 判断当前beanReloader是否准备完成
+     */
+    @Override
+    public boolean isReady() {
+        if (scanner == null || context == null) {
+            logger.warn("SpringBeanReloader not prepare ready. BeanDefinitionScanner or ApplicationContext object is " +
+                    "null.");
             return false;
         }
 
-        String[] beanTypeNames = getContext().getBeanNamesForType(clazz);
-        return beanTypeNames.length > 0;
+        return true;
     }
 
     /**

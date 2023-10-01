@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,5 +46,12 @@ public interface BeanReloader<T> {
      * @param object 用来判断当前实例对象是否可以被框架重新加载
      * @return 验证结果 boolean
      */
-    boolean isUseful(T object);
+    boolean isSuitable(T object);
+
+    /**
+     * 判断当前beanReloader是否准备完成
+     *
+     * @return is ready
+     */
+    boolean isReady();
 }

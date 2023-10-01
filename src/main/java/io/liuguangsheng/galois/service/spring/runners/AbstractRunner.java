@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.liuguangsheng.galois.service.runners;
+package io.liuguangsheng.galois.service.spring.runners;
 
 import io.liuguangsheng.galois.utils.GaloisLog;
 import org.slf4j.Logger;
@@ -39,10 +39,11 @@ import org.springframework.core.env.ConfigurableEnvironment;
  * @author liuguangsheng
  */
 public abstract class AbstractRunner implements SpringApplicationRunListener {
+
     /**
      * The constant logger.
      */
-    public static final Logger logger = new GaloisLog(AbstractRunner.class);
+    private static final Logger logger = new GaloisLog(AbstractRunner.class);
 
     /**
      * the rank mean which runer will run first if got a higher rank value
@@ -66,8 +67,7 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
     }
 
     /**
-     * Called once the {@link ApplicationContext} has been created and prepared, but
-     * before sources have been loaded.
+     * Called once the {@link ApplicationContext} has been created and prepared, but before sources have been loaded.
      *
      * @param context the application context
      */
@@ -76,8 +76,7 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
     }
 
     /**
-     * Called once the application context has been loaded but before it has been
-     * refreshed.
+     * Called once the application context has been loaded but before it has been refreshed.
      *
      * @param context the application context
      */
@@ -86,9 +85,10 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
     }
 
     /**
-     * The context has been refreshed and the application has started but
-     * {@link CommandLineRunner CommandLineRunners} and {@link ApplicationRunner
-     * ApplicationRunners} have not been called.
+     * The context has been refreshed and the application has started but {@link CommandLineRunner CommandLineRunners
+     * } and {@link ApplicationRunner ApplicationRunners} have not
+     * been
+     * called.
      *
      * @param context the application context.
      * @since 2.0.0
@@ -98,8 +98,8 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
     }
 
     /**
-     * Called immediately before the run method finishes, when the application context has
-     * been refreshed and all {@link CommandLineRunner CommandLineRunners} and
+     * Called immediately before the run method finishes, when the application context has been refreshed and all
+     * {@link CommandLineRunner CommandLineRunners} and
      * {@link ApplicationRunner ApplicationRunners} have been called.
      *
      * @param context the application context.
@@ -112,8 +112,7 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
     /**
      * Called when a failure occurs when running the application.
      *
-     * @param context   the application context or {@code null} if a failure occurred before
-     *                  the context was created
+     * @param context   the application context or {@code null} if a failure occurred before the context was created
      * @param exception the failure
      * @since 2.0.0
      */
@@ -146,8 +145,12 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof AbstractRunner)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof AbstractRunner)) {
+            return false;
+        }
         AbstractRunner runner = (AbstractRunner) o;
         return rank == runner.rank;
     }
@@ -162,7 +165,7 @@ public abstract class AbstractRunner implements SpringApplicationRunListener {
      *
      * @return the boolean
      */
-    protected boolean isCanInvoke() {
+    protected boolean canInvoke() {
         return --invokeCount == 0;
     }
 }

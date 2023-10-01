@@ -22,17 +22,27 @@
  * SOFTWARE.
  */
 
-package io.liuguangsheng.galois.service.monitor;
+package io.liuguangsheng.galois.service.spring.listeners;
+
+import io.liuguangsheng.galois.service.annotation.LazyBean;
+import io.liuguangsheng.galois.service.monitor.FileChangedListener;
+import io.liuguangsheng.galois.service.spring.SpringAgentService;
+import io.liuguangsheng.galois.utils.ClassUtil;
+import io.liuguangsheng.galois.utils.FileUtil;
 
 import java.io.File;
+import java.util.Objects;
+
+import static io.liuguangsheng.galois.constants.FileType.JAVA_FILE;
 
 /**
- * file monitor service interface
- *
  * @author liuguangsheng
  * @since 1.0.0
- */
-public interface FileChangedListener {
+ **/
+@LazyBean(value = "JavaFileListener", manager = SpringAgentService.class, rank = 1)
+public class JavaFileListener implements FileChangedListener {
+
+    private static final ClassChangedCache classChangedCache = ClassChangedCache.getInstance();
 
     /**
      * is listener useful for this file object
@@ -40,26 +50,45 @@ public interface FileChangedListener {
      * @param file the changed file
      * @return is the listener monitor this file change
      */
-    boolean isSuitable(File file);
+    @Override
+    public boolean isSuitable(File file) {
+        return Objects.equals(FileUtil.getFileType(file), JAVA_FILE.getFileType());
+    }
 
     /**
      * handler for file created
      *
      * @param file the changed file
      */
-    void createdHandle(File file);
+    @Override
+    public void createdHandle(File file) {
+        String className = ClassUtil.getClassNameFromSource(file);
+        classChangedCache.hadChanged(className);
+    }
 
     /**
      * handler for file modifed
      *
      * @param file the changed file
      */
-    void modifiedHandle(File file);
+    @Override
+    public void modifiedHandle(File file) {
+        String className = ClassUtil.getClassNameFromSource(file);
+        classChangedCache.hadChanged(className);
+    }
 
     /**
      * handler for file deleted
      *
      * @param file the changed file
      */
-    void deletedHandle(File file);
+    @Override
+    public void deletedHandle(File file) {
+
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName();
+    }
 }

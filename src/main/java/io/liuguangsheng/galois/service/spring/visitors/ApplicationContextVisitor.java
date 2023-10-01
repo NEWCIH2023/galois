@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,24 +24,18 @@
 
 package io.liuguangsheng.galois.service.spring.visitors;
 
-import io.liuguangsheng.galois.constants.ClassNameConstant;
 import io.liuguangsheng.galois.constants.Constant;
 import io.liuguangsheng.galois.service.MethodAdapter;
 import io.liuguangsheng.galois.service.annotation.AsmVisitor;
 import io.liuguangsheng.galois.service.spring.SpringAgentService;
 import io.liuguangsheng.galois.service.spring.SpringBeanReloader;
-import java.util.Objects;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 
-import static jdk.internal.org.objectweb.asm.Opcodes.ALOAD;
-import static jdk.internal.org.objectweb.asm.Opcodes.ASM5;
-import static jdk.internal.org.objectweb.asm.Opcodes.ATHROW;
-import static jdk.internal.org.objectweb.asm.Opcodes.CHECKCAST;
-import static jdk.internal.org.objectweb.asm.Opcodes.INVOKESTATIC;
-import static jdk.internal.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
-import static jdk.internal.org.objectweb.asm.Opcodes.IRETURN;
-import static jdk.internal.org.objectweb.asm.Opcodes.RETURN;
+import java.util.Objects;
+
+import static io.liuguangsheng.galois.constants.ClassNameConstant.CLASS_WEB_SERVER_APPLICATION_CONTEXT;
+import static jdk.internal.org.objectweb.asm.Opcodes.*;
 
 
 /**
@@ -57,7 +51,7 @@ public class ApplicationContextVisitor extends MethodAdapter {
      * Instantiates a new Application context visitor.
      */
     public ApplicationContextVisitor() {
-        super(ClassNameConstant.ANNOTATION_CONFIG_SERVLET_WEB_SERVER_APPLICATION_CONTEXT);
+        super(CLASS_WEB_SERVER_APPLICATION_CONTEXT);
     }
 
     @Override

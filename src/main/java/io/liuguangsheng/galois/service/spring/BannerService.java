@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,14 +22,21 @@
  * SOFTWARE.
  */
 
-package io.liuguangsheng.galois.service;
+package io.liuguangsheng.galois.service.spring;
 
 import io.liuguangsheng.galois.conf.GlobalConfiguration;
-import io.liuguangsheng.galois.constants.ConfConstant;
-import io.liuguangsheng.galois.constants.Constant;
+import io.liuguangsheng.galois.service.spring.visitors.SpringBootBannerVisitor;
+import io.liuguangsheng.galois.utils.StringUtil;
+import org.springframework.boot.ansi.AnsiColor;
+import org.springframework.boot.ansi.AnsiOutput;
+import org.springframework.boot.ansi.AnsiStyle;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
+
+import static io.liuguangsheng.galois.constants.ConfConstant.*;
+import static io.liuguangsheng.galois.constants.Constant.*;
 
 /**
  * print banner when galois starting
@@ -37,34 +44,27 @@ import java.util.Map;
  * @author liuguangsheng
  * @since 1.0.0
  */
-public class BannerService {
+public class BannerService implements SpringBootBannerVisitor.NecessaryMethods {
 
-    private static final GlobalConfiguration globalConfig = GlobalConfiguration.getInstance();
-    private static final String BANNER = " ██████╗  █████╗ ██╗      ██████╗ ██╗███████╗\n" +
-            "██╔════╝ ██╔══██╗██║     ██╔═══██╗██║██╔════╝\n" +
-            "██║  ███╗███████║██║     ██║   ██║██║███████╗\n" +
-            "██║   ██║██╔══██║██║     ██║   ██║██║╚════██║\n" +
-            "╚██████╔╝██║  ██║███████╗╚██████╔╝██║███████║\n" +
-            " ╚═════╝ ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝╚══════╝";
-
-    private BannerService() {
-    }
+    private static final GlobalConfiguration config = GlobalConfiguration.getInstance();
 
     /**
      * print banner
      */
-    public static void printBanner() {
-        if (!globalConfig.getBoolean(ConfConstant.BANNER_ENABLE, true)) {
+    @Override
+    public void printBanner() {
+        if (!config.getBool(BANNER_ENABLE, true)) {
             return;
         }
 
-        String bannerBuilder = Constant.LF + BANNER + Constant.TAB + galoisVersion() + Constant.LF +
-                String.format(
-                        " :: SpringBoot (%s) :: Spring (%s) :: MyBatis (%s)%n :: Jdk (%s)",
-                        springBootVersion(), springVersion(), mybatisVersion(), jdkVersion()
-                ) +
-                Constant.LF;
-        System.out.println(bannerBuilder);
+        String galoisName = " :: Galois :: ";
+        String gitUrl = "";
+        String galoisGitUrl = config.getStr(GALOIS_GIT_URL);
+        if (StringUtil.isNotBlank(galoisGitUrl)) {
+            gitUrl += String.join(" | ", galoisGitUrl.split(COMMA));
+        }
+        System.out.println(AnsiOutput.toString(AnsiColor.GREEN, galoisName,
+                AnsiColor.DEFAULT, SPACE, AnsiStyle.FAINT, galoisVersion() + SPACE + gitUrl));
     }
 
     /**
@@ -122,7 +122,7 @@ public class BannerService {
     private static String mybatisVersion() {
         try {
             Class<?> mapperRegistry = Class.forName("org.apache.ibatis.binding.MapperRegistry");
-            Field knownMappers = mapperRegistry.getDeclaredField("knownMappers");
+            Field knownMappers = mapperRegistry.getDeclaredField(KNOWN_MAPPERS);
             boolean flag = knownMappers.getType().equals(Map.class);
             return flag ? ">= 3.2.0" : "<= 3.1.0";
         } catch (Exception e) {
@@ -137,7 +137,6 @@ public class BannerService {
      * @see String
      */
     private static String galoisVersion() {
-        return String.format("%s (%s)", globalConfig.getString(ConfConstant.GALOIS_VERSION, Constant.HYPHEN),
-                globalConfig.getString(ConfConstant.BUILD_TYPE));
+        return String.format("%s", config.getStr(GALOIS_VERSION, HYPHEN));
     }
 }

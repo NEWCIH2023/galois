@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,15 +25,14 @@
 package io.liuguangsheng.galois.demo.asm;
 
 import io.liuguangsheng.galois.utils.StringUtil;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
 import jdk.internal.org.objectweb.asm.ClassReader;
 import jdk.internal.org.objectweb.asm.util.ASMifier;
 import jdk.internal.org.objectweb.asm.util.Printer;
 import jdk.internal.org.objectweb.asm.util.Textifier;
 import jdk.internal.org.objectweb.asm.util.TraceClassVisitor;
-import org.springframework.boot.SpringApplicationRunListener;
+
+import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * The type Print asm code.
@@ -43,15 +42,6 @@ import org.springframework.boot.SpringApplicationRunListener;
  */
 public class PrintAsmCode {
 
-    private String log;
-    private List<SpringApplicationRunListener> listeners;
-
-    /**
-     * Instantiates a new Print asm code.
-     */
-    public PrintAsmCode() {
-    }
-
     /**
      * The entry point of application.
      *
@@ -59,7 +49,7 @@ public class PrintAsmCode {
      * @throws IOException the io exception
      */
     public static void main(String[] args) throws IOException {
-        printCode(null, false);
+        printCode(SpringBootBanner.class.getName(), true);
     }
 
     /**
@@ -74,11 +64,17 @@ public class PrintAsmCode {
             className = PrintAsmCode.class.getName();
         }
 
-        int parsingOptions = ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG;
+        ClassReader cr = new ClassReader(className);
         Printer printer = asmCode ? new ASMifier() : new Textifier();
         PrintWriter printWriter = new PrintWriter(System.out, true);
         TraceClassVisitor cv = new TraceClassVisitor(null, printer, printWriter);
-        new ClassReader(className).accept(cv, parsingOptions);
+        cr.accept(cv, ClassReader.SKIP_FRAMES + ClassReader.SKIP_DEBUG);
     }
 
+    public void updateHandlerMethods(Object handler) {
+    }
+
+    protected void detectHandlerMethods(Object handler) {
+
+    }
 }

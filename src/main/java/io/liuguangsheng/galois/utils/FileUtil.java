@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,16 +26,10 @@ package io.liuguangsheng.galois.utils;
 
 import io.liuguangsheng.galois.constants.Constant;
 import io.liuguangsheng.galois.constants.FileType;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Objects;
 import org.slf4j.Logger;
+
+import java.io.*;
+import java.util.Objects;
 
 /**
  * file util
@@ -57,7 +51,7 @@ public class FileUtil {
      * @param fileType target file type
      * @return the boolean
      */
-    public static boolean validFileType(File file, FileType fileType) {
+    public static boolean matchFileType(File file, FileType fileType) {
         return Objects.equals(getFileType(file), fileType.getFileType());
     }
 
@@ -115,8 +109,7 @@ public class FileUtil {
             return new byte[0];
         }
 
-        try (FileInputStream fileInputStream = new FileInputStream(file);
-             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+        try (FileInputStream fileInputStream = new FileInputStream(file); ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
 
             byte[] b = new byte[1024];
             int n;

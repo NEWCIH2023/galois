@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,14 @@
 
 package io.liuguangsheng.galois.service;
 
-import io.liuguangsheng.galois.constants.ClassNameConstant;
-import io.liuguangsheng.galois.constants.Constant;
 import io.liuguangsheng.galois.service.annotation.AsmVisitor;
-import io.liuguangsheng.galois.service.runners.AbstractRunner;
-import io.liuguangsheng.galois.service.runners.SpringRunnerManager;
+import io.liuguangsheng.galois.service.spring.runners.AbstractRunner;
+import io.liuguangsheng.galois.service.spring.runners.SpringRunnerManager;
 import io.liuguangsheng.galois.utils.ClassUtil;
 import io.liuguangsheng.galois.utils.GaloisLog;
 import io.liuguangsheng.galois.utils.StringUtil;
+import org.slf4j.Logger;
+
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Modifier;
@@ -39,10 +39,11 @@ import java.security.ProtectionDomain;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.Objects;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
+
+import static io.liuguangsheng.galois.constants.ClassNameConstant.PACKAGE_SERVICE;
+import static io.liuguangsheng.galois.constants.Constant.*;
 
 /**
  * premain agent服务入口
@@ -61,8 +62,10 @@ public class PremainService {
         scanAsmVisitor();
         scanRunner();
 
-        logger.debug("Scan {} agentServices as list [{}].", agentServiceMap.keySet().size(),
-                agentServiceMap.values().stream().map(AgentService::toString).collect(Collectors.joining(Constant.COMMA)));
+        logger.debug("Scan {} agentServices as list [{}].", agentServiceMap.keySet().size(), agentServiceMap.values()
+                .stream()
+                .map(AgentService::toString)
+                .collect(Collectors.joining(COMMA)));
     }
 
     /**
@@ -73,15 +76,14 @@ public class PremainService {
      */
     public static void premain(String agentArgs, Instrumentation inst) {
         if (inst == null) {
-            logger.error("Your program do not support instrumentation.");
+            logger.error("Your program do not support instrumentation, Please remove this javaagent.");
             System.exit(0);
         }
 
         try {
-            ClassFileTransformer custom = new CustomTransformer();
-            inst.addTransformer(custom, true);
+            inst.addTransformer(new CustomTransformer(), true);
             ClassUtil.setInstrumentation(inst);
-            BannerService.printBanner();
+//            BannerService.printBanner();
         } catch (Throwable e) {
             logger.error("Start Premain Service fail.", e);
         }
@@ -91,51 +93,49 @@ public class PremainService {
      * scan agent service
      */
     private static void scanAgentService() {
-        // scan agent service over abstract class named AgentService
-        Set<Class<?>> agentClasses = ClassUtil.scanBaseClass(ClassNameConstant.SERVICE_PACKAGE, AgentService.class);
-
-        for (Class<?> agentClass : agentClasses) {
-            if (Modifier.isAbstract(agentClass.getModifiers())) {
-                continue;
-            }
-
-            Optional.ofNullable(ClassUtil.getInstance(agentClass)).ifPresent(object -> {
-                AgentService agentService = (AgentService) object;
-                agentServiceMap.put(agentClass.getName(), agentService);
-            });
-        }
+        ClassUtil.scanBaseClass(PACKAGE_SERVICE, AgentService.class)
+                .stream()
+                .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
+                .forEach(clazz -> {
+                    Object agentService = ClassUtil.getInstance(clazz);
+                    if (agentService != null) {
+                        agentServiceMap.put(clazz.getName(), (AgentService) agentService);
+                    }
+                });
     }
 
     /**
      * scan asm visitor
      */
     private static void scanAsmVisitor() {
-        Set<Class<?>> visitorClasses = ClassUtil.scanBaseClass(ClassNameConstant.SERVICE_PACKAGE, MethodAdapter.class);
-        for (Class<?> visitorClass : visitorClasses) {
-            if (Modifier.isAbstract(visitorClass.getModifiers())) {
-                continue;
-            }
+        ClassUtil.scanBaseClass(PACKAGE_SERVICE, MethodAdapter.class)
+                .stream()
+                .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
+                .forEach(clazz -> {
+                    MethodAdapter adapter = (MethodAdapter) ClassUtil.getInstance(clazz);
+                    AsmVisitor visitor = clazz.getAnnotation(AsmVisitor.class);
+                    if (visitor == null) {
+                        return;
+                    }
 
-            MethodAdapter methodAdapter = (MethodAdapter) ClassUtil.getInstance(visitorClass);
-            AsmVisitor visitor = visitorClass.getAnnotation(AsmVisitor.class);
-
-            Optional.ofNullable(ClassUtil.getInstance(visitor.manager())).ifPresent(object -> ((AgentService) object).registerMethodAdapter(methodAdapter));
-        }
+                    AgentService service = (AgentService) ClassUtil.getInstance(visitor.manager());
+                    Objects.requireNonNull(service, "Get agentService instance <" + visitor.manager() + "> by " +
+                                    "visitor annotation failed.")
+                            .registerMethodAdapter(adapter);
+                });
     }
 
     /**
      * scan runner
      */
     private static void scanRunner() {
-        Set<Class<?>> runnerClasses = ClassUtil.scanBaseClass(ClassNameConstant.SERVICE_PACKAGE, AbstractRunner.class);
-        for (Class<?> runnerClass : runnerClasses) {
-            if (Modifier.isAbstract(runnerClass.getModifiers())) {
-                continue;
-            }
-
-            Optional.ofNullable(ClassUtil.getInstance(runnerClass)).ifPresent(object -> runManager.addRunner((AbstractRunner) object));
-        }
-
+        ClassUtil.scanBaseClass(PACKAGE_SERVICE, AbstractRunner.class)
+                .stream()
+                .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
+                .map(ClassUtil::getInstance)
+                .filter(Objects::nonNull)
+                .map(obj -> (AbstractRunner) obj)
+                .forEach(runManager::addRunner);
     }
 
     /**
@@ -152,19 +152,19 @@ public class PremainService {
                 return null;
             }
 
-            String newClassName = className.replace(Constant.SLASH, Constant.DOT);
+            String fullClassName = className.replace(SLASH, DOT);
             Collection<AgentService> agentServices = agentServiceMap.values();
 
             for (AgentService agentService : agentServices) {
-                boolean isNecessaryClass = agentService.checkNecessaryClass(newClassName);
+                boolean isNecessaryClass = agentService.isNecessaryClass(fullClassName);
                 // checkedClass表示当前加载的类newClassName是否有对应的MethodAdapter，当为false时，
                 // 表示没有对应的MethodAdapter，这时候就直接跳过
                 if (!isNecessaryClass) {
                     continue;
                 }
 
-                MethodAdapter adapter = agentService.getMethodAdapterMap().get(newClassName);
-                return adapter.transform();
+                MethodAdapter adapter = agentService.getMethodAdapterMap().get(fullClassName);
+                return adapter.transform(classfileBuffer);
             }
 
             return null;

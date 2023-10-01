@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,7 @@ public class StringUtil {
      * @return {@link boolean}
      */
     public static boolean isBlank(String str) {
-        return isEmpty(str) || "".equals(str.trim());
+        return isEmpty(str) || str.trim().isEmpty();
     }
 
     /**
@@ -49,7 +49,7 @@ public class StringUtil {
      * @return {@link boolean}
      */
     public static boolean isEmpty(String str) {
-        return str == null || "".equals(str);
+        return str == null || str.isEmpty();
     }
 
     /**

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [$user]
+ * Copyright (c) [2023] [liuguangsheng]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,13 +25,8 @@
 package io.liuguangsheng.galois.service;
 
 import io.liuguangsheng.galois.service.monitor.FileChangedListener;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
 
 /**
  * abstract agent service
@@ -67,7 +62,7 @@ public abstract class AgentService {
      *
      * @return 当项目已经加载了必须的类之后 ，该AgentService将成为可用状态
      */
-    public boolean isUseful() {
+    public boolean isSuitable() {
         return enabled == necessaryClasses.size();
     }
 
@@ -78,7 +73,7 @@ public abstract class AgentService {
      * @param loadedClassName loaded class name
      * @return 项目是否加载了对应的类名的类 boolean
      */
-    public boolean checkNecessaryClass(String loadedClassName) {
+    public boolean isNecessaryClass(String loadedClassName) {
         if (necessaryClasses.contains(loadedClassName)) {
             enabled++;
             return true;

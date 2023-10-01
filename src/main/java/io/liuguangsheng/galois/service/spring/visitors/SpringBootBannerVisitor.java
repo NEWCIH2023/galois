@@ -26,32 +26,30 @@ package io.liuguangsheng.galois.service.spring.visitors;
 
 import io.liuguangsheng.galois.service.MethodAdapter;
 import io.liuguangsheng.galois.service.annotation.AsmVisitor;
+import io.liuguangsheng.galois.service.spring.BannerService;
 import io.liuguangsheng.galois.service.spring.SpringAgentService;
-import io.liuguangsheng.galois.service.spring.SpringBeanReloader;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
-import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 
 import java.util.Objects;
 
-import static io.liuguangsheng.galois.constants.ClassNameConstant.CLASS_PATH_BEAN_DEFINITION_SCANNER;
+import static io.liuguangsheng.galois.constants.ClassNameConstant.CLASS_SPRING_BOOT_BANNER;
 import static io.liuguangsheng.galois.constants.Constant.DOT;
 import static io.liuguangsheng.galois.constants.Constant.SLASH;
 import static jdk.internal.org.objectweb.asm.Opcodes.*;
 
-/**
- * bean definition scanner visitor
- *
- * @author liuguangsheng
- * @since 1.0.0
- */
-@AsmVisitor(value = "BeanDefinitionScannerVisitor", manager = SpringAgentService.class)
-public class BeanDefinitionScannerVisitor extends MethodAdapter {
-
+@AsmVisitor(value = "SpringBootBannerVisitor", manager = SpringAgentService.class)
+public class SpringBootBannerVisitor extends MethodAdapter {
     /**
-     * Instantiates a new Bean definition scanner visitor.
+     * Instantiates a new Method adapter.
+     *
+     * @param className the class name
      */
-    public BeanDefinitionScannerVisitor() {
-        super(CLASS_PATH_BEAN_DEFINITION_SCANNER);
+    protected SpringBootBannerVisitor(String className) {
+        super(className);
+    }
+
+    public SpringBootBannerVisitor() {
+        super(CLASS_SPRING_BOOT_BANNER);
     }
 
     @Override
@@ -59,47 +57,36 @@ public class BeanDefinitionScannerVisitor extends MethodAdapter {
                                      String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
 
-        if (Objects.equals("doScan", name)) {
-            return new DoScanMethodVisitor(ASM5, mv);
+        if (Objects.equals("printBanner", name)) {
+            return new PrintBannerMethodVisitor(ASM5, mv);
         }
 
         return mv;
     }
 
     public interface NecessaryMethods {
-
-        void setScanner(ClassPathBeanDefinitionScanner scanner);
+        void printBanner();
     }
 
-    /**
-     * The type Do scan method visitor.
-     */
-    class DoScanMethodVisitor extends MethodVisitor {
+    static class PrintBannerMethodVisitor extends MethodVisitor {
 
-        /**
-         * Instantiates a new Do scan method visitor.
-         *
-         * @param api           the api
-         * @param methodVisitor the method visitor
-         */
-        public DoScanMethodVisitor(int api, MethodVisitor methodVisitor) {
-            super(api, methodVisitor);
+        public PrintBannerMethodVisitor(int i, MethodVisitor methodVisitor) {
+            super(i, methodVisitor);
         }
 
         @Override
-        public void visitInsn(int opcode) {
-            if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-                String pClassName = SpringBeanReloader.class.getName().replace(DOT, SLASH);
-                String vClassName = className.replace(DOT, SLASH);
+        public void visitMethodInsn(int i, String s, String s1, String s2, boolean b) {
+            if ("println".equals(s1) && "()V".equals(s2)) {
+                String pClassName = BannerService.class.getName().replace(DOT, SLASH);
 
                 mv.visitCode();
-                mv.visitMethodInsn(INVOKESTATIC, pClassName, "getInstance", "()L" + pClassName + ";", false);
-                mv.visitVarInsn(ALOAD, 0);
-                mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "setScanner", "(L" + vClassName + ";)V", false);
+                mv.visitTypeInsn(NEW, pClassName);
+                mv.visitInsn(DUP);
+                mv.visitMethodInsn(INVOKESPECIAL, pClassName, "<init>", "()V", false);
+                mv.visitMethodInsn(INVOKEVIRTUAL, pClassName, "printBanner", "()V", false);
             }
 
-            super.visitInsn(opcode);
+            super.visitMethodInsn(i, s, s1, s2, b);
         }
     }
-
 }
