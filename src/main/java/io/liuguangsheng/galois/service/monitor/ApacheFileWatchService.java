@@ -60,6 +60,11 @@ public class ApacheFileWatchService extends FileWatchService {
         URL buildUrl = getClass().getClassLoader().getResource("");
         String buildPath = Objects.requireNonNull(buildUrl, "Can't get build path by classLoader.").getPath();
         FileFilter fileFilter = pathname -> !pathname.toURI().getPath().startsWith(buildPath);
+
+        if (buildPath != null) {
+            logger.info("Ignored build path [{}].", buildPath);
+        }
+
         FileAlterationObserver observer = new FileAlterationObserver(rootPath, fileFilter);
 
         try {
