@@ -69,12 +69,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.comtop.top</groupId>
-            <artifactId>comtop-top-corm</artifactId>
-            <version>3.1.4</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis-spring</artifactId>
             <version>2.0.6</version>
@@ -104,14 +98,10 @@
             <version>4.0.1</version>
             <scope>provided</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.11.0</version>
-            <!--            <scope>compile</scope>-->
-            <!--            <scope>system</scope>-->
-            <!--            <systemPath>N:/IdeaProjects/galois/src/main/resources/libs/include/commons-io-2.11.0.jar</systemPath>-->
         </dependency>
     </dependencies>
 
