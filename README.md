@@ -36,6 +36,14 @@ Java版本上，目前仅支持JDK 8版本。因为使用了JDK自带的ASM框�
 + 配置项目JVM参数
     + 项目的启动参数`-vm`中，添加 `-javaagent:/XXX/galois.jar` (jar包的绝对路径)，以Windows系统举例，配置为
       `-javaagent:N:\IdeaProjects\galois\target\galois-jar-with-dependencies.jar`
+    + 可选参数说明
+      + **galois.includes**
+        + 指定galois仅扫描的路径，多个路径通过 **;** 隔开，默认galois扫描整个工程路径
+        + 举例：`-javaagent:N:\IdeaProjects\galois\target\galois-jar-with-dependencies.jar -Dgalois.
+          includes=N:\IdeaProjects\galois\target\;N:\IdeaProjects\galois\demo\ `
+      + **galois.excludes**
+        + 指定galois排除扫描的路径，多个路径通过 **;** 隔开
+        + *注意：excludes策略总是优先于includes策略*
 + 配置你的项目的控制台日志Logger，可以直观看到galois的运行状态
    ```xml
    <logger name="io.liuguangsheng.galois" level="INFO"/>

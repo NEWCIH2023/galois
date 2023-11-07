@@ -25,17 +25,19 @@
 package io.liuguangsheng.galois.service.monitor;
 
 import io.liuguangsheng.galois.utils.GaloisLog;
+import io.liuguangsheng.galois.utils.StringUtil;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.slf4j.Logger;
 
 import java.io.FileFilter;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static io.liuguangsheng.galois.constants.Constant.COMMA;
+import static io.liuguangsheng.galois.constants.Constant.SEMICOLON;
 
 /**
  * The type Apache file watch service.
@@ -45,6 +47,9 @@ import static io.liuguangsheng.galois.constants.Constant.COMMA;
  */
 public class ApacheFileWatchService extends FileWatchService {
     private static final Logger logger = new GaloisLog(ApacheFileWatchService.class);
+
+    private static final String GALOIS_INCLUDES = "galois.includes";
+    private static final String GALOIS_EXCLUDES = "galois.excludes";
     private static final long interval = 1000;
 
     private static class ApacheFileWatchServiceHolder {
@@ -55,18 +60,47 @@ public class ApacheFileWatchService extends FileWatchService {
         return ApacheFileWatchServiceHolder.instance;
     }
 
-    @Override
-    public void start() {
-        URL buildUrl = getClass().getClassLoader().getResource("");
-        Objects.requireNonNull(buildUrl, "Can't get build path by classLoader.");
-        String buildPath = buildUrl.getPath();
-        FileFilter fileFilter = pathname -> !pathname.toURI().getPath().startsWith(buildPath);
+    private FileFilter getFileFilter() {
+        List<String> excludePaths = new ArrayList<>();
+        List<String> includePaths = new ArrayList<>();
 
-        if (buildPath != null) {
-            logger.info("Ignored build path [{}].", buildPath);
+        String includeProperty = System.getProperty(GALOIS_INCLUDES);
+        String excludeProperty = System.getProperty(GALOIS_EXCLUDES);
+
+        if (StringUtil.isNotBlank(excludeProperty)) {
+            excludePaths.addAll(Arrays.asList(excludeProperty.trim().split(SEMICOLON)));
         }
 
-        FileAlterationObserver observer = new FileAlterationObserver(rootPath, fileFilter);
+        if (StringUtil.isNotBlank(includeProperty)) {
+            includePaths.addAll(Arrays.asList(includeProperty.trim().split(SEMICOLON)));
+        }
+
+        FileFilter fileFilter = pathname -> {
+            String cur = pathname.getPath();
+            boolean keepFlag = true;
+
+            if (!excludePaths.isEmpty()) {
+                keepFlag = excludePaths.stream().noneMatch(cur::startsWith);
+            }
+            if (!includePaths.isEmpty()) {
+                keepFlag = includePaths.stream().anyMatch(
+                        path -> path.length() > cur.length()
+                                ? path.startsWith(cur)
+                                : cur.startsWith(path)
+                );
+            }
+
+            return keepFlag;
+        };
+
+        logger.info("include path [{}], exclude path [{}].", String.join(COMMA, includePaths), String.join(COMMA,
+                excludePaths));
+        return fileFilter;
+    }
+
+    @Override
+    public void start() {
+        FileAlterationObserver observer = new FileAlterationObserver(rootPath, getFileFilter());
 
         try {
             listeners.stream().map(ApacheFileChangedListener::new).forEach(observer::addListener);
