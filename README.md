@@ -5,7 +5,7 @@
 一个开源的springboot项目热部署工具，基于JavaAgent +
 ASM方式，在项目启动阶段，动态获取SpringBoot框架及MyBatis框架的重点对象，并通过监听项目本地文件变更，来实现实体或MyBatis的Mapper
 热更新。支持MyBatis、SpringBoot等框架的代码热部署。
-Java版本上，目前仅支持JDK 8版本。因为使用了JDK自带的ASM框架，因此暂无适配其它Java版本。
+Java版本上，目前仅实测支持JDK 8版本。因为使用了JDK自带的ASM框架，因此其它Java版本暂未测试，理论上都是通用的。
 
 ## 软件架构
 
