@@ -31,12 +31,19 @@ Java版本上，目前仅实测支持JDK 8版本。因为使用了JDK自带的AS
   ，这是一个最高支持到JDK 8的JVM插件，用来拓展idea刷新class变动的能力，使其支持属性级别，方法级别的热更新能力。该项目`DCEVM`
   仅是一个推荐工具，与该开源项目并无直接关系，不是必须要求。
 + 打包可用jar包
-    + 更新完maven依赖后，能在 `Plugins` 找到 `assembly`插件，需要通过 `assembly:assembly`
+    + 更新完maven依赖后，通过 `mvn clean package`
       来打包可用jar包，可用jar包的名称为 `galois-jar-with-dependencies.jar`，位于 `target`目录下
-    + 完整的mvn打包配置为 `mvn clean assembly:assembly`
 + 配置项目JVM参数
-    + 项目的启动参数`-vm/vm options`中，添加 `-javaagent:/XXX/galois.jar` (jar包的绝对路径)，以Windows系统举例，配置为
+    + 项目的启动参数`-vm`中，添加 `-javaagent:/XXX/galois.jar` (jar包的绝对路径)，以Windows系统举例，配置为
       `-javaagent:N:\IdeaProjects\galois\target\galois-jar-with-dependencies.jar`
+    + 可选参数说明
+      + **galois.includes**
+        + 指定galois仅扫描的路径，多个路径通过 **;** 隔开，默认galois扫描整个工程路径
+        + 举例：`-javaagent:N:\IdeaProjects\galois\target\galois-jar-with-dependencies.jar -Dgalois.
+          includes=N:\IdeaProjects\galois\target\;N:\IdeaProjects\galois\demo\ `
+      + **galois.excludes**
+        + 指定galois排除扫描的路径，多个路径通过 **;** 隔开
+        + *注意：excludes策略总是优先于includes策略*
 + 配置你的项目的控制台日志Logger，可以直观看到galois的运行状态
    ```xml
    <logger name="io.liuguangsheng.galois" level="INFO"/>
