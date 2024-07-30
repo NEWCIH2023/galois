@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) [2023] [liuguangsheng]
+ * Copyright (c) [2024] [$user]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,6 +43,7 @@ import org.springframework.core.io.Resource;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -56,18 +57,35 @@ import static io.liuguangsheng.galois.constants.Constant.*;
 @LazyBean(value = "MyBatisBeanReloader", manager = MyBatisAgentService.class)
 public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigurationVisitor.NecessaryMethods {
     private static final Logger logger = new GaloisLog(MyBatisBeanReloader.class);
-    protected Configuration configuration;
     private static final String NODE_MAPPER = "/mapper";
-
-    private static class MyBatisBeanReloaderHolder {
-        private static final MyBatisBeanReloader instance = new MyBatisBeanReloader();
-    }
+    protected Configuration configuration;
 
     private MyBatisBeanReloader() {
     }
 
     public static MyBatisBeanReloader getInstance() {
         return MyBatisBeanReloaderHolder.instance;
+    }
+
+    public static String applyCurrentNamespace(String base, boolean isReference, String namespace) {
+        if (base == null) {
+            return null;
+        }
+
+        if (isReference) {
+            if (base.contains(DOT)) {
+                return base;
+            }
+        } else {
+            if (base.startsWith(namespace + DOT)) {
+                return base;
+            }
+            if (base.contains(DOT)) {
+                throw new BuilderException("Dots are not allowed in element names, please remove it from " + base);
+            }
+        }
+
+        return namespace + DOT + base;
     }
 
     @Override
@@ -81,11 +99,10 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
 
             updateSingleBean(mapperLocation, namespace);
             Set<Resource> files = getAllNamespaceFile(namespace);
-            Set<Resource> mappers =
-                    files.stream()
-                            .filter(resource -> !resource.toString()
-                                    .contains(Objects.requireNonNull(mapperLocation.getFilename())))
-                            .collect(Collectors.toSet());
+            Set<Resource> mappers = files.stream()
+                    .filter(resource -> !resource.toString()
+                            .contains(Objects.requireNonNull(mapperLocation.getFilename())))
+                    .collect(Collectors.toSet());
 
             for (Resource resource : mappers) {
                 updateSingleBean(resource, namespace);
@@ -98,10 +115,13 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
     }
 
     private void updateSingleBean(Resource mapperLocation, String namespace) {
+        if (mapperLocation == null || namespace == null || namespace.trim().isEmpty()) {
+            logger.error("Invalid input parameters for updating single bean.");
+            return;
+        }
 
-        try {
-            XPathParser parser = new XPathParser(mapperLocation.getInputStream(), true, configuration.getVariables(),
-                    new XMLMapperEntityResolver());
+        try (InputStream in = mapperLocation.getInputStream()) {
+            XPathParser parser = new XPathParser(in, true, configuration.getVariables(), new XMLMapperEntityResolver());
             XNode context = parser.evalNode("/mapper");
 
             clearLoadedResources(mapperLocation);
@@ -124,15 +144,24 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
         return true;
     }
 
+    /**
+     * 检查当前实例是否已准备好可以使用。
+     * 此方法用于确定MybatisBeanReloader是否已经成功初始化并配置了必要的设置。
+     *
+     * @return 如果已准备好，则返回true；如果未准备好，例如配置对象为null，则返回false。
+     */
     @Override
     public boolean isReady() {
+        // 检查配置对象是否为null，如果是，则记录错误并返回false
         if (configuration == null) {
             logger.error("MybatisBeanReloader not prepare ready. Configuration object is null.");
             return false;
         }
 
+        // 如果配置对象不为null，说明已经准备好，返回true
         return true;
     }
+
 
     private Set<Resource> getAllNamespaceFile(String namespace) {
         try {
@@ -268,24 +297,7 @@ public class MyBatisBeanReloader implements BeanReloader<File>, MyBatisConfigura
         this.configuration = configuration;
     }
 
-    public static String applyCurrentNamespace(String base, boolean isReference, String namespace) {
-        if (base == null) {
-            return null;
-        }
-
-        if (isReference) {
-            if (base.contains(DOT)) {
-                return base;
-            }
-        } else {
-            if (base.startsWith(namespace + DOT)) {
-                return base;
-            }
-            if (base.contains(DOT)) {
-                throw new BuilderException("Dots are not allowed in element names, please remove it from " + base);
-            }
-        }
-
-        return namespace + DOT + base;
+    private static class MyBatisBeanReloaderHolder {
+        private static final MyBatisBeanReloader instance = new MyBatisBeanReloader();
     }
 }
