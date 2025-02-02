@@ -1,27 +1,3 @@
-/*
- * MIT License
- *
- * Copyright (c) [2023] [liuguangsheng]
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package io.liuguangsheng.galois.conf;
 
 import io.liuguangsheng.galois.constants.Constant;
@@ -30,6 +6,7 @@ import io.liuguangsheng.galois.utils.StringUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * global configuration service
@@ -40,7 +17,7 @@ import java.util.Properties;
 public class GlobalConfiguration {
 
     private static final String GALOIS_PROPERTIES = "galois.properties";
-    private static final Properties configuration = new Properties();
+    private static final ConcurrentHashMap<String, String> configuration = new ConcurrentHashMap<>();
 
     private static class GlobalConfigurationHolder {
         private static final GlobalConfiguration globalConfiguration = new GlobalConfiguration();
@@ -48,10 +25,18 @@ public class GlobalConfiguration {
 
     private GlobalConfiguration() {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        if (loader == null) {
+            throw new IllegalStateException("ClassLoader is null");
+        }
         try (InputStream is = loader.getResourceAsStream(GALOIS_PROPERTIES)) {
-            configuration.load(is);
+            if (is == null) {
+                throw new IOException("Configuration file not found: " + GALOIS_PROPERTIES);
+            }
+            Properties props = new Properties();
+            props.load(is);
+            props.stringPropertyNames().forEach(key -> configuration.put(key, props.getProperty(key)));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to load configuration", e);
         }
     }
 
@@ -89,13 +74,8 @@ public class GlobalConfiguration {
             return defaultValue;
         }
 
-        String result = configuration.getProperty(key);
-
-        if (StringUtil.isBlank(result)) {
-            return System.getProperty(key, defaultValue);
-        }
-
-        return result;
+        String result = configuration.getOrDefault(key, System.getProperty(key, defaultValue));
+        return StringUtil.isBlank(result) ? defaultValue : result;
     }
 
     /**
@@ -116,8 +96,8 @@ public class GlobalConfiguration {
      * @return {@link boolean}
      */
     public boolean getBool(String key, boolean defaultValue) {
-        String result = getStr(key, defaultValue ? Constant.TRUE : Constant.FALSE);
-        return Constant.TRUE.equalsIgnoreCase(result);
+        String result = getStr(key, Boolean.toString(defaultValue));
+        return Boolean.parseBoolean(result);
     }
 
     /**
@@ -141,8 +121,8 @@ public class GlobalConfiguration {
         String result = getStr(key, String.valueOf(defaultValue));
         try {
             return Long.parseLong(result);
-        } catch (Exception e) {
-            return -1L;
+        } catch (NumberFormatException e) {
+            return defaultValue;
         }
     }
 
@@ -167,9 +147,8 @@ public class GlobalConfiguration {
         String result = getStr(key, String.valueOf(defaultValue));
         try {
             return Integer.parseInt(result);
-        } catch (Exception e) {
-            return -1;
+        } catch (NumberFormatException e) {
+            return defaultValue;
         }
     }
-
 }
