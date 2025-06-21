@@ -24,6 +24,9 @@
 
 package io.liuguangsheng.galois.service;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import io.liuguangsheng.galois.service.monitor.FileChangedListener;
 
 import java.util.*;
@@ -39,7 +42,7 @@ public abstract class AgentService {
     /**
      * 文件变更监听器列表
      */
-    protected List<FileChangedListener> listeners = new ArrayList<>(4);
+    protected List<FileChangedListener> listeners = new CopyOnWriteArrayList<>();
     /**
      * 对应的Bean重载的service
      */
@@ -47,11 +50,11 @@ public abstract class AgentService {
     /**
      * The Method adapters.
      */
-    protected Map<String, MethodAdapter> methodAdapterMap = new HashMap<>(32);
+    protected Map<String, MethodAdapter> methodAdapterMap = new ConcurrentHashMap<>(32);
     /**
      * 必备的加载类名称列表
      */
-    protected Set<String> necessaryClasses = new HashSet<>(8);
+    protected Set<String> necessaryClasses = ConcurrentHashMap.newKeySet();
     /**
      * 是否启用该AgentService，当该变量值与necessaryClasses的大小一致时，表示该AgentService启用
      */
@@ -88,8 +91,15 @@ public abstract class AgentService {
      * @param methodAdapter methodAdapter
      */
     public void registerMethodAdapter(MethodAdapter methodAdapter) {
-        methodAdapterMap.put(methodAdapter.getClassName(), methodAdapter);
-        necessaryClasses.add(methodAdapter.getClassName());
+        if (methodAdapter == null) {
+            throw new IllegalArgumentException("MethodAdapter cannot be null");
+        }
+        String className = methodAdapter.getClassName();
+        if (className == null || className.isEmpty()) {
+            throw new IllegalArgumentException("MethodAdapter class name cannot be null or empty");
+        }
+        methodAdapterMap.put(className, methodAdapter);
+        necessaryClasses.add(className);
     }
 
     /**
@@ -107,6 +117,9 @@ public abstract class AgentService {
      * @param listener the listener
      */
     public void registerFileChangedListener(FileChangedListener listener) {
+        if (listener == null) {
+            throw new IllegalArgumentException("FileChangedListener cannot be null");
+        }
         listeners.add(listener);
     }
 
@@ -139,6 +152,9 @@ public abstract class AgentService {
      * @param beanReloader the bean reloader
      */
     public void setBeanReloader(BeanReloader<?> beanReloader) {
+        if (beanReloader == null) {
+            throw new IllegalArgumentException("BeanReloader cannot be null");
+        }
         this.beanReloader = beanReloader;
     }
 
