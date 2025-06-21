@@ -26,6 +26,7 @@ package io.liuguangsheng.galois.service;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import io.liuguangsheng.galois.service.monitor.FileChangedListener;
 
@@ -58,7 +59,7 @@ public abstract class AgentService {
     /**
      * 是否启用该AgentService，当该变量值与necessaryClasses的大小一致时，表示该AgentService启用
      */
-    private int enabled;
+    private AtomicInteger enabled = new AtomicInteger(0);
 
     /**
      * 当前AgentService是否可启用
@@ -78,7 +79,7 @@ public abstract class AgentService {
      */
     public boolean isNecessaryClass(String loadedClassName) {
         if (necessaryClasses.contains(loadedClassName)) {
-            enabled++;
+            enabled.incrementAndGet();
             return true;
         }
 
@@ -182,7 +183,7 @@ public abstract class AgentService {
      * @return the enabled
      */
     public int getEnabled() {
-        return enabled;
+        return enabled.get();
     }
 
 }
